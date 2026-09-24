@@ -107,6 +107,18 @@ the table is the "list price" baseline.
   - **Decline** — they leave. **No penalty.** Just wait for the next spawn.
 - No haggling / counter-offers.
 
+### Security deposit
+
+- Paid **up front** when a tenant moves in (instant cash on accept).
+- Amount **varies per customer**; shown alongside their bid in the Tenant menu.
+- Refund rules: **TBD** (see open questions).
+
+### VIP tenants
+
+- Rarer prospects who **bid higher** and pay **bigger deposits**.
+- Visually distinct (e.g. gold toast / badge).
+- Spawn odds possibly tied to reputation / sign tier (**TBD**).
+
 ### Leases
 
 - Lease length is measured in **points** (`n` payouts).
@@ -164,6 +176,9 @@ More to come as RT continues.
 - Other employees beyond Manager.
 
 ## ❓ Open questions
+
+- Security deposit: refunded when a lease ends normally? Kept on abandonment? Refunded on eviction?
+- VIP odds: flat rare chance, or boosted by reputation / sign tier?
 
 - Online timer behavior when a point is ready but uncollected — see RT note on
   refresh exploit (units stall vs keep accumulating).
