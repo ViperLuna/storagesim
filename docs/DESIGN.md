@@ -176,7 +176,18 @@ When a unit is abandoned, you're offered a choice:
   (keeps things routine), but actual **rent payout is multiplied** by a
   rebirth multiplier that grows each rebirth.
   - e.g. tenant bids $11/pt; at a 1.5× multiplier each point pays $16.50.
-- Still TBD: rebirth requirement, multiplier curve, what else carries over / unlocks.
+- **Requirements stack up each rebirth** (each one pushes a new mechanic):
+
+  | Rebirth | Requirements |
+  |---|---|
+  | 1st | Money |
+  | 2nd | Money + a sign |
+  | 3rd | Money + a sign + at least one employee |
+  | 4th+ | TBD — more stacked conditions |
+
+  - Money amount scales per rebirth (math TBD).
+  - Maybe a "grid filled" condition — iffy; TBD.
+- Still TBD: multiplier curve, what else carries over / unlocks.
 
 ## Menus (draft)
 
