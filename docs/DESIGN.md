@@ -112,15 +112,15 @@ the table is the "list price" baseline.
 
 ### Security deposit
 
-- Paid **up front** when a tenant moves in (instant cash on accept).
-- Amount **varies per customer**; shown alongside their bid in the Tenant menu.
-- Refund rules: **TBD** (see open questions).
+- **Non-refundable. Never goes back.** It's just money.
+- **Deposit = the accepted bid** (one point's rent), paid instantly on move-in.
+  - e.g. accept an $11/pt bid → +$11 deposit now, +$11 at the first point = $22 on day one.
 
 ### VIP tenants
 
-- Rarer prospects who **bid higher** and pay **bigger deposits**.
-- Visually distinct (e.g. gold toast / badge).
-- Spawn odds possibly tied to reputation / sign tier (**TBD**).
+- **Rare** — gacha-feel. Higher bids (so higher deposits too), gold toast / badge.
+- **Better reputation = better VIP odds**, but always rare.
+  - *Placeholder:* ~1% at bad reputation → ~5% at max reputation.
 
 ### Leases
 
@@ -190,6 +190,4 @@ More to come as RT continues.
 
 ## ❓ Open questions
 
-- Security deposit: refunded when a lease ends normally? Kept on abandonment? Refunded on eviction?
-- VIP odds: flat rare chance, or boosted by reputation / sign tier?
 
