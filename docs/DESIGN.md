@@ -88,7 +88,7 @@ the table is the "list price" baseline.
   - Rent **accumulates** for every point a tenant was actually present.
 - You still **click to collect** the accumulated rent when you're back
   (so refreshing / going offline is not a shortcut).
-- Blocked-door units don't earn offline either.
+- Blocked-door units earn **no rent** offline either — and the tenant will likely rage-quit before you're back.
 - You may return to all-vacant, all-occupied, or a mix.
 
 ## Tenants
