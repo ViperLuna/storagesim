@@ -77,7 +77,10 @@ the table is the "list price" baseline.
 
 ## Collecting
 
-- **Click to collect** rent when a unit's point is ready.
+- Rent **accumulates on the unit** (💰 counter) — online and offline alike. Timers never stall.
+- **Click the unit to collect** its pile into your wallet. (Refreshing gains nothing.)
+- When a tenant **vacates**, the unit shows as needing attention: **clicking it collects
+  any remaining rent and cleans it out**. It can't be rented again until you do.
 - A **Manager** (hired employee) automates collecting later.
 - **Employees are paid per minute** and must be tunable so you still profit while paying them.
 
@@ -125,6 +128,17 @@ the table is the "list price" baseline.
 - At lease end the tenant either **renews** or **vacates** (packs up, unit goes vacant).
 - Some tenants **abandon**: stop paying and leave their stuff behind.
 
+### Abandoned units
+
+When a unit is abandoned, you're offered a choice:
+
+- **Fixed sale** — take the offered price now, unit is cleared immediately.
+- **Auction** — unit is locked while the auction runs (**duration scales with unit size**),
+  then pays out **more or less** than the fixed offer:
+  - ~**60%** chance of beating the offer, ~40% chance of coming in under.
+  - *Placeholder ranges:* win = 1.1×–2.0× offer, lose = 0.4×–0.9× offer (EV ≈ 1.2×).
+  - The real cost is time: the unit can't earn rent while it's up for auction.
+
 ### Complaints
 
 - A tenant whose door is unreachable → **timer pauses** and they complain:
@@ -169,7 +183,6 @@ More to come as RT continues.
 
 - **Prestige / rebirth** — what resets, what persists, what unlocks. (Viper thinking on it.)
 - **Grid expansion** model (buy chunks vs grow rows/cols).
-- **Abandoned units → auctions** (Storage Wars-style random loot).
 - Lease length ranges & renew/abandon odds.
 - Other complaint types (dirty units, break-ins → cameras/fences).
 - Non-grid advertising (newspaper/radio/online) as prestige unlocks.
@@ -180,5 +193,3 @@ More to come as RT continues.
 - Security deposit: refunded when a lease ends normally? Kept on abandonment? Refunded on eviction?
 - VIP odds: flat rare chance, or boosted by reputation / sign tier?
 
-- Online timer behavior when a point is ready but uncollected — see RT note on
-  refresh exploit (units stall vs keep accumulating).
