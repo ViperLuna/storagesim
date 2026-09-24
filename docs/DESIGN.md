@@ -25,7 +25,8 @@ to unlock more.
 
 ## The grid
 
-- Starts small, expands over time (expansion model: **TBD**).
+- Starts small. **Grid size is fixed within a run — the only way to expand is to rebirth.**
+- Grid sizes per rebirth: **TBD** (Viper working on it).
 - Has a **gate / main entrance** tile — the root of all access.
 - Walkways are **just empty tiles**. No path tiles to build.
 
@@ -167,6 +168,16 @@ When a unit is abandoned, you're offered a choice:
 
 *Placeholder.*
 
+## Rebirth (prestige)
+
+- Rebirth **resets you to zero**.
+- Each rebirth gives a **bigger grid**.
+- **Rent multiplier:** tenants' bids stay in the same familiar range every run
+  (keeps things routine), but actual **rent payout is multiplied** by a
+  rebirth multiplier that grows each rebirth.
+  - e.g. tenant bids $11/pt; at a 1.5× multiplier each point pays $16.50.
+- Still TBD: rebirth requirement, multiplier curve, what else carries over / unlocks.
+
 ## Menus (draft)
 
 - 🏗️ **Build** — units, signs
@@ -181,8 +192,7 @@ More to come as RT continues.
 
 ## 🅿️ Parked (later)
 
-- **Prestige / rebirth** — what resets, what persists, what unlocks. (Viper thinking on it.)
-- **Grid expansion** model (buy chunks vs grow rows/cols).
+- **Rebirth details** — requirement to rebirth, multiplier curve, grid sizes, extra unlocks.
 - Lease length ranges & renew/abandon odds.
 - Other complaint types (dirty units, break-ins → cameras/fences).
 - Non-grid advertising (newspaper/radio/online) as prestige unlocks.
