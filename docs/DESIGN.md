@@ -33,14 +33,20 @@ to unlock more.
 - On expansion the gate and locked tiles just drop to the new bottom row.
   - Width must be **odd** so the 3 locked tiles sit dead center (ring expansion keeps it odd).
 
+Starting layout (7×7), per Viper's sketch:
+
 ```
 . . . . . . .
 . . . . . . .
 . . . . . . .
-. . L L L . .
+. . . . . . .
+. . . . . . .
+O O . . . . .
+O O L L L . .
     ═GATE═
 ```
-- Starting size: **TBD** (Viper working on it).
+`O` = office (2×2), `L` = locked entrance tiles.
+- Starting size: **7×7**.
 - Walkways are **just empty tiles**. No path tiles to build.
 
 ## Placement (sandbox)
@@ -204,7 +210,8 @@ When a unit is abandoned, you're offered a choice:
 
 ## Office
 
-- A structure on the grid — **3×3** to start. Holds **1 staff member**.
+- A structure on the grid — **2×2** for the first office. Holds **1 staff member**.
+- Sketch shows it in the **bottom-left corner**, next to the locked tiles (fixed vs movable — TBD).
 - **Staff need an office slot** — no office, no employees.
 - The first employee available is the **Janitor**.
 - More staff slots / more employee types come with rebirths (TBD: bigger office tiers vs
