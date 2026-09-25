@@ -203,6 +203,8 @@ When a unit is abandoned, you're offered a choice:
   - **Uncaught burglaries.** Tenants of **adjacent units may pull out** too.
 - **Does NOT lower rating:** abandonments (you already lose that unit's rent until you deal with it).
   - **Evictions** (selling an occupied unit).
+  - **Units left dirty too long** — only after several ticks (*placeholder:* ~3 ticks / 15 min),
+    so a janitor on his rounds never triggers it.
 - **Raising rating:** climbs **passively** on a tick (*placeholder:* every 5 minutes, same as payroll)
   as long as the place is maintained — no angry tenants, no blackouts, etc. Needs playtesting.
 - **Zero rating = lose the level** (restart current rebirth), same as bankruptcy.
