@@ -304,8 +304,9 @@ When a unit is abandoned, you're offered a choice:
 - The **power grid can be upgraded** for more capacity — each upgrade gets pricier.
   (Upgrade uses the usual ghost flow if the footprint grows.)
 - **No utility bill.** Electricity is capacity only; the cost is in buying/upgrading the grid.
-- Still TBD: over-capacity behavior (draft: newest units lose power → no rent + complaint),
-  whether the office counts against the free allowance.
+- The free allowance covers **storage units only**. The office always draws from the power grid —
+  it's expensive enough that you'll have more than 5 units (and a grid) by the time you can afford it.
+- Still TBD: over-capacity behavior (draft: newest units lose power → no rent + complaint).
 
 ## Cameras (overlay layer)
 
