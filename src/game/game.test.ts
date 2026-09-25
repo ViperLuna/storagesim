@@ -202,12 +202,15 @@ describe('grammar', () => {
 })
 
 describe('offline safety', () => {
-  it('a long absence with dirty units never ends the level or sinks rating below 1', () => {
+  it('rating never drops while offline, even with problems', () => {
     const s = createRun(0)
     for (const it of s.items) { it.unit!.status = 'dirty'; it.unit!.dirtySince = 0 }
+    s.money = 1e6
+    for (let i = 0; i < 6; i++) place(s, 'unit', 'locker', i, 0, 0) // overload → blackout the whole time
+    const before = s.rating
     catchUp(s, 48 * 3600)
     expect(s.levelOver).toBeUndefined()
-    expect(s.rating).toBeGreaterThanOrEqual(1)
+    expect(s.rating).toBe(before)
   })
   it('online, neglected dirty units still hurt', () => {
     const s = createRun(0)

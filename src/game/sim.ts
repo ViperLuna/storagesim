@@ -154,12 +154,11 @@ function businessTick(state: GameState, offline: boolean) {
   }
   if (state.tripped) issues++
 
-  if (issues) state.rating -= E.RATING_LOSS_PER_ISSUE * issues
-  else state.rating = Math.min(E.RATING_MAX, state.rating + E.RATING_GAIN_PER_TICK)
+  // Your rating never drops while you're away; it can still climb if everything's running clean.
+  if (issues && !offline) state.rating -= E.RATING_LOSS_PER_ISSUE * issues
+  else if (!issues) state.rating = Math.min(E.RATING_MAX, state.rating + E.RATING_GAIN_PER_TICK)
 
   if (offline) {
-    // Never lose the level in your sleep.
-    state.rating = Math.max(state.rating, Math.min(E.OFFLINE_RATING_FLOOR, state.ratingAtLastTick))
     state.failStrikes = 0
   } else if (state.rating <= 0) {
     if (state.rating <= state.ratingAtLastTick) state.failStrikes++
