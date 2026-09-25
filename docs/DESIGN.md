@@ -33,7 +33,7 @@ to unlock more.
 - On expansion the gate and locked tiles just drop to the new bottom row.
   - Width must be **odd** so the 3 locked tiles sit dead center (ring expansion keeps it odd).
 
-Starting layout (7×7), per Viper's sketch:
+Example layout (7×7), per Viper's sketch — the office is placed by the player, not fixed:
 
 ```
 . . . . . . .
@@ -211,12 +211,12 @@ When a unit is abandoned, you're offered a choice:
 ## Office
 
 - A structure on the grid — **2×2** for the first office. Holds **1 staff member**.
-- Sketch shows it in the **bottom-left corner**, next to the locked tiles (fixed vs movable — TBD).
+- **Player-placed** like everything else (sandbox). Move/sell/upgrade rules apply.
 - **Staff need an office slot** — no office, no employees.
 - The first employee available is the **Janitor**.
 - More staff slots / more employee types come with rebirths (TBD: bigger office tiers vs
   second office; likely one office per plot upgraded via the same upgrade-ghost flow as signs).
-- Probably needs door access like units (staff have to get in) — TBD.
+- **Needs an accessible door**, same rule as units. Blocked office = staff can't work.
 
 ## Employees
 
@@ -224,6 +224,11 @@ When a unit is abandoned, you're offered a choice:
 - Each employee takes an **office slot**.
 - **Manager** — auto-collects rent.
 - **Janitor** — auto-cleans vacated units (so they're ready to rent again).
+  - Shown as a **dot that walks the pathways** (empty tiles) from the office door to the
+    dirty unit's door, cleans it, then heads to the next job or back to the office.
+  - Uses the shortest path (BFS). Can't reach a unit → can't clean it.
+  - **Upgrades:** movement speed, cleaning speed.
+  - Job order (nearest vs oldest first) — TBD.
 - **Security guard** — possible late-game option (TBD); cameras are the main security.
 
 ## Cameras (overlay layer)
