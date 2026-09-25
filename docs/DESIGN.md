@@ -318,7 +318,7 @@ When a unit is abandoned, you're offered a choice:
 - **Unlock order (locked):** **Janitor → Security → Leasing Agent → Manager**.
   - Security arrives with the ~5th rebirth (3×3 office, cameras, burglaries).
   - Security is a staff member watching the monitors → 3×3 office needs **2 slots** (Janitor + Security).
-  - **Leasing Agent at rebirth 10** (with the next office). Manager TBD (likely a later milestone).
+  - **Leasing Agent at rebirth 10** (with the next office). **Manager at rebirth 15 or 20** (playtest).
 - **Janitor** — auto-cleans vacated units (so they're ready to rent again).
   - Shown as a **dot that walks the pathways** (empty tiles) from the office door to the
     dirty unit's door, cleans it, then heads to the next job or back to the office.
@@ -392,6 +392,7 @@ Rebirths unlock new stuff, not just a bigger grid.
 | Start | Begins with ~3 cheap units. Buildable: storage units, **small sign**, 2×2 office + Janitor |
 | 5th (17×17) | **Burglaries** begin; **cameras** unlocked; **3×3 office** + Security staff |
 | 10th (27×27) | **Next office size** + **Leasing Agent** (size/slots TBD) |
+| 15th or 20th | **Manager** (decide in playtesting) |
 | Later | TBD |
 
 ## Title screen
