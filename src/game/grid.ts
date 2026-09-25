@@ -61,3 +61,48 @@ export function isAccessible(state: GameState, item: Item, reach: Set<number>): 
   if (ox < 0 || oy < 0 || ox >= state.size || oy >= state.size) return false
   return reach.has(oy * state.size + ox)
 }
+
+/**
+ * Breadth-first search over empty tiles from (sx, sy). The start tile always counts as walkable
+ * (someone may be standing where a building just went down). Returns distances and parents for paths.
+ */
+export function bfsFrom(state: GameState, sx: number, sy: number): { dist: Int32Array; prev: Int32Array } {
+  const n = state.size
+  const occ = occupancy(state)
+  const dist = new Int32Array(n * n).fill(-1)
+  const prev = new Int32Array(n * n).fill(-1)
+  if (sx < 0 || sy < 0 || sx >= n || sy >= n) return { dist, prev }
+  const start = sy * n + sx
+  dist[start] = 0
+  const queue = [start]
+  for (let qi = 0; qi < queue.length; qi++) {
+    const k = queue[qi]
+    const x = k % n, y = (k - x) / n
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nx = x + dx, ny = y + dy
+      if (nx < 0 || ny < 0 || nx >= n || ny >= n) continue
+      const nk = ny * n + nx
+      if (dist[nk] >= 0 || occ.has(nk)) continue
+      dist[nk] = dist[k] + 1
+      prev[nk] = k
+      queue.push(nk)
+    }
+  }
+  return { dist, prev }
+}
+
+/** Tiles to walk from the BFS start to (tx, ty), excluding the start tile. */
+export function pathTo(state: GameState, prev: Int32Array, tx: number, ty: number): [number, number][] {
+  const n = state.size
+  const out: [number, number][] = []
+  let k = ty * n + tx
+  while (prev[k] >= 0) {
+    out.push([k % n, Math.floor(k / n)])
+    k = prev[k]
+  }
+  return out.reverse()
+}
+
+export function isWalkable(state: GameState, x: number, y: number, occ = occupancy(state)): boolean {
+  return x >= 0 && y >= 0 && x < state.size && y < state.size && !occ.has(y * state.size + x)
+}

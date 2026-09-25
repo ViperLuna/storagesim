@@ -5,7 +5,7 @@ import { catchUp, step } from './game/sim'
 
 const SAVE_KEY = 'storagesim.save.v1'
 
-export type Menu = 'build' | 'tenants' | 'rebirth' | 'log' | 'settings' | null
+export type Menu = 'build' | 'tenants' | 'staff' | 'money' | 'rebirth' | 'log' | 'settings' | null
 
 export interface Placing {
   mode: 'new' | 'move' | 'upgrade'
@@ -53,11 +53,19 @@ function loadSave(): GameState | null {
   try {
     const raw = localStorage.getItem(SAVE_KEY)
     if (!raw) return null
-    const g = JSON.parse(raw) as GameState
-    return g.version === 1 ? g : null
+    return migrate(JSON.parse(raw))
   } catch {
     return null
   }
+}
+
+/** Bring older saves up to the current shape. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function migrate(g: any): GameState | null {
+  if (g.version === 1) {
+    Object.assign(g, { version: 2, staff: [], upgrades: {}, bankruptStrikes: 0, cashAtLastPayroll: g.money })
+  }
+  return g.version === 2 ? (g as GameState) : null
 }
 
 function writeSave(g: GameState) {

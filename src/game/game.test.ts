@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createRun } from './init'
 import { canPlace, isAccessible, reachable } from './grid'
 import { doorOutside } from './geometry'
-import { place, offerUnit, collect, sell } from './actions'
+import { place, offerUnit, collect, sell, hire, takeLoan } from './actions'
 import { step, catchUp } from './sim'
 import { isTripped, powerDraw } from './power'
 import { UNITS } from '../data/units'
@@ -116,5 +116,77 @@ describe('power', () => {
     expect(isTripped(s)).toBe(true)
     place(s, 'generator', 'gen-1', 4, 0, 0)
     expect(isTripped(s)).toBe(false)
+  })
+})
+
+describe('office & janitor', () => {
+  const setup = () => {
+    const s = createRun(0)
+    s.money = 1e6
+    place(s, 'generator', 'gen-1', 6, 0, 0)
+    // Office in the top-left, door facing down.
+    expect(place(s, 'office', 'office-small', 0, 0, 0)).toBeNull()
+    expect(hire(s, 'janitor')).toBeNull()
+    return s
+  }
+  it('needs an office with a free slot', () => {
+    const s = createRun(0)
+    s.money = 1e6
+    expect(hire(s, 'janitor')).not.toBeNull()
+    const t = setup()
+    expect(hire(t, 'janitor')).not.toBeNull() // max 1 / 1 slot
+  })
+  it('walks to the nearest dirty unit and cleans it', () => {
+    const s = setup()
+    const far = s.items[2], near = s.items[0]
+    far.unit!.status = 'dirty'; far.unit!.dirtySince = 0
+    near.unit!.status = 'dirty'; near.unit!.dirtySince = 0
+    step(s, 0.1)
+    expect(s.staff[0].targetId).toBe(near.id)
+    for (let i = 0; i < 200; i++) step(s, 0.25)
+    expect(near.unit!.status).toBe('vacant')
+    expect(far.unit!.status).toBe('vacant')
+  })
+  it('does nothing when the office has no power', () => {
+    const s = setup()
+    s.items.find(i => i.kind === 'office')!.on = false
+    s.items[0].unit!.status = 'dirty'
+    for (let i = 0; i < 200; i++) step(s, 0.25)
+    expect(s.items[0].unit!.status).toBe('dirty')
+  })
+})
+
+describe('payroll, loans, bankruptcy', () => {
+  it('pays wages each tick and goes bankrupt after 3 strikes in the red', () => {
+    const s = createRun(0)
+    s.money = 1e6
+    place(s, 'generator', 'gen-1', 6, 0, 0)
+    place(s, 'office', 'office-small', 0, 0, 0)
+    hire(s, 'janitor')
+    s.money = 0
+    s.cashAtLastPayroll = 0
+    for (let i = 0; i < 3 && !s.levelOver; i++) step(s, 300)
+    expect(s.levelOver).toBe('bankrupt')
+  })
+  it('offline payroll pauses at $0', () => {
+    const s = createRun(0)
+    s.money = 1e6
+    place(s, 'generator', 'gen-1', 6, 0, 0)
+    place(s, 'office', 'office-small', 0, 0, 0)
+    hire(s, 'janitor')
+    s.money = 60
+    catchUp(s, 3600)
+    expect(s.money).toBeGreaterThanOrEqual(-50)
+    expect(s.levelOver).toBeUndefined()
+  })
+  it('loan has a grace period then auto-repays', () => {
+    const s = createRun(0)
+    expect(takeLoan(s)).toBeNull()
+    expect(s.money).toBe(1000)
+    expect(takeLoan(s)).not.toBeNull()
+    for (let i = 0; i < 6; i++) step(s, 300)
+    expect(s.money).toBe(1000)
+    step(s, 300)
+    expect(s.money).toBeCloseTo(1000 - 125)
   })
 })

@@ -1,5 +1,5 @@
 export type Rot = 0 | 1 | 2 | 3
-export type ItemKind = 'unit' | 'sign' | 'generator'
+export type ItemKind = 'unit' | 'sign' | 'generator' | 'office'
 
 export interface Tenant {
   name: string
@@ -74,8 +74,27 @@ export interface OfflineSummary {
   auctions: number
 }
 
+export interface Staff {
+  id: number
+  role: string
+  /** Tile coordinates (fractional while walking). */
+  x: number
+  y: number
+  mode: 'idle' | 'toJob' | 'cleaning' | 'toOffice'
+  /** Remaining tiles to walk. */
+  path: [number, number][]
+  targetId?: number
+  cleanLeft: number
+}
+
+export interface Loan {
+  owed: number
+  installment: number
+  graceLeft: number
+}
+
 export interface GameState {
-  version: 1
+  version: 2
   rebirth: number
   size: number
   money: number
@@ -95,6 +114,11 @@ export interface GameState {
   /** Item currently picked up (timer paused). */
   heldId?: number
   levelOver?: 'rating' | 'bankrupt'
+  staff: Staff[]
+  upgrades: Record<string, number>
+  loan?: Loan
+  bankruptStrikes: number
+  cashAtLastPayroll: number
   lastSaved: number
   /** Items whose power is out this frame (derived, but cached for UI). */
   tripped: boolean

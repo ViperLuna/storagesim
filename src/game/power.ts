@@ -1,7 +1,7 @@
 import type { GameState, Item } from './types'
 import { FREE_POWER } from '../data/power'
 import { UNIT_POWER_PER_TILE } from '../data/units'
-import { genDef, signDef, unitDef } from './defs'
+import { genDef, officeDef, signDef, unitDef } from './defs'
 
 export function itemDraw(item: Item): number {
   if (item.kind === 'unit') {
@@ -9,6 +9,7 @@ export function itemDraw(item: Item): number {
     return d.w * d.h * UNIT_POWER_PER_TILE
   }
   if (item.kind === 'sign') return signDef(item.defId).power
+  if (item.kind === 'office') return officeDef(item.defId).power
   return 0
 }
 

@@ -1,5 +1,5 @@
 import { useStore, type Menu } from '../store'
-import { money } from '../game/format'
+import { duration, money } from '../game/format'
 import { powerCapacity, powerDraw } from '../game/power'
 import { stars } from '../game/tenants'
 import { rentMultiplierFor } from '../data/rebirths'
@@ -14,6 +14,7 @@ export function Hud() {
       <Stat label="Cash" value={money(g.money)} tone={g.money < 0 ? 'bad' : undefined} />
       <Stat label="Rating" value={<Stars value={st} />} tone={g.failStrikes ? 'bad' : undefined} />
       <Stat label="POWER" value={`${fmt(draw)} / ${fmt(cap)}`} tone={g.tripped ? 'bad' : draw > cap * 0.85 ? 'warn' : undefined} />
+      {(g.staff.length > 0 || g.loan) && <Stat label="Payday" value={duration(g.tickIn)} tone={g.bankruptStrikes ? 'bad' : undefined} />}
       <Stat label="Rebirth" value={`#${g.rebirth} · ×${rentMultiplierFor(g.rebirth)}`} />
       <Stat label="Lot" value={`${g.size}×${g.size}`} />
     </header>
@@ -45,6 +46,8 @@ export function Stars({ value }: { value: number }) {
 const NAV: { id: Exclude<Menu, null>; icon: string; label: string }[] = [
   { id: 'build', icon: '🏗️', label: 'Build' },
   { id: 'tenants', icon: '🧍', label: 'Tenants' },
+  { id: 'staff', icon: '👷', label: 'Staff' },
+  { id: 'money', icon: '💰', label: 'Money' },
   { id: 'rebirth', icon: '🔁', label: 'Rebirth' },
   { id: 'log', icon: '📜', label: 'Log' },
   { id: 'settings', icon: '⚙️', label: 'Settings' },

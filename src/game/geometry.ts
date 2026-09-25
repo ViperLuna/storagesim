@@ -1,16 +1,10 @@
 import type { Item, Rot } from './types'
-import { UNITS } from '../data/units'
-import { SIGNS } from '../data/signs'
-import { GENERATORS } from '../data/power'
+import { defSize } from './defs'
 
 export interface Footprint { w: number; h: number }
 
 export function baseSize(kind: Item['kind'], defId: string): Footprint {
-  const def = kind === 'unit' ? UNITS.find(d => d.id === defId)
-    : kind === 'sign' ? SIGNS.find(d => d.id === defId)
-    : GENERATORS.find(d => d.id === defId)
-  if (!def) throw new Error(`Unknown ${kind} ${defId}`)
-  return { w: def.w, h: def.h }
+  return defSize(kind, defId)
 }
 
 /** Size after rotation: odd rotations swap width/height. */

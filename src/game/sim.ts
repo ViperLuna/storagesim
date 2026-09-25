@@ -10,6 +10,7 @@ import { log } from './log'
 import { expWait, rand, randInt, weighted } from './random'
 import { makeProspect, stars } from './tenants'
 import { money } from './format'
+import { payrollTotal, stepStaff } from './staff'
 
 export interface StepOptions {
   offline?: boolean
@@ -98,7 +99,51 @@ function updateOccupied(state: GameState, item: Item, reach: Set<number>, dt: nu
   }
 }
 
-function businessTick(state: GameState) {
+/** Payroll, loan repayment, and the bankruptcy check. Offline, payroll pauses once cash hits $0. */
+function payday(state: GameState, offline: boolean) {
+  const wages = payrollTotal(state)
+  const loan = state.loan
+  if (offline && state.money <= 0) return
+  if (wages > 0) {
+    state.money -= wages
+    log(state, `💸 Payroll: -${money(wages)}`, { toast: !offline })
+  }
+  if (loan) {
+    if (loan.graceLeft > 0) loan.graceLeft--
+    else {
+      const pay = Math.min(loan.installment, loan.owed)
+      state.money -= pay
+      loan.owed -= pay
+      log(state, `🏦 Loan payment: -${money(pay)} (${money(loan.owed)} left)`, { toast: !offline })
+      if (loan.owed <= 0.005) {
+        state.loan = undefined
+        log(state, `🏦 Loan paid off!`, { tone: 'good', toast: true })
+      }
+    }
+  }
+  if (wages === 0 && !loan) {
+    state.bankruptStrikes = 0
+    state.cashAtLastPayroll = state.money
+    return
+  }
+  if (state.money < 0 && !offline) {
+    if (state.money <= state.cashAtLastPayroll) state.bankruptStrikes++
+    else state.bankruptStrikes = 0
+    if (state.bankruptStrikes >= E.FAIL_STRIKES) {
+      state.levelOver = 'bankrupt'
+      log(state, `💀 Bankrupt. The bank took the keys.`, { tone: 'bad', toast: true })
+    } else if (state.bankruptStrikes > 0) {
+      log(state, `⚠️ In the red and not recovering! Strike ${state.bankruptStrikes}/${E.FAIL_STRIKES} — sell something, fire someone, or take a loan.`, { tone: 'bad', toast: true })
+    }
+  } else {
+    state.bankruptStrikes = 0
+  }
+  state.cashAtLastPayroll = state.money
+}
+
+function businessTick(state: GameState, offline: boolean) {
+  payday(state, offline)
+  if (state.levelOver) return
   let issues = 0
   for (const it of state.items) {
     const u = it.unit
@@ -145,6 +190,8 @@ export function step(state: GameState, dt: number, opts: StepOptions = {}): void
     else if (u.status === 'auction' && state.time >= (u.auctionEndsAt ?? 0)) finishAuction(state, item, opts.summary)
   }
 
+  stepStaff(state, dt)
+
   // Prospects: nobody's at the desk while you're offline, so no new arrivals then.
   const before = state.prospects.length
   state.prospects = state.prospects.filter(p => state.time - p.arrivedAt < T.PROSPECT_PATIENCE)
@@ -160,7 +207,7 @@ export function step(state: GameState, dt: number, opts: StepOptions = {}): void
   state.tickIn -= dt
   while (state.tickIn <= 0 && !state.levelOver) {
     state.tickIn += E.TICK_SECONDS
-    businessTick(state)
+    businessTick(state, !!opts.offline)
   }
 }
 

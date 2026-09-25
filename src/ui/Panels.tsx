@@ -8,6 +8,11 @@ import { money, duration } from '../game/format'
 import { unitDef } from '../game/defs'
 import * as A from '../game/actions'
 import { startPlacing } from './placing'
+import { OFFICES } from '../data/office'
+import { STAFF, UPGRADES } from '../data/staff'
+import { LOAN_GRACE, LOAN_INSTALLMENTS, LOAN_INTEREST, loanAmountFor } from '../data/bank'
+import { FAIL_STRIKES, TICK_SECONDS } from '../data/economy'
+import { janitorCleanTime, janitorSpeed, office, officeSlots, payrollTotal, staffBlocker } from '../game/staff'
 import { notice } from './notice'
 
 export function SidePanel() {
@@ -17,12 +22,14 @@ export function SidePanel() {
   return (
     <aside className="panel">
       <div className="panel-head">
-        <h2>{{ build: '🏗️ Build', tenants: '🧍 Tenants', rebirth: '🔁 Rebirth', log: '📜 Message Log', settings: '⚙️ Settings' }[menu]}</h2>
+        <h2>{{ build: '🏗️ Build', tenants: '🧍 Tenants', staff: '👷 Staff', money: '💰 Money', rebirth: '🔁 Rebirth', log: '📜 Message Log', settings: '⚙️ Settings' }[menu]}</h2>
         <button className="icon-btn" onClick={() => set({ menu: null })} aria-label="Close">✕</button>
       </div>
       <div className="panel-body">
         {menu === 'build' && <BuildMenu />}
         {menu === 'tenants' && <TenantsMenu />}
+        {menu === 'staff' && <StaffMenu />}
+        {menu === 'money' && <MoneyMenu />}
         {menu === 'rebirth' && <RebirthMenu />}
         {menu === 'log' && <LogMenu />}
         {menu === 'settings' && <SettingsMenu />}
@@ -56,7 +63,15 @@ function BuildMenu() {
         : <BuildRow color={GENERATORS[0].color} name={GENERATORS[0].name} cost={GENERATORS[0].cost} money={g.money}
             detail={`${GENERATORS[0].w}×${GENERATORS[0].h} · +${GENERATORS[0].capacity}⚡ capacity`}
             onClick={() => startPlacing('generator', GENERATORS[0].id)} />}
-      <p className="muted small">Office & staff, cameras: coming in a later build.</p>
+      <h3>Office</h3>
+      {g.items.some(i => i.kind === 'office')
+        ? <p className="muted small">One office per plot. For a bigger one, sell this one and build the new one.</p>
+        : OFFICES.filter(o => o.unlockRebirth <= g.rebirth).map(o => (
+          <BuildRow key={o.id} color={o.color} name={o.name} cost={o.cost} money={g.money}
+            detail={`${o.w}×${o.h} · ${o.slots} staff slot${o.slots > 1 ? 's' : ''} · ${o.power}⚡ · door must be reachable`}
+            onClick={() => startPlacing('office', o.id)} />
+        ))}
+      <p className="muted small">Cameras: coming in a later build.</p>
     </>
   )
 }
@@ -127,6 +142,110 @@ function TenantsMenu() {
           </button>
         )
       })}
+    </>
+  )
+}
+
+function StaffMenu() {
+  const g = useStore(s => s.game)!
+  const mutate = useStore(s => s.mutate)
+  const set = useStore(s => s.set)
+  const o = office(g)
+  const slots = officeSlots(g)
+  const blocker = staffBlocker(g)
+  const wages = payrollTotal(g)
+  return (
+    <>
+      {!o && <p className="muted small">You need an office before you can hire anyone. Build one from the 🏗️ Build menu.</p>}
+      {o && <p className="small">🏢 {o.label}: {g.staff.length}/{slots} slot{slots > 1 ? 's' : ''} filled</p>}
+      {o && blocker && g.staff.length > 0 && <p className="bad small">⚠️ Staff can't work: {blocker}.</p>}
+      <h3>Hire</h3>
+      {STAFF.filter(d => d.unlockRebirth <= g.rebirth).map(d => {
+        const count = g.staff.filter(x => x.role === d.id).length
+        const err = !o ? 'Needs an office' : g.staff.length >= slots ? 'No free office slot' : count >= d.max ? `Max ${d.max} for now` : g.money < d.hireCost ? 'Not enough money' : null
+        return (
+          <div key={d.id} className="card">
+            <div className="row"><strong>{d.icon} {d.name}</strong><span className="small muted">{money(d.wage)} / payroll</span></div>
+            <div className="small muted">Walks the paths and cleans units after tenants move out. Nearest job first.</div>
+            <div className="actions">
+              <button className="good" disabled={!!err} onClick={() => {
+                const e = mutate(s => A.hire(s, d.id))
+                if (e) notice(e)
+              }}>Hire ({money(d.hireCost)})</button>
+              {err && <span className="small muted">{err}</span>}
+            </div>
+          </div>
+        )
+      })}
+      <h3>Employees ({g.staff.length})</h3>
+      {g.staff.length === 0 && <p className="muted small">Nobody yet.</p>}
+      {g.staff.map(st => {
+        const d = STAFF.find(x => x.id === st.role)!
+        const doing = blocker ? `idle — ${blocker.toLowerCase()}` : st.mode === 'idle' ? 'in the office' : st.mode === 'toJob' ? 'heading to a job' : st.mode === 'cleaning' ? 'cleaning' : 'walking back'
+        return (
+          <div key={st.id} className="card">
+            <div className="row"><strong>{d.icon} {d.name}</strong><span className="small muted">{doing}</span></div>
+            <div className="actions">
+              {st.targetId && <button onClick={() => useStore.getState().focusItem(st.targetId!)}>📍 Show job</button>}
+              <button className="bad" onClick={() => { if (confirm(`Fire the ${d.name}?`)) mutate(s => A.fire(s, st.id)) }}>Fire</button>
+            </div>
+          </div>
+        )
+      })}
+      {wages > 0 && <p className="small">Payroll: <b>{money(wages)}</b> every {duration(TICK_SECONDS)} (next in {duration(g.tickIn)}).</p>}
+      <h3>Upgrades</h3>
+      <p className="small muted">Walk speed {janitorSpeed(g).toFixed(1)} tiles/s · clean time {janitorCleanTime(g).toFixed(1)}s</p>
+      {UPGRADES.map(u => {
+        const lvl = g.upgrades[u.id] ?? 0
+        const maxed = lvl >= u.costs.length
+        const cost = u.costs[lvl]
+        return (
+          <button key={u.id} className="build-row" disabled={maxed || g.money < cost} onClick={() => {
+            const e = mutate(s => A.buyUpgrade(s, u.id))
+            if (e) notice(e)
+          }}>
+            <span className="grow"><strong>{u.name} · Lv {lvl}/{u.costs.length}</strong><span className="small muted">{u.desc}</span></span>
+            <span className="price">{maxed ? 'MAX' : money(cost)}</span>
+          </button>
+        )
+      })}
+      <button className="big" onClick={() => set({ menu: 'money' })}>💰 Payroll & bank →</button>
+    </>
+  )
+}
+
+function MoneyMenu() {
+  const g = useStore(s => s.game)!
+  const mutate = useStore(s => s.mutate)
+  const wages = payrollTotal(g)
+  const pendingRent = g.items.reduce((sum, i) => sum + (i.unit?.pending ?? 0), 0)
+  const amount = loanAmountFor(g.rebirth)
+  return (
+    <>
+      <div className="card">
+        <div className="row"><span>Cash</span><b className={g.money < 0 ? 'bad' : ''}>{money(g.money)}</b></div>
+        <div className="row"><span>Rent waiting on units</span><b>{money(pendingRent)}</b></div>
+        <div className="row"><span>Payroll</span><b>{money(wages)} / {duration(TICK_SECONDS)}</b></div>
+        {g.loan && <div className="row"><span>Loan payment</span><b>{g.loan.graceLeft > 0 ? `starts in ${g.loan.graceLeft} payrolls` : money(g.loan.installment)}</b></div>}
+        <div className="row"><span>Next payday</span><b>{duration(g.tickIn)}</b></div>
+      </div>
+      {g.bankruptStrikes > 0 && <p className="bad small">⚠️ Bankruptcy strikes: {g.bankruptStrikes}/{FAIL_STRIKES}. Each payday in the red without gaining ground is a strike.</p>}
+      <h3>🏦 Bank</h3>
+      {g.loan ? (
+        <div className="card">
+          <div className="row"><span>Still owed</span><b>{money(g.loan.owed)}</b></div>
+          <div className="small muted">{g.loan.graceLeft > 0 ? `Grace period: ${g.loan.graceLeft} more payroll${g.loan.graceLeft > 1 ? 's' : ''}.` : `${money(g.loan.installment)} comes out every payday.`}</div>
+        </div>
+      ) : (
+        <div className="card">
+          <div className="row"><span>Loan</span><b>{money(amount)}</b></div>
+          <div className="small muted">{Math.round(LOAN_INTEREST * 100)}% interest · no payments for {LOAN_GRACE} paydays · then {LOAN_INSTALLMENTS} automatic payments of {money(amount * (1 + LOAN_INTEREST) / LOAN_INSTALLMENTS)}.</div>
+          <div className="actions">
+            <button className="good" onClick={() => { if (confirm(`Borrow ${money(amount)}?`)) mutate(s => A.takeLoan(s)) }}>Take loan</button>
+          </div>
+        </div>
+      )}
+      <p className="muted small">Getting out of a hole: sell stuff, fire staff, or borrow. Payroll pauses while you're offline once you hit $0.</p>
     </>
   )
 }

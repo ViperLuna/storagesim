@@ -10,6 +10,7 @@ import { createRun } from '../game/init'
 import { cancelPlacing, commitPlacing, rotatePlacing, startMove, startUpgrade } from './placing'
 import { defCost } from '../game/defs'
 import { unlockAudio } from '../audio'
+import { officeSlots, staffBlocker } from '../game/staff'
 
 export function SelectionPanel() {
   const g = useStore(s => s.game)!
@@ -30,6 +31,7 @@ export function SelectionPanel() {
         <button className="icon-btn" onClick={() => set({ selectedId: null })} aria-label="Close">✕</button>
       </div>
       {u && <UnitInfo />}
+      {it.kind === 'office' && <OfficeInfo />}
       {draw > 0 && <div className="small">Power: {draw}⚡ · {it.on ? (isPowered(g, it) ? 'on' : 'on (grid tripped!)') : 'switched off'}</div>}
       <div className="actions">
         {u && (u.pending > 0 || u.status === 'dirty') && (
@@ -48,12 +50,26 @@ export function SelectionPanel() {
         )}
         {u?.status !== 'auction' && (
           <button className="bad" onClick={() => {
+            if (it.kind === 'office' && g.staff.length && !confirm('Sell the office? All staff will be let go.')) return
             if (u?.status === 'occupied' && !confirm(`Evict ${u.tenant!.name}? They get their ${money(u.tenant!.deposit)} deposit back and your rating takes a hit. 😬`)) return
             mutate(s => A.sell(s, it.id))
             set({ selectedId: null })
           }}>💲 Sell ({money(sellFor)})</button>
         )}
       </div>
+    </div>
+  )
+}
+
+function OfficeInfo() {
+  const g = useStore(s => s.game)!
+  const set = useStore(s => s.set)
+  const blocker = staffBlocker(g)
+  return (
+    <div className="small info">
+      <div>Staff: {g.staff.length}/{officeSlots(g)}</div>
+      {blocker && <div className="bad">⚠️ {blocker}</div>}
+      <div className="actions"><button onClick={() => set({ menu: 'staff' })}>👷 Manage staff</button></div>
     </div>
   )
 }
@@ -184,7 +200,7 @@ export function LevelOverModal() {
         <h2>💀 Level over</h2>
         <p>{g.levelOver === 'rating'
           ? 'Your rating hit rock bottom and stayed there. Every tenant pulled out.'
-          : 'You went bankrupt.'}</p>
+          : 'You ran out of money and kept bleeding it. The bank took the keys.'}</p>
         <div className="actions">
           <button className="big good" onClick={() => {
             replaceGame(createRun(g.rebirth))
@@ -223,6 +239,8 @@ export function DebugPanel() {
         }}>Offline 1h</button>
         <button onClick={() => mutate(s => { s.rating = 5 })}>Rating 5★</button>
         <button onClick={() => mutate(s => { s.rating = 0.05 })}>Rating ~0</button>
+        <button onClick={() => mutate(s => { for (const it of s.items) if (it.unit?.status === 'vacant') { it.unit.status = 'dirty'; it.unit.dirtySince = s.time } })}>Dirty vacant units</button>
+        <button onClick={() => mutate(s => { s.money = -500; s.cashAtLastPayroll = -500 })}>Cash → -$500</button>
         <button onClick={() => set({ showReach: !showReach })}>{showReach ? 'Hide' : 'Show'} reachable tiles</button>
       </div>
       <label className="small">Time speed ×{timeScale}

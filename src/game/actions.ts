@@ -9,6 +9,9 @@ import * as E from '../data/economy'
 import * as T from '../data/tenants'
 import { requirementFor, rentMultiplierFor } from '../data/rebirths'
 import { newLease } from './sim'
+import { STAFF, UPGRADES } from '../data/staff'
+import { LOAN_GRACE, LOAN_INSTALLMENTS, LOAN_INTEREST, loanAmountFor } from '../data/bank'
+import { homeTile, office, officeSlots } from './staff'
 
 type Result = string | null
 
@@ -75,6 +78,10 @@ export function sell(state: GameState, id: number): Result {
   }
   state.money += sellValue(state, it)
   state.items.splice(idx, 1)
+  if (it.kind === 'office' && state.staff.length) {
+    state.staff = []
+    log(state, `👋 Sold the office — all staff were let go.`, { tone: 'bad' })
+  }
   return null
 }
 
@@ -167,7 +174,7 @@ export function rebirthChecks(state: GameState): RequirementCheck[] {
   const req = requirementFor(state.rebirth)
   const checks: RequirementCheck[] = [{ label: `${money(req.money)} cash on hand`, met: state.money >= req.money }]
   if (req.sign) checks.push({ label: 'Own a sign', met: state.items.some(i => i.kind === 'sign') })
-  if (req.employee) checks.push({ label: 'At least one employee (coming soon)', met: false })
+  if (req.employee) checks.push({ label: 'At least one employee', met: state.staff.length > 0 })
   return checks
 }
 
@@ -180,4 +187,52 @@ export function rebirth(state: GameState): GameState | null {
   const next = createRun(state.rebirth + 1)
   log(next, `🔁 Rebirth #${next.rebirth}! Bigger lot (${next.size}×${next.size}), rent ×${rentMultiplierFor(next.rebirth)}.`, { tone: 'good', toast: true })
   return next
+}
+
+// ---- Staff ----
+
+export function hire(state: GameState, role: string): Result {
+  const def = STAFF.find(d => d.id === role)
+  if (!def) return 'Unknown role'
+  const o = office(state)
+  if (!o) return 'Build an office first'
+  if (state.staff.length >= officeSlots(state)) return 'No free office slots'
+  if (state.staff.filter(s => s.role === role).length >= def.max) return `Max ${def.max} ${def.name.toLowerCase()} for now`
+  if (state.money < def.hireCost) return 'Not enough money'
+  state.money -= def.hireCost
+  const home = homeTile(state)!
+  state.staff.push({ id: state.nextId++, role, x: home[0], y: home[1], mode: 'idle', path: [], cleanLeft: 0 })
+  log(state, `${def.icon} Hired a ${def.name}. Wage: ${money(def.wage)} per payroll.`, { tone: 'good' })
+  return null
+}
+
+export function fire(state: GameState, staffId: number): void {
+  const s = state.staff.find(x => x.id === staffId)
+  if (!s) return
+  state.staff = state.staff.filter(x => x.id !== staffId)
+  const def = STAFF.find(d => d.id === s.role)
+  log(state, `👋 Let the ${def?.name ?? 'employee'} go.`)
+}
+
+export function buyUpgrade(state: GameState, id: string): Result {
+  const def = UPGRADES.find(u => u.id === id)
+  const lvl = state.upgrades[id] ?? 0
+  if (!def || lvl >= def.costs.length) return 'Maxed out'
+  const cost = def.costs[lvl]
+  if (state.money < cost) return 'Not enough money'
+  state.money -= cost
+  state.upgrades[id] = lvl + 1
+  return null
+}
+
+// ---- Bank ----
+
+export function takeLoan(state: GameState): Result {
+  if (state.loan) return 'One loan at a time'
+  const amount = loanAmountFor(state.rebirth)
+  const owed = amount * (1 + LOAN_INTEREST)
+  state.money += amount
+  state.loan = { owed, installment: owed / LOAN_INSTALLMENTS, graceLeft: LOAN_GRACE }
+  log(state, `🏦 Took a ${money(amount)} loan. You owe ${money(owed)}; payments start in ${LOAN_GRACE} payrolls.`, { tone: 'info' })
+  return null
 }

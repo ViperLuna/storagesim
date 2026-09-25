@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { useStore } from '../store'
 import { canPlace, itemAt, reachable, isAccessible } from '../game/grid'
 import { doorInside, baseSize, isLocked, itemSize, lockedTiles } from '../game/geometry'
-import { defColor, unitDef } from '../game/defs'
+import { defColor, hasDoor, unitDef } from '../game/defs'
 import { isPowered, itemDraw } from '../game/power'
 import * as A from '../game/actions'
 import { money } from '../game/format'
@@ -216,10 +216,14 @@ export function GridView() {
         })}
         <div className="gate" style={{ left: (game.size / 2 - 1.5) * TILE, top: game.size * TILE, width: TILE * 3, height: GATE_H }}>═ GATE ═</div>
         {game.items.map(it => (
-          <ItemView key={it.id} game={game} item={it} accessible={!it.unit || isAccessible(game, it, reach)}
+          <ItemView key={it.id} game={game} item={it} accessible={!hasDoor(it.kind) || isAccessible(game, it, reach)}
             selected={it.id === selectedId} flashN={flash?.id === it.id ? flash.n : 0}
             hidden={placing?.itemId === it.id && placing.mode === 'move'} />
         ))}
+        {game.staff.map(st => (st.mode === 'idle' ? null : (
+          <div key={st.id} className={`staff-dot ${st.mode}`} title="Janitor"
+            style={{ left: (st.x + 0.5) * TILE, top: (st.y + 0.5) * TILE }}>🧹</div>
+        )))}
         {placing && <Ghost game={game} />}
       </div>
       <div className="zoom-controls" onPointerDown={e => e.stopPropagation()}>
@@ -230,6 +234,8 @@ export function GridView() {
     </div>
   )
 }
+
+const ICONS: Record<Item['kind'], string> = { unit: '', sign: '🪧', generator: '⚡', office: '🏢' }
 
 const DOOR_BAR: Record<Rot, React.CSSProperties> = {
   0: { bottom: 0, left: '20%', width: '60%', height: 5 },
@@ -261,7 +267,7 @@ function ItemView({ game, item, accessible, selected, flashN, hidden }: {
     else if (u.status === 'occupied' && t) status = (
       <span className="st">{t.vip && '👑'}{t.anger >= ANGER_GRACE && '😠'}{t.name}</span>
     )
-    else if (u.status === 'dirty') status = <span className="st">🧹 clean me</span>
+    else if (u.status === 'dirty') status = <span className="st">🧹 dirty</span>
     else if (u.status === 'abandoned') status = <span className="st">🏚️ abandoned</span>
     else if (u.status === 'auction') status = <span className="st">🔨 {Math.max(0, Math.ceil(((u.auctionEndsAt ?? 0) - game.time) / 60))}m</span>
   }
@@ -269,14 +275,15 @@ function ItemView({ game, item, accessible, selected, flashN, hidden }: {
   return (
     <div key={flashN} className={cls + (flashN ? ' flash' : '')}
       style={{ left: item.x * TILE, top: item.y * TILE, width: fp.w * TILE, height: fp.h * TILE, background: defColor(item.kind, item.defId) }}>
-      {u && <DoorMarker item={item} />}
+      {hasDoor(item.kind) && <DoorMarker item={item} />}
       <div className="item-body">
-        <span className="lbl">{item.kind === 'unit' ? item.label : item.kind === 'sign' ? '🪧' : '⚡'}</span>
+        <span className="lbl">{item.kind === 'unit' ? item.label : ICONS[item.kind]}</span>
         {item.kind !== 'unit' && fp.w * fp.h > 1 && <span className="st">{item.label}</span>}
         {status}
+        {item.kind === 'office' && <span className="st">{game.staff.length ? '🧹'.repeat(game.staff.length) : 'no staff'}</span>}
       </div>
       {u && u.pending > 0 && <div className="pending">{money(u.pending)}</div>}
-      {u && !accessible && u.status !== 'auction' && <div className="badge blocked" title="Door can't be reached from the gate">⛔</div>}
+      {hasDoor(item.kind) && !accessible && u?.status !== 'auction' && <div className="badge blocked" title="Door can't be reached from the gate">⛔</div>}
       {!powered && itemDraw(item) > 0 && <div className="badge off" title="No power">⚡</div>}
       {progress > 0 && <div className="progress"><div style={{ width: `${progress * 100}%` }} /></div>}
     </div>
@@ -290,7 +297,7 @@ function Ghost({ game }: { game: GameState }) {
   const ok = canPlace(game, p.kind, p.defId, p.x, p.y, p.rot, ignore)
   return (
     <div className={`ghost ${ok ? 'ok' : 'bad'}`} style={{ left: p.x * TILE, top: p.y * TILE, width: fp.w * TILE, height: fp.h * TILE }}>
-      {p.kind === 'unit' && <DoorMarker item={{ x: p.x, y: p.y, rot: p.rot, kind: p.kind, defId: p.defId }} />}
+      {hasDoor(p.kind) && <DoorMarker item={{ x: p.x, y: p.y, rot: p.rot, kind: p.kind, defId: p.defId }} />}
     </div>
   )
 }

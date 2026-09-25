@@ -3,7 +3,7 @@
 > Living document. Captures what's been **locked** in RoundTable (RT) discussions.
 > Numbers marked *placeholder* are for tuning once the game is playable.
 
-## Build status — Alpha v0.1
+## Build status — Alpha v0.2
 
 **In:** title screen (audio unlock), 7×7 lot with gate + locked tiles, 3 pre-placed lockers,
 place/move/sell/upgrade with green/red ghost (R rotate, Esc cancel), door access via flood fill,
@@ -14,8 +14,13 @@ power (free hookup, generator tiers, on/off, overload blackout), small sign, reb
 requirements + bigger lot + rent multiplier, offline catch-up + "while you were away", pan/zoom/fit,
 toasts + message log with jump-to-unit, debug panel, autosave, phone layout.
 
-**Not yet:** office & staff (Janitor/Security/Agent/Manager), cameras & burglaries, payroll,
-bank loans & bankruptcy, sounds, real art.
+**v0.2 added:** 2×2 office (placeable, reachable door, 5⚡, 1 slot; selling it lets staff go),
+Janitor (hire in 👷 Staff; walking dot, nearest-dirty-unit-first, claims jobs, stops when the office
+is dark or blocked; walk-speed & mop upgrades), payroll every 5 min, 💰 Money menu with bank loan
+(25% interest, 6-payday grace, 10 auto payments), bankruptcy strikes → level over, offline payroll
+pause at $0, rebirth-3 "employee" requirement now works.
+
+**Not yet:** Security/Agent/Manager, cameras & burglaries, sounds, real art.
 
 **Implementation note:** the free power hookup is currently **5 power** (= 5 lockers' worth), not
 "5 units of any size". It's `FREE_POWER` in `src/data/power.ts`.
