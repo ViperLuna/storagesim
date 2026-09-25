@@ -176,9 +176,11 @@ When a unit is abandoned, you're offered a choice:
 - Clicking a complaint **jumps to and highlights** the unit.
 - Names: first name + last initial, with the occasional pun tenant.
 
-### Reputation
+### Reputation (star rating)
 
-- Hurt by evictions and rage-quits. Affects prospect spawn speed / bids (details TBD).
+- Shown as a **star rating (1–5 ★)**.
+- Hurt by evictions and rage-quits. Affects prospect spawn speed / bids / VIP odds (details TBD).
+- **5 stars = rent bonus** (*placeholder:* +10%).
 
 ## Advertising (signs)
 
@@ -310,15 +312,17 @@ When a unit is abandoned, you're offered a choice:
   Off = draws 0.
 - **Overload:** if total draw of everything switched on exceeds capacity, **the generator trips
   and the whole grid goes dark**. Fix by switching something off, selling it, or upgrading the grid.
-  (The free 5-unit hookup trips the same way — TBD.)
+  - **Recovery is automatic** as soon as the draw fits capacity again.
+  - The **free 5-unit hookup trips the same way** — placing a 6th unit with no generator blacks you out.
+- **Generator cost curve:** the first one is **fairly cheap**; upgrades get **stupid expensive**.
 - **Unpowered effects** (tripped or switched off):
   - Units: rent **significantly reduced** (*placeholder:* 25%).
   - Cameras: catch nobody.
   - Sign: unlit → base spawn rate.
-  - Office: staff stop working? — TBD.
+  - **Office: staff stop working** (they can't see what they're doing).
 - Emergent strategy: switch off **vacant** units to free up power (could be automated by staff later).
 - **HUD stat:** `POWER: {n} / {max}` always visible. Placement ghost shows its draw (e.g. `+4 ⚡`).
-- Still TBD: auto-recovery vs a "Reset breaker" button; do tenants of powered-off units complain.
+- Still TBD: do tenants of powered-off units complain / hurt the rating.
 
 ## Cameras (overlay layer)
 
