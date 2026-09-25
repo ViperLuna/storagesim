@@ -27,9 +27,19 @@ to unlock more.
 
 - Starts small. **Grid size is fixed within a run — the only way to expand is to rebirth.**
 - **Each rebirth adds one ring of tiles around the whole perimeter** (N×N → (N+2)×(N+2)).
-- The **gate is always at the bottom-middle**. It's a fixed, unbuildable tile and the root of all access.
-  On expansion it just drops to the new bottom row.
-  - Start with an **odd width** so there's a true middle tile (ring expansion keeps it odd).
+- The **gate is not a tile** — it sits **on the perimeter** at the bottom-middle edge.
+- The **3 bottom-middle tiles** directly inside the gate are **locked** (nothing can be
+  placed on them). They're the root of all access — the flood fill starts there.
+- On expansion the gate and locked tiles just drop to the new bottom row.
+  - Width must be **odd** so the 3 locked tiles sit dead center (ring expansion keeps it odd).
+
+```
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . L L L . .
+    ═GATE═
+```
 - Starting size: **TBD** (Viper working on it).
 - Walkways are **just empty tiles**. No path tiles to build.
 
@@ -204,7 +214,7 @@ When a unit is abandoned, you're offered a choice:
 - Cameras live on their **own layer above the grid**. They **must be mounted on a
   structure** — only tiles occupied by a structure are valid (ghost is 🟥 on empty tiles).
   They don't eat real estate and never block paths.
-- Valid mounts: **storage units and the sign**. Not the gate (entrance tiles are locked).
+- Valid mounts: **storage units and the sign** (the locked entrance tiles have nothing to mount on).
 - Cameras are **rotatable** and **see through buildings** — if the FOV reaches a tile, it's visible.
 - Lower-tier cameras are low quality: **shorter range and narrower angle**.
 - Moving/selling a structure with a camera on it — *tentative:* camera rides along on move;
