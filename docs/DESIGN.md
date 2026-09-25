@@ -26,8 +26,11 @@ to unlock more.
 ## The grid
 
 - Starts small. **Grid size is fixed within a run — the only way to expand is to rebirth.**
-- Grid sizes per rebirth: **TBD** (Viper working on it).
-- Has a **gate / main entrance** tile — the root of all access.
+- **Each rebirth adds one ring of tiles around the whole perimeter** (N×N → (N+2)×(N+2)).
+- The **gate is always at the bottom-middle**. It's a fixed, unbuildable tile and the root of all access.
+  On expansion it just drops to the new bottom row.
+  - Start with an **odd width** so there's a true middle tile (ring expansion keeps it odd).
+- Starting size: **TBD** (Viper working on it).
 - Walkways are **just empty tiles**. No path tiles to build.
 
 ## Placement (sandbox)
@@ -185,9 +188,18 @@ When a unit is abandoned, you're offered a choice:
   | 3rd | Money + a sign + at least one employee |
   | 4th+ | TBD — more stacked conditions |
 
-  - Money amount scales per rebirth (math TBD).
+  - Money = **cash on hand** at the moment of rebirth. Amount scales per rebirth (math TBD).
   - Maybe a "grid filled" condition — iffy; TBD.
 - Still TBD: multiplier curve, what else carries over / unlocks.
+
+## Employees
+
+- Hired from the Upgrades menu, **paid per minute**. Must still be profitable to employ.
+- **Manager** — auto-collects rent.
+- **Janitor** — auto-cleans vacated units (so they're ready to rent again).
+- **Security** — stops random burglaries. Either a **guard** (employee) or **cameras**
+  (placeable, auto-catch burglars) — **TBD**.
+- More TBD.
 
 ## Menus (draft)
 
@@ -207,7 +219,7 @@ More to come as RT continues.
 - Lease length ranges & renew/abandon odds.
 - Other complaint types (dirty units, break-ins → cameras/fences).
 - Non-grid advertising (newspaper/radio/online) as prestige unlocks.
-- Other employees beyond Manager.
+- Burglaries: frequency, consequences, guard vs cameras.
 
 ## ❓ Open questions
 
