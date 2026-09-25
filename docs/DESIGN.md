@@ -327,6 +327,9 @@ When a unit is abandoned, you're offered a choice:
   - **Job order: nearest first** (by walking distance from wherever he currently is).
     Dirty units go into a pool; each time he finishes a job he picks the closest one from
     his current spot. He commits to his current target (no mid-walk switching).
+  - **Built to support multiple janitors**, but **capped at 1** for now (a data value,
+    tweakable in the debug panel). With several, each free janitor **claims** the nearest
+    unclaimed dirty unit so two never go to the same one. Extra janitors still need office slots.
 - **Security** — a staff member in the 3×3 office watching the monitors (not visible on the grid).
   Useless without cameras; cameras useless without them. Takes an office slot.
 
