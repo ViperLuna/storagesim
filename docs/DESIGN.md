@@ -299,10 +299,12 @@ When a unit is abandoned, you're offered a choice:
 - Power grid provides **capacity**; things **consume** it:
   - Storage units: **1 per tile** (locker = 1, Medium 2×2 = 4, XL = 8).
   - **2×2 office: 5** (a bit more than 1 per tile).
+  - **Sign: draws power** (*draft:* 1 per tile).
+  - **Cameras: a fraction** (*draft:* e.g. 0.25 each, or per covered tile — TBD).
 - The **power grid can be upgraded** for more capacity — each upgrade gets pricier.
   (Upgrade uses the usual ghost flow if the footprint grows.)
 - Still TBD: over-capacity behavior (draft: newest units lose power → no rent + complaint),
-  whether the office counts against the free allowance, sign/camera draw, utility bill.
+  whether the office counts against the free allowance, utility bill.
 
 ## Cameras (overlay layer)
 
