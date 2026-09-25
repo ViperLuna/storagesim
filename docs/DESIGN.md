@@ -197,8 +197,19 @@ When a unit is abandoned, you're offered a choice:
 - Hired from the Upgrades menu, **paid per minute**. Must still be profitable to employ.
 - **Manager** — auto-collects rent.
 - **Janitor** — auto-cleans vacated units (so they're ready to rent again).
-- **Security** — stops random burglaries. Either a **guard** (employee) or **cameras**
-  (placeable, auto-catch burglars) — **TBD**.
+- **Security guard** — possible late-game option (TBD); cameras are the main security.
+
+## Cameras (overlay layer)
+
+- Cameras live on their **own layer above the grid** — they can sit on any tile,
+  **including occupied ones**. They don't eat real estate and never block paths.
+- Coverage drawn as a translucent overlay (SVG). Burglaries inside coverage get caught.
+- Tiers:
+  - **Directional (cone) cameras** — cheaper. Pie-slice field of view, rotated with **R**
+    like everything else.
+  - **360° (dome) cameras** — upgrade. Full circle radius.
+- A tile is covered if its center is within range (and inside the cone angle for directional cameras).
+- *Placeholder:* one camera per tile; line-of-sight blocking by units TBD (probably not in v1).
 - More TBD.
 
 ## Menus (draft)
