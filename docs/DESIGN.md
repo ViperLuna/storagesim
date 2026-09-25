@@ -204,15 +204,19 @@ When a unit is abandoned, you're offered a choice:
 - Cameras live on their **own layer above the grid**. They **must be mounted on a
   structure** — only tiles occupied by a structure are valid (ghost is 🟥 on empty tiles).
   They don't eat real estate and never block paths.
-- Which structures count (units only? signs? gate?) — TBD.
-- Moving/selling a structure with a camera on it — TBD (camera rides along vs pops off).
+- Valid mounts: **storage units and the sign**. Not the gate (entrance tiles are locked).
+- Cameras are **rotatable** and **see through buildings** — if the FOV reaches a tile, it's visible.
+- Lower-tier cameras are low quality: **shorter range and narrower angle**.
+- Moving/selling a structure with a camera on it — *tentative:* camera rides along on move;
+  selling warns and sells both.
+- ⚠️ **WIP** — real camera/burglary functionality still being designed.
 - Coverage drawn as a translucent overlay (SVG). Burglaries inside coverage get caught.
 - Tiers:
   - **Directional (cone) cameras** — cheaper. Pie-slice field of view, rotated with **R**
     like everything else.
   - **360° (dome) cameras** — upgrade. Full circle radius.
 - A tile is covered if its center is within range (and inside the cone angle for directional cameras).
-- *Placeholder:* one camera per tile; line-of-sight blocking by units TBD (probably not in v1).
+- *Placeholder:* one camera per tile.
 - More TBD.
 
 ## Menus (draft)
