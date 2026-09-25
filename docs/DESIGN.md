@@ -294,13 +294,15 @@ When a unit is abandoned, you're offered a choice:
 
 ## Electricity (draft)
 
-- After a certain number of units, you need a **power grid** (a small structure placed on
-  the grid — eats real estate, can block paths like anything else).
-- Power grid provides **capacity**; units **consume** it.
-  - *Draft:* **1 unit of electricity per tile** a unit occupies (locker = 1, Medium 2×2 = 4, XL = 8).
-- Bigger power grids for more capacity (new building, like offices — TBD).
-- Still TBD: the free allowance before power is needed, what happens when over capacity,
-  whether office/sign/cameras draw power, and whether there's a utility bill.
+- **The first 5 storage units run free.** Beyond that you need a **power grid** — a small
+  structure placed on the grid (eats real estate, can block paths).
+- Power grid provides **capacity**; things **consume** it:
+  - Storage units: **1 per tile** (locker = 1, Medium 2×2 = 4, XL = 8).
+  - **2×2 office: 5** (a bit more than 1 per tile).
+- The **power grid can be upgraded** for more capacity — each upgrade gets pricier.
+  (Upgrade uses the usual ghost flow if the footprint grows.)
+- Still TBD: over-capacity behavior (draft: newest units lose power → no rent + complaint),
+  whether the office counts against the free allowance, sign/camera draw, utility bill.
 
 ## Cameras (overlay layer)
 
