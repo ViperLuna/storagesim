@@ -306,7 +306,19 @@ When a unit is abandoned, you're offered a choice:
 - **No utility bill.** Electricity is capacity only; the cost is in buying/upgrading the grid.
 - The free allowance covers **storage units only**. The office always draws from the power grid —
   it's expensive enough that you'll have more than 5 units (and a grid) by the time you can afford it.
-- Still TBD: over-capacity behavior (draft: newest units lose power → no rent + complaint).
+- **On/off switches:** every powered thing (units, sign, cameras, office) can be switched on or off.
+  Off = draws 0.
+- **Overload:** if total draw of everything switched on exceeds capacity, **the generator trips
+  and the whole grid goes dark**. Fix by switching something off, selling it, or upgrading the grid.
+  (The free 5-unit hookup trips the same way — TBD.)
+- **Unpowered effects** (tripped or switched off):
+  - Units: rent **significantly reduced** (*placeholder:* 25%).
+  - Cameras: catch nobody.
+  - Sign: unlit → base spawn rate.
+  - Office: staff stop working? — TBD.
+- Emergent strategy: switch off **vacant** units to free up power (could be automated by staff later).
+- **HUD stat:** `POWER: {n} / {max}` always visible. Placement ghost shows its draw (e.g. `+4 ⚡`).
+- Still TBD: auto-recovery vs a "Reset breaker" button; do tenants of powered-off units complain.
 
 ## Cameras (overlay layer)
 
