@@ -9,7 +9,7 @@ import { unitDef, signDef } from './defs'
 import { log } from './log'
 import { expWait, rand, randInt, weighted } from './random'
 import { makeProspect, stars } from './tenants'
-import { money } from './format'
+import { aOrAn, money } from './format'
 import { payrollTotal, stepStaff } from './staff'
 
 export interface StepOptions {
@@ -215,7 +215,7 @@ export function addProspect(state: GameState, forceVip = false) {
   const p = makeProspect(state, forceVip)
   state.prospects.push(p)
   const d = unitDef(p.wants)
-  log(state, `${p.vip ? '👑 VIP ' : '🧍 '}${p.name} wants a ${d.name} — offering ${money(p.bid)}/pt.`, { tone: p.vip ? 'vip' : 'info', openTenants: true, toast: true })
+  log(state, `${p.vip ? '👑 VIP ' : '🧍 '}${p.name} wants ${aOrAn(d.name)} — offering ${money(p.bid)}/pt.`, { tone: p.vip ? 'vip' : 'info', openTenants: true, toast: true })
 }
 
 function finishAuction(state: GameState, item: Item, s?: OfflineSummary) {

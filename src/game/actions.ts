@@ -4,7 +4,7 @@ import { canPlace } from './grid'
 import { createRun, newUnit } from './init'
 import { defCost, defName, nextTier, unitDef, unitRank } from './defs'
 import { log } from './log'
-import { money } from './format'
+import { aOrAn, money } from './format'
 import * as E from '../data/economy'
 import * as T from '../data/tenants'
 import { requirementFor, rentMultiplierFor } from '../data/rebirths'
@@ -202,7 +202,7 @@ export function hire(state: GameState, role: string): Result {
   state.money -= def.hireCost
   const home = homeTile(state)!
   state.staff.push({ id: state.nextId++, role, x: home[0], y: home[1], mode: 'idle', path: [], cleanLeft: 0 })
-  log(state, `${def.icon} Hired a ${def.name}. Wage: ${money(def.wage)} per payroll.`, { tone: 'good' })
+  log(state, `${def.icon} Hired ${aOrAn(def.name)}. Wage: ${money(def.wage)} per payroll.`, { tone: 'good' })
   return null
 }
 

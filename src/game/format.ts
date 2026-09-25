@@ -14,3 +14,9 @@ export function duration(sec: number): string {
   if (m) return `${m}m ${s.toString().padStart(2, '0')}s`
   return `${s}s`
 }
+
+/** "a Locker" / "an XL" — picks the article by sound (acronyms like XL start with a vowel sound). */
+export function aOrAn(word: string): string {
+  const vowelSound = /^[aeiou]/i.test(word) || /^[FHLMNRSX][A-Z0-9]/.test(word)
+  return `${vowelSound ? 'an' : 'a'} ${word}`
+}

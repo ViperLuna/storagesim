@@ -4,7 +4,7 @@ import { SIGNS } from '../data/signs'
 import { GENERATORS } from '../data/power'
 import { rentMultiplierFor, gridSizeFor } from '../data/rebirths'
 import { PROSPECT_PATIENCE } from '../data/tenants'
-import { money, duration } from '../game/format'
+import { aOrAn, money, duration } from '../game/format'
 import { unitDef } from '../game/defs'
 import * as A from '../game/actions'
 import { startPlacing } from './placing'
@@ -110,7 +110,7 @@ function TenantsMenu() {
               <strong>{p.vip && '👑 '}{p.name}</strong>
               <span className="small muted">leaves in {duration(left)}</span>
             </div>
-            <div className="small">Wants a <b>{d.name}</b> ({d.w}×{d.h}) · offers <b>{money(p.bid)}/pt</b>
+            <div className="small">Wants {aOrAn(d.name).split(' ')[0]} <b>{d.name}</b> ({d.w}×{d.h}) · offers <b>{money(p.bid)}/pt</b>
               {mult !== 1 && <> (you get {money(p.bid * mult)})</>}
               <span className="muted"> · list {money(d.listPrice)}</span>
             </div>

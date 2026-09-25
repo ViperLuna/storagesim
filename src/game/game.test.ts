@@ -190,3 +190,13 @@ describe('payroll, loans, bankruptcy', () => {
     expect(s.money).toBeCloseTo(1000 - 125)
   })
 })
+
+describe('grammar', () => {
+  it('uses "an" before vowel sounds', async () => {
+    const { aOrAn } = await import('./format')
+    expect(aOrAn('XL')).toBe('an XL')
+    expect(aOrAn('Locker')).toBe('a Locker')
+    expect(aOrAn('Office')).toBe('an Office')
+    expect(aOrAn('Large')).toBe('a Large')
+  })
+})
