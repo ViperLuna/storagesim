@@ -292,6 +292,16 @@ When a unit is abandoned, you're offered a choice:
 - **Security** — a staff member in the 3×3 office watching the monitors (not visible on the grid).
   Useless without cameras; cameras useless without them. Takes an office slot.
 
+## Electricity (draft)
+
+- After a certain number of units, you need a **power grid** (a small structure placed on
+  the grid — eats real estate, can block paths like anything else).
+- Power grid provides **capacity**; units **consume** it.
+  - *Draft:* **1 unit of electricity per tile** a unit occupies (locker = 1, Medium 2×2 = 4, XL = 8).
+- Bigger power grids for more capacity (new building, like offices — TBD).
+- Still TBD: the free allowance before power is needed, what happens when over capacity,
+  whether office/sign/cameras draw power, and whether there's a utility bill.
+
 ## Cameras (overlay layer)
 
 - Cameras live on their **own layer above the grid**. They **must be mounted on a
