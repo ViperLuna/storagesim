@@ -195,6 +195,8 @@ When a unit is abandoned, you're offered a choice:
 ## Rebirth (prestige)
 
 - Rebirth **resets you to zero**.
+- **Every run starts the same:** ~**3 cheap storage units**. No office, no sign, nothing else.
+  (Only the grid size and rent multiplier differ.)
 - Each rebirth gives a **bigger grid**.
 - **Rent multiplier:** tenants' bids stay in the same familiar range every run
   (keeps things routine), but actual **rent payout is multiplied** by a
@@ -219,8 +221,10 @@ When a unit is abandoned, you're offered a choice:
 - **Player-placed** like everything else (sandbox). Move/sell/upgrade rules apply.
 - **Staff need an office slot** — no office, no employees.
 - The first employee available is the **Janitor**.
-- More staff slots / more employee types come with rebirths (TBD: bigger office tiers vs
-  second office; likely one office per plot upgraded via the same upgrade-ghost flow as signs).
+- **No office upgrades.** Bigger offices are **new buildings** (costs more) — sell the old
+  one and build the new one.
+- When security unlocks (~5th rebirth), a **3×3 office** becomes available.
+- Staff slots in the 3×3 office, and whether multiple offices are allowed — TBD.
 - **Needs an accessible door**, same rule as units. Blocked office = staff can't work.
 
 ## Employees
@@ -262,8 +266,8 @@ Rebirths unlock new stuff, not just a bigger grid.
 
 | Rebirth | Unlocks (draft) |
 |---|---|
-| Start | Storage units, **small sign**, office + Janitor |
-| ~5th | **Burglaries** begin; **cameras** unlocked |
+| Start | Begins with ~3 cheap units. Buildable: storage units, **small sign**, 2×2 office + Janitor |
+| ~5th | **Burglaries** begin; **cameras** unlocked; **3×3 office** |
 | Later | TBD |
 
 ## Menus (draft)
