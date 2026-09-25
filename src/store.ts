@@ -65,7 +65,18 @@ function migrate(g: any): GameState | null {
   if (g.version === 1) {
     Object.assign(g, { version: 2, staff: [], upgrades: {}, bankruptStrikes: 0, cashAtLastPayroll: g.money })
   }
-  return g.version === 2 ? (g as GameState) : null
+  if (g.version === 2) {
+    // v0.2 bug: offline catch-up could sink your rating to zero and end the level while you slept.
+    // Pardon anyone it happened to.
+    if (g.levelOver === 'rating') {
+      g.levelOver = undefined
+      g.rating = Math.max(g.rating, 1)
+      g.ratingAtLastTick = g.rating
+      g.failStrikes = 0
+    }
+    g.version = 3
+  }
+  return g.version === 3 ? (g as GameState) : null
 }
 
 function writeSave(g: GameState) {

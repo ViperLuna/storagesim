@@ -21,5 +21,8 @@ export const FIVE_STAR_RENT_BONUS = 0.1
 /** Ticks at zero rating with no gain before everyone pulls out. */
 export const FAIL_STRIKES = 3
 
+/** While offline your rating can't sink below this, and you can't lose the level. */
+export const OFFLINE_RATING_FLOOR = 1
+
 /** Offline catch-up is capped at this many hours. */
 export const OFFLINE_CAP_HOURS = 72

@@ -200,3 +200,19 @@ describe('grammar', () => {
     expect(aOrAn('Large')).toBe('a Large')
   })
 })
+
+describe('offline safety', () => {
+  it('a long absence with dirty units never ends the level or sinks rating below 1', () => {
+    const s = createRun(0)
+    for (const it of s.items) { it.unit!.status = 'dirty'; it.unit!.dirtySince = 0 }
+    catchUp(s, 48 * 3600)
+    expect(s.levelOver).toBeUndefined()
+    expect(s.rating).toBeGreaterThanOrEqual(1)
+  })
+  it('online, neglected dirty units still hurt', () => {
+    const s = createRun(0)
+    for (const it of s.items) { it.unit!.status = 'dirty'; it.unit!.dirtySince = 0 }
+    for (let i = 0; i < 12; i++) step(s, 300)
+    expect(s.rating).toBeLessThan(3)
+  })
+})

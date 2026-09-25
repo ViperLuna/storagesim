@@ -149,14 +149,19 @@ function businessTick(state: GameState, offline: boolean) {
     const u = it.unit
     if (!u) continue
     if (u.status === 'occupied' && u.tenant!.anger >= T.ANGER_GRACE) issues++
-    if (u.status === 'dirty' && state.time - (u.dirtySince ?? state.time) >= E.DIRTY_TICKS_BEFORE_ISSUE * E.TICK_SECONDS) issues++
+    // Nobody can mop while you're away (unless you have a janitor), so dirty units only count online.
+    if (!offline && u.status === 'dirty' && state.time - (u.dirtySince ?? state.time) >= E.DIRTY_TICKS_BEFORE_ISSUE * E.TICK_SECONDS) issues++
   }
   if (state.tripped) issues++
 
   if (issues) state.rating -= E.RATING_LOSS_PER_ISSUE * issues
   else state.rating = Math.min(E.RATING_MAX, state.rating + E.RATING_GAIN_PER_TICK)
 
-  if (state.rating <= 0) {
+  if (offline) {
+    // Never lose the level in your sleep.
+    state.rating = Math.max(state.rating, Math.min(E.OFFLINE_RATING_FLOOR, state.ratingAtLastTick))
+    state.failStrikes = 0
+  } else if (state.rating <= 0) {
     if (state.rating <= state.ratingAtLastTick) state.failStrikes++
     else state.failStrikes = 0
     if (state.failStrikes >= E.FAIL_STRIKES) {

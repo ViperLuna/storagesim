@@ -94,7 +94,7 @@ export interface Loan {
 }
 
 export interface GameState {
-  version: 2
+  version: 3
   rebirth: number
   size: number
   money: number

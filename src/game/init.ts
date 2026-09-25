@@ -16,7 +16,7 @@ export function newUnit(state: GameState, defId: string, x: number, y: number, r
 export function createRun(rebirth: number): GameState {
   const size = gridSizeFor(rebirth)
   const state: GameState = {
-    version: 2, rebirth, size, money: 0,
+    version: 3, rebirth, size, money: 0,
     rating: RATING_START, ratingAtLastTick: RATING_START, failStrikes: 0,
     items: [], nextId: 1, nextLabel: 1, prospects: [],
     nextProspectIn: BASE_SPAWN_SECONDS / 3, // first visitor shows up quickly

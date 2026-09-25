@@ -328,6 +328,8 @@ When a unit is abandoned, you're offered a choice:
   or take a loan. Then build income back up before re-expanding.
 - **Offline safety:** the offline simulation **pauses payroll once cash hits $0**, so you can wake up
   broke but never bankrupt from sleeping.
+- **Offline rating safety:** while away, dirty units don't count against you, your rating can't sink
+  below **1★**, and zero-rating strikes can't happen. You can never lose the level in your sleep.
 - Each employee takes an **office slot**.
 - **Leasing Agent** — auto-handles prospects using **player-set rules**:
   - **Minimum bid** (as % of list price, possibly per unit size). Can be set anywhere —
