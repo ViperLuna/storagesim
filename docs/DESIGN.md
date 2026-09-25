@@ -70,7 +70,7 @@ O O L L L . .
 |---|---|
 | **Place** | Buy from Build menu → ghost → click to place. |
 | **Move** | Pick up existing item → ghost (old spot counts as free) → drop, or Esc to snap back. **Free.** Occupied units move with the tenant (timer pauses while held). |
-| **Sell** | Partial refund (*placeholder:* 50%; idea: 100% within a short "oops" window). **No evictions** — occupied units can't be sold (TBD: blocked vs wait for vacancy). |
+| **Sell** | Partial refund (*placeholder:* 50%; idea: 100% within a short "oops" window). Selling an occupied unit = **eviction** (confirm popup; consequences TBD — rating hit? deposit refund?). No evictions for non-payment. |
 | **Upgrade** | Upgraded version becomes a ghost (old footprint counts as free) → place anywhere valid → old one removed, pay the difference. Esc = no change. |
 
 ## Access / pathing
@@ -140,7 +140,8 @@ the table is the "list price" baseline.
 
 ### Security deposit
 
-- **Non-refundable. Never goes back.** It's just money.
+- **Non-refundable — with one exception:** a tenant who leaves because they couldn't reach
+  their unit gets their deposit back.
 - **Deposit = the accepted bid** (one point's rent), paid instantly on move-in.
   - e.g. accept an $11/pt bid → +$11 deposit now, +$11 at the first point = $22 on day one.
 
@@ -172,17 +173,18 @@ When a unit is abandoned, you're offered a choice:
 - A tenant whose door is unreachable → **timer pauses** and they complain:
   1. "Dillon A. can't get to his storage unit."
   2. "Dillon A. is VERY annoyed he can't reach his unit."
-  3. "Dillon A. has moved out. 😡" → unit vacant, tenant gets a **refund**; rating dropped while he was mad.
+  3. "Dillon A. has moved out. 😡" → unit vacant, you **refund his deposit**; rating dropped while he was mad.
 - Clicking a complaint **jumps to and highlights** the unit.
 - Names: first name + last initial, with the occasional pun tenant.
 
 ### Reputation (star rating)
 
 - Shown as a **star rating (1–5 ★)**.
-- **No evictions** in the game.
+- **Evictions only happen when you sell an occupied unit.** No evictions for non-payment
+  (non-payers just abandon).
 - **Lowers rating:**
   - Tenants who **can't reach their unit** get mad → rating starts dropping while they're mad.
-    Eventually they leave and get a **refund**.
+    Eventually they leave and you **refund their deposit** (= the agreed price per point).
   - **Uncaught burglaries.** Tenants of **adjacent units may pull out** too.
 - **Does NOT lower rating:** abandonments (you already lose that unit's rent until you deal with it).
 - Raising rating — TBD (ideas: completed leases, renewals, caught burglars, complaint-free streaks).
