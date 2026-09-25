@@ -251,7 +251,7 @@ When a unit is abandoned, you're offered a choice:
 
 - Hired from the Upgrades menu, **paid per minute**. Must still be profitable to employ.
 - Each employee takes an **office slot**.
-- **Manager** — auto-collects rent.
+- **Manager** — auto-collects rent. Unlock rebirth TBD (parked).
 - **Janitor** — auto-cleans vacated units (so they're ready to rent again).
   - Shown as a **dot that walks the pathways** (empty tiles) from the office door to the
     dirty unit's door, cleans it, then heads to the next job or back to the office.
@@ -309,6 +309,7 @@ More to come as RT continues.
 - Other complaint types (dirty units, break-ins → cameras/fences).
 - Non-grid advertising (newspaper/radio/online) as prestige unlocks.
 - Burglaries: frequency, consequences, guard vs cameras.
+- **Manager** unlock timing (which rebirth) and office slots for it.
 
 ## ❓ Open questions
 
