@@ -70,7 +70,7 @@ O O L L L . .
 |---|---|
 | **Place** | Buy from Build menu → ghost → click to place. |
 | **Move** | Pick up existing item → ghost (old spot counts as free) → drop, or Esc to snap back. **Free.** Occupied units move with the tenant (timer pauses while held). |
-| **Sell** | Partial refund (*placeholder:* 50%; idea: 100% within a short "oops" window). Selling an occupied unit = **eviction** (confirm popup, reputation hit). |
+| **Sell** | Partial refund (*placeholder:* 50%; idea: 100% within a short "oops" window). **No evictions** — occupied units can't be sold (TBD: blocked vs wait for vacancy). |
 | **Upgrade** | Upgraded version becomes a ghost (old footprint counts as free) → place anywhere valid → old one removed, pay the difference. Esc = no change. |
 
 ## Access / pathing
@@ -172,14 +172,23 @@ When a unit is abandoned, you're offered a choice:
 - A tenant whose door is unreachable → **timer pauses** and they complain:
   1. "Dillon A. can't get to his storage unit."
   2. "Dillon A. is VERY annoyed he can't reach his unit."
-  3. "Dillon A. has moved out. 😡" → unit vacant, **reputation** hit.
+  3. "Dillon A. has moved out. 😡" → unit vacant, tenant gets a **refund**; rating dropped while he was mad.
 - Clicking a complaint **jumps to and highlights** the unit.
 - Names: first name + last initial, with the occasional pun tenant.
 
 ### Reputation (star rating)
 
 - Shown as a **star rating (1–5 ★)**.
-- Hurt by evictions and rage-quits. Affects prospect spawn speed / bids / VIP odds (details TBD).
+- **No evictions** in the game.
+- **Lowers rating:**
+  - Tenants who **can't reach their unit** get mad → rating starts dropping while they're mad.
+    Eventually they leave and get a **refund**.
+  - **Uncaught burglaries.** Tenants of **adjacent units may pull out** too.
+- **Does NOT lower rating:** abandonments (you already lose that unit's rent until you deal with it).
+- Raising rating — TBD (ideas: completed leases, renewals, caught burglars, complaint-free streaks).
+- **Zero rating = lose the level** (restart current rebirth), same as bankruptcy, if you can't
+  bring it back up. Warning/grace mechanics TBD.
+- Affects prospect spawn speed / bids / VIP odds (details TBD).
 - **5 stars = rent bonus** (*placeholder:* +10%).
 
 ## Advertising (signs)
