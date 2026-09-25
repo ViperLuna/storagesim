@@ -256,7 +256,10 @@ When a unit is abandoned, you're offered a choice:
 ## Debt, loans & bankruptcy (draft)
 
 - Cash can go **negative** (payroll is the main cause).
-- Possible **bank loan**: borrow cash, repaid with interest (details TBD).
+- **Bank loan**: a **fixed amount** with **interest**. One loan at a time (assumed).
+  - **Grace period:** no payments for the first ~**6 pay periods**.
+  - After that, repayment installments are taken **automatically at each payroll** until paid off.
+  - Loan amount probably scales with rebirth level (TBD).
 - **Bankruptcy = lose the run**: you restart **the current rebirth level** from scratch
   (keep rebirth count / grid size / multiplier; lose everything built this run).
 - **Trigger: too many pay periods in the red with no gain.**
@@ -316,7 +319,7 @@ Rebirths unlock new stuff, not just a bigger grid.
 | Rebirth | Unlocks (draft) |
 |---|---|
 | Start | Begins with ~3 cheap units. Buildable: storage units, **small sign**, 2×2 office + Janitor |
-| ~5th | **Burglaries** begin; **cameras** unlocked; **3×3 office** |
+| 5th (17×17) | **Burglaries** begin; **cameras** unlocked; **3×3 office** + Security staff |
 | Later | TBD |
 
 ## Menus (draft)
