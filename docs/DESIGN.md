@@ -322,7 +322,9 @@ When a unit is abandoned, you're offered a choice:
     dirty unit's door, cleans it, then heads to the next job or back to the office.
   - Uses the shortest path (BFS). Can't reach a unit → can't clean it.
   - **Upgrades:** movement speed, cleaning speed.
-  - Job order (nearest vs oldest first) — TBD.
+  - **Job order: nearest first** (by walking distance from wherever he currently is).
+    Dirty units go into a pool; each time he finishes a job he picks the closest one from
+    his current spot. He commits to his current target (no mid-walk switching).
 - **Security** — a staff member in the 3×3 office watching the monitors (not visible on the grid).
   Useless without cameras; cameras useless without them. Takes an office slot.
 
