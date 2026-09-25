@@ -249,7 +249,9 @@ When a unit is abandoned, you're offered a choice:
 
 ## Employees
 
-- Hired from the Upgrades menu, **paid per minute**. Must still be profitable to employ.
+- Hired from the Upgrades menu. Wages paid on an interval (**per minute or every 5 minutes** — TBD).
+  Must always be profitable to employ; wages tuned so the math holds.
+- What happens if you can't make payroll — TBD.
 - Each employee takes an **office slot**.
 - **Leasing Agent** — auto-handles prospects using **player-set rules**:
   - **Minimum bid** (as % of list price, possibly per unit size). Can be set anywhere —
@@ -261,7 +263,7 @@ When a unit is abandoned, you're offered a choice:
 - **Manager** — auto-collects rent. Pure convenience (rent accumulates anyway), so it comes last.
 - **Unlock order (locked):** **Janitor → Security → Leasing Agent → Manager**.
   - Security arrives with the ~5th rebirth (3×3 office, cameras, burglaries).
-  - Security as a staff member watching the monitors? Slot count — TBD.
+  - Security is a staff member watching the monitors → 3×3 office needs **2 slots** (Janitor + Security).
   - Agent / Manager unlock rebirths TBD.
 - **Janitor** — auto-cleans vacated units (so they're ready to rent again).
   - Shown as a **dot that walks the pathways** (empty tiles) from the office door to the
@@ -269,7 +271,8 @@ When a unit is abandoned, you're offered a choice:
   - Uses the shortest path (BFS). Can't reach a unit → can't clean it.
   - **Upgrades:** movement speed, cleaning speed.
   - Job order (nearest vs oldest first) — TBD.
-- **Security guard** — possible late-game option (TBD); cameras are the main security.
+- **Security** — a staff member in the 3×3 office watching the monitors (not visible on the grid).
+  Useless without cameras; cameras useless without them. Takes an office slot.
 
 ## Cameras (overlay layer)
 
