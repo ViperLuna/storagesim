@@ -54,6 +54,21 @@ O O L L L . .
 - Starting size: **7×7**.
 - Walkways are **just empty tiles**. No path tiles to build.
 
+## Camera / view controls
+
+The grid gets big, so the view can pan and zoom.
+
+| | PC | Mobile |
+|---|---|---|
+| **Pan** | Click-drag on the map (also middle-mouse / right-drag) | One-finger drag |
+| **Zoom** | Scroll wheel (zooms toward the cursor) | Pinch |
+| **Buttons** | ➕ / ➖ zoom, 🎯 re-center/fit | same |
+
+- A small drag threshold (a few px) separates a **click/tap** from a **pan**, so clicking units still works.
+- Zoom clamped between min/max; panning clamped so the lot can't be lost off-screen.
+- Clicking a complaint/toast **pans + zooms to** the unit.
+- Implemented as a CSS transform on the grid container (keeps the DOM grid + SVG overlays in sync).
+
 ## Placement (sandbox)
 
 - Everything placed via a **ghost** that follows the cursor:
