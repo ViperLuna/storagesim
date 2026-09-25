@@ -62,7 +62,7 @@ The grid gets big, so the view can pan and zoom.
 |---|---|---|
 | **Pan** | Click-drag on the map (also middle-mouse / right-drag) | One-finger drag |
 | **Zoom** | Scroll wheel (zooms toward the cursor) | Pinch |
-| **Buttons** | ➕ / ➖ zoom, 🎯 re-center/fit | same |
+| **Buttons** | `➕` `🎯` `➖` — the middle **fit** button zooms/pans so the **whole grid** fits on screen | same |
 
 - A small drag threshold (a few px) separates a **click/tap** from a **pan**, so clicking units still works.
 - Zoom clamped between min/max; panning clamped so the lot can't be lost off-screen.
