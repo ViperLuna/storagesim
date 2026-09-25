@@ -25,6 +25,8 @@ to unlock more.
 - **Data-driven:** all tunable game content (units, signs, cameras, employees, office tiers,
   rebirth requirements, unlock timeline, tenant names, etc.) lives in plain typed data files
   under `src/data/` — edit numbers there, never hunt through game logic.
+- **Debug / tuning panel** (dev-only, hidden from players): tweak data values live while
+  playing, plus handy cheats (add money, skip time, spawn prospect, force rebirth) for testing.
 
 ## The grid
 
