@@ -259,7 +259,12 @@ When a unit is abandoned, you're offered a choice:
 - Possible **bank loan**: borrow cash, repaid with interest (details TBD).
 - **Bankruptcy = lose the run**: you restart **the current rebirth level** from scratch
   (keep rebirth count / grid size / multiplier; lose everything built this run).
-- Trigger TBD — e.g. negative for too long, or below a debt limit. Needs clear warnings first.
+- **Trigger: too many pay periods in the red with no gain.**
+  - Each payroll where cash is **below $0 and hasn't improved** since the last payroll = a **strike**.
+  - Any payroll where cash went up resets strikes. *Placeholder:* 3 strikes = bankrupt.
+  - Big red warning with the strike count (e.g. "⚠️ 2/3 — bankruptcy next payroll").
+- **Offline safety:** the offline simulation **pauses payroll once cash hits $0**, so you can wake up
+  broke but never bankrupt from sleeping.
 - Each employee takes an **office slot**.
 - **Leasing Agent** — auto-handles prospects using **player-set rules**:
   - **Minimum bid** (as % of list price, possibly per unit size). Can be set anywhere —
