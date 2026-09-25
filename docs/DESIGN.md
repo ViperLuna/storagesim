@@ -201,8 +201,11 @@ When a unit is abandoned, you're offered a choice:
 
 ## Cameras (overlay layer)
 
-- Cameras live on their **own layer above the grid** — they can sit on any tile,
-  **including occupied ones**. They don't eat real estate and never block paths.
+- Cameras live on their **own layer above the grid**. They **must be mounted on a
+  structure** — only tiles occupied by a structure are valid (ghost is 🟥 on empty tiles).
+  They don't eat real estate and never block paths.
+- Which structures count (units only? signs? gate?) — TBD.
+- Moving/selling a structure with a camera on it — TBD (camera rides along vs pops off).
 - Coverage drawn as a translucent overlay (SVG). Burglaries inside coverage get caught.
 - Tiers:
   - **Directional (cone) cameras** — cheaper. Pie-slice field of view, rotated with **R**
