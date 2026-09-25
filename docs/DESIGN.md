@@ -371,6 +371,14 @@ Rebirths unlock new stuff, not just a bigger grid.
 | 5th (17×17) | **Burglaries** begin; **cameras** unlocked; **3×3 office** + Security staff |
 | Later | TBD |
 
+## Title screen
+
+- Shown on load. Its **Play / Continue** click is the user gesture that **unlocks browser audio**
+  (browsers block sound until the player interacts), so sounds/music can play from then on.
+- Also where **Quit** (from the level-over screen) returns to.
+- Draft options: Continue, New Game, Settings.
+- After Continue: show a **"While you were away…"** summary of the offline simulation.
+
 ## Menus (draft)
 
 - 🏗️ **Build** — units, signs
