@@ -89,13 +89,16 @@ earn more per hour — and more per tile.** A grid of lockers must never beat bi
 
 A **point** = one payout, when a unit's timer hits zero.
 
-| Unit | Size | Timer | Payout | $/sec | $/sec/tile |
+| Unit | Size | Timer | Payout | $/hr | $/hr/tile |
 |---|---|---|---|---|---|
-| Locker | 1×1 | 10s | $10 | 1.0 | 1.0 |
-| Small | 1×2 | 30s | $72 | 2.4 | 1.2 |
-| Medium | 2×2 | 90s | $540 | 6.0 | 1.5 |
-| Large | 2×3 | 4 min | $2,592 | 10.8 | 1.8 |
-| XL | 2×4 | 10 min | $10,560 | 17.6 | 2.2 |
+| Locker | 1×1 | 1 min | $10 | $600 | $600 |
+| Small | 1×2 | 3 min | $72 | $1,440 | $720 |
+| Medium | 2×2 | 9 min | $540 | $3,600 | $900 |
+| Large | 2×3 | 24 min | $2,592 | $6,480 | $1,080 |
+| XL | 2×4 | 60 min | $10,560 | $10,560 | $1,320 |
+
+Timers are deliberately slow (even lockers wait a minute) so income ramps up smoothly
+as each unit is added.
 
 *All placeholder.* Actual rent per point is set by the tenant's accepted bid (see below);
 the table is the "list price" baseline.
@@ -195,7 +198,7 @@ When a unit is abandoned, you're offered a choice:
 ## Rebirth (prestige)
 
 - Rebirth **resets you to zero**.
-- **Every run starts the same:** ~**3 cheap storage units**. No office, no sign, nothing else.
+- **Every run starts the same:** **$0 cash** and ~**3 cheap storage units** (lockers). No office, no sign, nothing else.
   (Only the grid size and rent multiplier differ.)
 - The 3 starting units are **pre-placed in the same pattern every run**, anchored to the gate
   (so the pattern is identical on bigger grids). They can be moved for free like anything else.
