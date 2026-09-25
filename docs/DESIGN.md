@@ -246,7 +246,7 @@ Rebirths unlock new stuff, not just a bigger grid.
 | Rebirth | Unlocks (draft) |
 |---|---|
 | Start | Storage units, sign, office + Janitor |
-| ~5th | A new employee type; **burglaries** begin; **cameras** unlocked |
+| ~5th | **Burglaries** begin; **cameras** unlocked |
 | Later | TBD |
 
 ## Menus (draft)
