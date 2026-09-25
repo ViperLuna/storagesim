@@ -22,6 +22,9 @@ to unlock more.
   - PC: side panel menus. Mobile (later): bottom tab bar + slide-up sheets.
 - Rendering: DOM / CSS Grid. Colored shapes with text until real art exists.
 - State: Zustand (tentative) + localStorage save. No backend.
+- **Data-driven:** all tunable game content (units, signs, cameras, employees, office tiers,
+  rebirth requirements, unlock timeline, tenant names, etc.) lives in plain typed data files
+  under `src/data/` — edit numbers there, never hunt through game logic.
 
 ## The grid
 
@@ -257,7 +260,7 @@ Rebirths unlock new stuff, not just a bigger grid.
 
 | Rebirth | Unlocks (draft) |
 |---|---|
-| Start | Storage units, sign, office + Janitor |
+| Start | Storage units, **small sign**, office + Janitor |
 | ~5th | **Burglaries** begin; **cameras** unlocked |
 | Later | TBD |
 
