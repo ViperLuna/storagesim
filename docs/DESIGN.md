@@ -197,6 +197,21 @@ When a unit is abandoned, you're offered a choice:
 - Rebirth **resets you to zero**.
 - **Every run starts the same:** ~**3 cheap storage units**. No office, no sign, nothing else.
   (Only the grid size and rent multiplier differ.)
+- The 3 starting units are **pre-placed in the same pattern every run**, anchored to the gate
+  (so the pattern is identical on bigger grids). They can be moved for free like anything else.
+  - *Draft pattern:* 3 lockers in a row, centered above the locked tiles with one empty row
+    between, doors facing down toward the gate:
+
+    ```
+    . . . . . . .
+    . . . . . . .
+    . . . . . . .
+    . . . . . . .
+    . . ▼ ▼ ▼ . .
+    . . . . . . .
+    . . L L L . .
+        ═GATE═
+    ```
 - Each rebirth gives a **bigger grid**.
 - **Rent multiplier:** tenants' bids stay in the same familiar range every run
   (keeps things routine), but actual **rent payout is multiplied** by a
