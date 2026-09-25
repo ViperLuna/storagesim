@@ -259,8 +259,10 @@ When a unit is abandoned, you're offered a choice:
   - Prospects that fail the rules are declined (or left for the player — TBD).
   - Works offline too: with a Janitor, vacated units get cleaned and re-rented while you're away.
 - **Manager** — auto-collects rent. Pure convenience (rent accumulates anyway), so it comes last.
-- **Recommended hire order:** Janitor → Leasing Agent → Manager
-  (each removes the next bottleneck: dirty → vacant → uncollected). Unlock rebirths TBD.
+- **Unlock order (locked):** **Janitor → Security → Leasing Agent → Manager**.
+  - Security arrives with the ~5th rebirth (3×3 office, cameras, burglaries).
+  - Security as a staff member watching the monitors? Slot count — TBD.
+  - Agent / Manager unlock rebirths TBD.
 - **Janitor** — auto-cleans vacated units (so they're ready to rent again).
   - Shown as a **dot that walks the pathways** (empty tiles) from the office door to the
     dirty unit's door, cleans it, then heads to the next job or back to the office.
