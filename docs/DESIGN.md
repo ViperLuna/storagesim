@@ -251,7 +251,16 @@ When a unit is abandoned, you're offered a choice:
 
 - Hired from the Upgrades menu, **paid per minute**. Must still be profitable to employ.
 - Each employee takes an **office slot**.
-- **Manager** — auto-collects rent. Unlock rebirth TBD (parked).
+- **Leasing Agent** — auto-handles prospects using **player-set rules**:
+  - **Minimum bid** (as % of list price, possibly per unit size). Can be set anywhere —
+    lenient ("as long as they pay") or so strict that *nobody* ever qualifies. The player
+    has to learn what works.
+  - **Allow upsizing** yes/no.
+  - Prospects that fail the rules are declined (or left for the player — TBD).
+  - Works offline too: with a Janitor, vacated units get cleaned and re-rented while you're away.
+- **Manager** — auto-collects rent. Pure convenience (rent accumulates anyway), so it comes last.
+- **Recommended hire order:** Janitor → Leasing Agent → Manager
+  (each removes the next bottleneck: dirty → vacant → uncollected). Unlock rebirths TBD.
 - **Janitor** — auto-cleans vacated units (so they're ready to rent again).
   - Shown as a **dot that walks the pathways** (empty tiles) from the office door to the
     dirty unit's door, cleans it, then heads to the next job or back to the office.
@@ -309,7 +318,8 @@ More to come as RT continues.
 - Other complaint types (dirty units, break-ins → cameras/fences).
 - Non-grid advertising (newspaper/radio/online) as prestige unlocks.
 - Burglaries: frequency, consequences, guard vs cameras.
-- **Manager** unlock timing (which rebirth) and office slots for it.
+- **Leasing Agent / Manager** unlock timing (which rebirth) and office slots for them.
+- Tenant bid distribution (e.g. ~50%–130% of list price; VIPs higher).
 
 ## ❓ Open questions
 
