@@ -242,7 +242,9 @@ When a unit is abandoned, you're offered a choice:
 - **No office upgrades.** Bigger offices are **new buildings** (costs more) — sell the old
   one and build the new one.
 - When security unlocks (~5th rebirth), a **3×3 office** becomes available.
-- Staff slots in the 3×3 office, and whether multiple offices are allowed — TBD.
+  - Its purpose is **security**: the extra space fits the monitors/computers.
+    **Cameras require the 3×3 office** to function.
+  - Staff slots: still 1 (TBD). One office per plot (TBD, assumed).
 - **Needs an accessible door**, same rule as units. Blocked office = staff can't work.
 
 ## Employees
