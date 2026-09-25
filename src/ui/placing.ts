@@ -1,5 +1,6 @@
 import { useStore, type Placing } from '../store'
-import { baseSize, rotatedSize } from '../game/geometry'
+import { baseSize, doorInside, rotatedSize } from '../game/geometry'
+import { hasDoor } from '../game/defs'
 import * as A from '../game/actions'
 import { notice } from './notice'
 import type { ItemKind, Rot } from '../game/types'
@@ -8,10 +9,17 @@ export function placingSize(p: Placing) {
   return rotatedSize(baseSize(p.kind, p.defId), p.rot)
 }
 
-/** Anchor the ghost so the pointer sits roughly in its middle. */
+/** Offset from the top-left corner to the tile the pointer should "hold": the door tile if it has one. */
+function grabOffset(p: Pick<Placing, 'kind' | 'defId' | 'rot'>): [number, number] {
+  if (hasDoor(p.kind)) return doorInside(0, 0, baseSize(p.kind, p.defId), p.rot)
+  const { w, h } = rotatedSize(baseSize(p.kind, p.defId), p.rot)
+  return [Math.floor((w - 1) / 2), Math.floor((h - 1) / 2)]
+}
+
+/** Anchor the ghost so the tapped/hovered tile is its door tile (or its middle if it has no door). */
 export function anchorAt(p: Placing, cx: number, cy: number): { x: number; y: number } {
-  const { w, h } = placingSize(p)
-  return { x: cx - Math.floor((w - 1) / 2), y: cy - Math.floor((h - 1) / 2) }
+  const [ox, oy] = grabOffset(p)
+  return { x: cx - ox, y: cy - oy }
 }
 
 export function startPlacing(kind: ItemKind, defId: string) {
@@ -36,7 +44,11 @@ export function startUpgrade(itemId: number, nextId: string) {
 export function rotatePlacing() {
   const s = useStore.getState()
   if (!s.placing) return
-  s.set({ placing: { ...s.placing, rot: ((s.placing.rot + 1) % 4) as Rot } })
+  // Spin around the held tile (the door) so it stays where the pointer is.
+  const [ox, oy] = grabOffset(s.placing)
+  const rot = ((s.placing.rot + 1) % 4) as Rot
+  const [nx, ny] = grabOffset({ ...s.placing, rot })
+  s.set({ placing: { ...s.placing, rot, x: s.placing.x + ox - nx, y: s.placing.y + oy - ny } })
 }
 
 export function cancelPlacing() {
