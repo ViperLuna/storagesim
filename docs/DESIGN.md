@@ -3,6 +3,23 @@
 > Living document. Captures what's been **locked** in RoundTable (RT) discussions.
 > Numbers marked *placeholder* are for tuning once the game is playable.
 
+## Build status — Alpha v0.1
+
+**In:** title screen (audio unlock), 7×7 lot with gate + locked tiles, 3 pre-placed lockers,
+place/move/sell/upgrade with green/red ghost (R rotate, Esc cancel), door access via flood fill,
+all 5 unit sizes, prospects with bids/sizes/VIPs, accept/upsize/decline, deposits, leases
+(renew/vacate/abandon), click-to-collect + clean, abandonment fixed sale or auction, blocked-door
+complaints → rage-quit + deposit refund, star rating with passive climb + zero-rating fail state,
+power (free hookup, generator tiers, on/off, overload blackout), small sign, rebirth with stacked
+requirements + bigger lot + rent multiplier, offline catch-up + "while you were away", pan/zoom/fit,
+toasts + message log with jump-to-unit, debug panel, autosave, phone layout.
+
+**Not yet:** office & staff (Janitor/Security/Agent/Manager), cameras & burglaries, payroll,
+bank loans & bankruptcy, sounds, real art.
+
+**Implementation note:** the free power hookup is currently **5 power** (= 5 lockers' worth), not
+"5 units of any size". It's `FREE_POWER` in `src/data/power.ts`.
+
 ## Elevator pitch
 
 An idle self-storage empire on an expandable grid. Place storage units, keep

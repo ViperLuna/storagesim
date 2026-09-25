@@ -1,0 +1,120 @@
+import { describe, expect, it } from 'vitest'
+import { createRun } from './init'
+import { canPlace, isAccessible, reachable } from './grid'
+import { doorOutside } from './geometry'
+import { place, offerUnit, collect, sell } from './actions'
+import { step, catchUp } from './sim'
+import { isTripped, powerDraw } from './power'
+import { UNITS } from '../data/units'
+
+describe('economy curve', () => {
+  it('bigger units take longer, pay more per point, per hour, and per tile', () => {
+    for (let i = 1; i < UNITS.length; i++) {
+      const a = UNITS[i - 1], b = UNITS[i]
+      expect(b.timer).toBeGreaterThan(a.timer)
+      expect(b.listPrice).toBeGreaterThan(a.listPrice)
+      expect(b.listPrice / b.timer).toBeGreaterThan(a.listPrice / a.timer)
+      expect(b.listPrice / b.timer / (b.w * b.h)).toBeGreaterThan(a.listPrice / a.timer / (a.w * a.h))
+    }
+  })
+})
+
+describe('starting run', () => {
+  it('7x7 with 3 accessible lockers', () => {
+    const s = createRun(0)
+    expect(s.size).toBe(7)
+    expect(s.items).toHaveLength(3)
+    const reach = reachable(s)
+    for (const it of s.items) expect(isAccessible(s, it, reach)).toBe(true)
+  })
+  it('grid grows by a ring per rebirth and stays odd', () => {
+    expect(createRun(1).size).toBe(9)
+    expect(createRun(5).size).toBe(17)
+  })
+})
+
+describe('placement', () => {
+  it('cannot place on locked tiles, off grid, or overlapping', () => {
+    const s = createRun(0)
+    expect(canPlace(s, 'unit', 'locker', 3, 6, 0)).toBe(false) // locked
+    expect(canPlace(s, 'unit', 'locker', 7, 0, 0)).toBe(false) // off grid
+    expect(canPlace(s, 'unit', 'locker', 3, 4, 0)).toBe(false) // on a starting locker
+    expect(canPlace(s, 'unit', 'locker', 0, 0, 0)).toBe(true)
+  })
+  it('rotation swaps footprint and moves the door', () => {
+    const s = createRun(0)
+    expect(canPlace(s, 'unit', 'small', 5, 0, 0)).toBe(true) // 1x2
+    expect(canPlace(s, 'unit', 'small', 6, 0, 1)).toBe(false) // 2x1 hangs off the edge
+    expect(doorOutside(0, 0, { w: 1, h: 2 }, 0)).toEqual([0, 2])
+    expect(doorOutside(0, 0, { w: 1, h: 2 }, 3)).toEqual([2, 0])
+  })
+  it('blocking the walkway cuts off a unit (placement still allowed)', () => {
+    const s = createRun(0)
+    s.money = 1e6
+    // Wall off the row in front of the lockers.
+    for (let x = 0; x < 7; x++) expect(place(s, 'unit', 'locker', x, 5, 0)).toBeNull()
+    const reach = reachable(s)
+    const starters = s.items.slice(0, 3)
+    for (const it of starters) expect(isAccessible(s, it, reach)).toBe(false)
+  })
+})
+
+describe('tenants & rent', () => {
+  it('deposit + rent accumulates on the unit until collected', () => {
+    const s = createRun(0)
+    s.prospects.push({ id: 999, name: 'Dillon A.', wants: 'locker', bid: 11, vip: false, arrivedAt: 0 })
+    const unit = s.items[0]
+    expect(offerUnit(s, 999, unit.id)).toBeNull()
+    expect(s.money).toBe(11)
+    unit.unit!.tenant!.leaseLeft = 100
+    step(s, 60)
+    expect(unit.unit!.pending).toBe(11)
+    expect(s.money).toBe(11)
+    collect(s, unit.id)
+    expect(s.money).toBe(22)
+  })
+  it('blocked tenant eventually rage-quits and gets deposit back', () => {
+    const s = createRun(0)
+    s.money = 1e6
+    s.prospects.push({ id: 999, name: 'Dillon A.', wants: 'locker', bid: 11, vip: false, arrivedAt: 0 })
+    const unit = s.items[1]
+    offerUnit(s, 999, unit.id)
+    place(s, 'unit', 'locker', unit.x, unit.y + 1, 0) // block the door
+    const before = s.money
+    for (let i = 0; i < 400; i++) step(s, 1)
+    expect(unit.unit!.status).toBe('vacant')
+    expect(s.money).toBeCloseTo(before - 11)
+  })
+  it('evicting by selling refunds the deposit and hurts rating', () => {
+    const s = createRun(0)
+    s.prospects.push({ id: 999, name: 'Dillon A.', wants: 'locker', bid: 11, vip: false, arrivedAt: 0 })
+    offerUnit(s, 999, s.items[0].id)
+    const rating = s.rating
+    sell(s, s.items[0].id)
+    expect(s.rating).toBeLessThan(rating)
+  })
+  it('offline catch-up piles rent on units', () => {
+    const s = createRun(0)
+    s.prospects.push({ id: 999, name: 'Dillon A.', wants: 'locker', bid: 10, vip: false, arrivedAt: 0 })
+    offerUnit(s, 999, s.items[0].id)
+    s.items[0].unit!.tenant!.leaseLeft = 1000
+    const sum = catchUp(s, 600)
+    expect(sum.rent).toBeCloseTo(100)
+    expect(s.items[0].unit!.pending).toBeCloseTo(100)
+  })
+})
+
+describe('power', () => {
+  it('6th locker with no generator trips the grid', () => {
+    const s = createRun(0)
+    s.money = 1e6
+    place(s, 'unit', 'locker', 0, 0, 0)
+    place(s, 'unit', 'locker', 1, 0, 0)
+    expect(powerDraw(s)).toBe(5)
+    expect(isTripped(s)).toBe(false)
+    place(s, 'unit', 'locker', 2, 0, 0)
+    expect(isTripped(s)).toBe(true)
+    place(s, 'generator', 'gen-1', 4, 0, 0)
+    expect(isTripped(s)).toBe(false)
+  })
+})
