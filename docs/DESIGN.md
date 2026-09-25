@@ -300,7 +300,7 @@ When a unit is abandoned, you're offered a choice:
   - Storage units: **1 per tile** (locker = 1, Medium 2×2 = 4, XL = 8).
   - **2×2 office: 5** (a bit more than 1 per tile).
   - **Sign: draws power** (*draft:* 1 per tile).
-  - **Cameras: a fraction** (*draft:* e.g. 0.25 each, or per covered tile — TBD).
+  - **Cameras: a small flat fraction, same for every tier** (*draft:* 0.25 each).
 - The **power grid can be upgraded** for more capacity — each upgrade gets pricier.
   (Upgrade uses the usual ghost flow if the footprint grows.)
 - **No utility bill.** Electricity is capacity only; the cost is in buying/upgrading the grid.
