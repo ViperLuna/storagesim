@@ -251,7 +251,15 @@ When a unit is abandoned, you're offered a choice:
 
 - Hired from the Upgrades menu. Wages paid on an interval (**per minute or every 5 minutes** — TBD).
   Must always be profitable to employ; wages tuned so the math holds.
-- What happens if you can't make payroll — TBD.
+- **Can't make payroll → staff still get paid and your cash goes negative.**
+
+## Debt, loans & bankruptcy (draft)
+
+- Cash can go **negative** (payroll is the main cause).
+- Possible **bank loan**: borrow cash, repaid with interest (details TBD).
+- **Bankruptcy = lose the run**: you restart **the current rebirth level** from scratch
+  (keep rebirth count / grid size / multiplier; lose everything built this run).
+- Trigger TBD — e.g. negative for too long, or below a debt limit. Needs clear warnings first.
 - Each employee takes an **office slot**.
 - **Leasing Agent** — auto-handles prospects using **player-set rules**:
   - **Minimum bid** (as % of list price, possibly per unit size). Can be set anywhere —
