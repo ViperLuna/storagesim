@@ -190,8 +190,12 @@ When a unit is abandoned, you're offered a choice:
   - **Evictions** (selling an occupied unit).
 - **Raising rating:** climbs **passively** on a tick (*placeholder:* every 5 minutes, same as payroll)
   as long as the place is maintained — no angry tenants, no blackouts, etc. Needs playtesting.
-- **Zero rating = lose the level** (restart current rebirth), same as bankruptcy, if you can't
-  bring it back up. Warning/grace mechanics TBD.
+- **Zero rating = lose the level** (restart current rebirth), same as bankruptcy.
+  - Hits **keep counting below zero** internally — the game knows you're still getting hammered.
+  - Same strike rule as bankruptcy: each tick at zero with **no gain** = a strike.
+    *Placeholder:* 3 strikes → **everyone pulls out**, level over.
+- **Level-over screen** (bankruptcy or zero rating): a message explaining what happened, with
+  **Restart** (restart current rebirth level) or **Quit**.
 - Affects prospect spawn speed / bids / VIP odds (details TBD).
 - **5 stars = rent bonus** (*placeholder:* +10%).
 
