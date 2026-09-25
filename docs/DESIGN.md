@@ -202,9 +202,19 @@ When a unit is abandoned, you're offered a choice:
   - Maybe a "grid filled" condition — iffy; TBD.
 - Still TBD: multiplier curve, what else carries over / unlocks.
 
+## Office
+
+- A structure on the grid — **3×3** to start. Holds **1 staff member**.
+- **Staff need an office slot** — no office, no employees.
+- The first employee available is the **Janitor**.
+- More staff slots / more employee types come with rebirths (TBD: bigger office tiers vs
+  second office; likely one office per plot upgraded via the same upgrade-ghost flow as signs).
+- Probably needs door access like units (staff have to get in) — TBD.
+
 ## Employees
 
 - Hired from the Upgrades menu, **paid per minute**. Must still be profitable to employ.
+- Each employee takes an **office slot**.
 - **Manager** — auto-collects rent.
 - **Janitor** — auto-cleans vacated units (so they're ready to rent again).
 - **Security guard** — possible late-game option (TBD); cameras are the main security.
@@ -228,6 +238,16 @@ When a unit is abandoned, you're offered a choice:
 - A tile is covered if its center is within range (and inside the cone angle for directional cameras).
 - *Placeholder:* one camera per tile.
 - More TBD.
+
+## Unlock timeline (draft)
+
+Rebirths unlock new stuff, not just a bigger grid.
+
+| Rebirth | Unlocks (draft) |
+|---|---|
+| Start | Storage units, sign, office + Janitor |
+| ~5th | A new employee type; **burglaries** begin; **cameras** unlocked |
+| Later | TBD |
 
 ## Menus (draft)
 
