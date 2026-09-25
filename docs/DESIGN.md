@@ -303,8 +303,9 @@ When a unit is abandoned, you're offered a choice:
   - **Cameras: a fraction** (*draft:* e.g. 0.25 each, or per covered tile — TBD).
 - The **power grid can be upgraded** for more capacity — each upgrade gets pricier.
   (Upgrade uses the usual ghost flow if the footprint grows.)
+- **No utility bill.** Electricity is capacity only; the cost is in buying/upgrading the grid.
 - Still TBD: over-capacity behavior (draft: newest units lose power → no rent + complaint),
-  whether the office counts against the free allowance, utility bill.
+  whether the office counts against the free allowance.
 
 ## Cameras (overlay layer)
 
