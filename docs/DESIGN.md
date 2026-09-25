@@ -70,7 +70,7 @@ O O L L L . .
 |---|---|
 | **Place** | Buy from Build menu → ghost → click to place. |
 | **Move** | Pick up existing item → ghost (old spot counts as free) → drop, or Esc to snap back. **Free.** Occupied units move with the tenant (timer pauses while held). |
-| **Sell** | Partial refund (*placeholder:* 50%; idea: 100% within a short "oops" window). Selling an occupied unit = **eviction** (confirm popup; consequences TBD — rating hit? deposit refund?). No evictions for non-payment. |
+| **Sell** | Partial refund (*placeholder:* 50%; idea: 100% within a short "oops" window). Selling an occupied unit = **eviction** (confirm popup, **rating hit**, deposit refunded). No evictions for non-payment. |
 | **Upgrade** | Upgraded version becomes a ghost (old footprint counts as free) → place anywhere valid → old one removed, pay the difference. Esc = no change. |
 
 ## Access / pathing
@@ -187,7 +187,9 @@ When a unit is abandoned, you're offered a choice:
     Eventually they leave and you **refund their deposit** (= the agreed price per point).
   - **Uncaught burglaries.** Tenants of **adjacent units may pull out** too.
 - **Does NOT lower rating:** abandonments (you already lose that unit's rent until you deal with it).
-- Raising rating — TBD (ideas: completed leases, renewals, caught burglars, complaint-free streaks).
+  - **Evictions** (selling an occupied unit).
+- **Raising rating:** climbs **passively** on a tick (*placeholder:* every 5 minutes, same as payroll)
+  as long as the place is maintained — no angry tenants, no blackouts, etc. Needs playtesting.
 - **Zero rating = lose the level** (restart current rebirth), same as bankruptcy, if you can't
   bring it back up. Warning/grace mechanics TBD.
 - Affects prospect spawn speed / bids / VIP odds (details TBD).
