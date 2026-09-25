@@ -263,6 +263,8 @@ When a unit is abandoned, you're offered a choice:
   - Each payroll where cash is **below $0 and hasn't improved** since the last payroll = a **strike**.
   - Any payroll where cash went up resets strikes. *Placeholder:* 3 strikes = bankrupt.
   - Big red warning with the strike count (e.g. "⚠️ 2/3 — bankruptcy next payroll").
+- **Ways out of the hole:** sell stuff (cameras, units, sign…), **fire staff** (stops their wages),
+  or take a loan. Then build income back up before re-expanding.
 - **Offline safety:** the offline simulation **pauses payroll once cash hits $0**, so you can wake up
   broke but never bankrupt from sleeping.
 - Each employee takes an **office slot**.
