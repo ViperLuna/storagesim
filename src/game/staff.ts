@@ -3,7 +3,7 @@ import type { GameState, Item, Staff } from './types'
 import { bfsFrom, isAccessible, occupancy, pathTo, reachable, isWalkable } from './grid'
 import { doorOutside, baseSize } from './geometry'
 import { isPowered } from './power'
-import { officeDef } from './defs'
+import { officeDef, unitDef } from './defs'
 import { log } from './log'
 import * as S from '../data/staff'
 
@@ -16,7 +16,9 @@ export const officeSlots = (state: GameState) => {
 const doorTile = (it: Item) => doorOutside(it.x, it.y, baseSize(it.kind, it.defId), it.rot)
 
 export const janitorSpeed = (state: GameState) => S.JANITOR_SPEED_BASE + S.JANITOR_SPEED_PER_LEVEL * (state.upgrades.janitorSpeed ?? 0)
-export const janitorCleanTime = (state: GameState) => S.JANITOR_CLEAN_BASE * S.JANITOR_CLEAN_MULT_PER_LEVEL ** (state.upgrades.janitorClean ?? 0)
+/** Janitor clean time as a multiple of yours (1.5 at level 0, shrinking with mop upgrades). */
+export const janitorCleanFactor = (state: GameState) => S.JANITOR_CLEAN_FACTOR * S.JANITOR_CLEAN_MULT_PER_LEVEL ** (state.upgrades.janitorClean ?? 0)
+export const janitorCleanTime = (state: GameState, item: Item) => unitDef(item.defId).cleanTime * janitorCleanFactor(state)
 
 /** Why staff can't work right now, if they can't. */
 export function staffBlocker(state: GameState): string | null {
@@ -41,7 +43,8 @@ function setIdle(s: Staff) {
 
 /** Nearest unclaimed dirty unit by walking distance from where the janitor stands. */
 function pickJob(state: GameState, s: Staff): boolean {
-  const claimed = new Set(state.staff.filter(o => o !== s && o.targetId !== undefined).map(o => o.targetId))
+  const claimed = new Set<number | undefined>(state.staff.filter(o => o !== s && o.targetId !== undefined).map(o => o.targetId))
+  for (const id of state.playerClean.queue) claimed.add(id) // you've got those
   const sx = Math.round(s.x), sy = Math.round(s.y)
   const { dist, prev } = bfsFrom(state, sx, sy)
   let best: { item: Item; d: number; tx: number; ty: number } | null = null
@@ -121,11 +124,11 @@ function updateJanitor(state: GameState, s: Staff, dt: number) {
     }
     if (s.mode === 'toJob') {
       const target = state.items.find(i => i.id === s.targetId)
-      if (target?.unit?.status !== 'dirty') { setIdle(s); continue }
+      if (target?.unit?.status !== 'dirty' || state.playerClean.queue.includes(target.id)) { setIdle(s); continue }
       budget = walk(state, s, budget)
       if (s.mode === 'toJob' && !s.path.length) {
         s.mode = 'cleaning'
-        s.cleanLeft = janitorCleanTime(state)
+        s.cleanLeft = s.cleanTotal = janitorCleanTime(state, target)
       }
       continue
     }

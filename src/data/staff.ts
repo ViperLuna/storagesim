@@ -19,7 +19,8 @@ export const STAFF: StaffDef[] = [
 // Janitor tuning
 export const JANITOR_SPEED_BASE = 1.5 // tiles per second
 export const JANITOR_SPEED_PER_LEVEL = 0.5
-export const JANITOR_CLEAN_BASE = 8 // seconds per unit
+/** Janitor's clean time as a multiple of yours (he starts slower; mop upgrades fix that). */
+export const JANITOR_CLEAN_FACTOR = 1.5
 export const JANITOR_CLEAN_MULT_PER_LEVEL = 0.8
 
 export interface UpgradeDef {

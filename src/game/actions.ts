@@ -78,6 +78,7 @@ export function sell(state: GameState, id: number): Result {
   }
   state.money += sellValue(state, it)
   state.items.splice(idx, 1)
+  cancelClean(state, it.id)
   if (it.kind === 'office' && state.staff.length) {
     state.staff = []
     log(state, `👋 Sold the office — all staff were let go.`, { tone: 'bad' })
@@ -85,18 +86,38 @@ export function sell(state: GameState, id: number): Result {
   return null
 }
 
-/** Click a unit: collect its pile of rent, and clean it if the tenant moved out. */
+/** Click a unit: collect its pile of rent, and start cleaning it (or queue it) if the tenant moved out. */
 export function collect(state: GameState, id: number): number {
-  const u = state.items.find(i => i.id === id)?.unit
-  if (!u) return 0
+  const it = state.items.find(i => i.id === id)
+  const u = it?.unit
+  if (!it || !u) return 0
   const amt = u.pending
   state.money += amt
   u.pending = 0
-  if (u.status === 'dirty') {
-    u.status = 'vacant'
-    u.dirtySince = undefined
-  }
+  if (u.status === 'dirty') queueClean(state, it)
   return amt
+}
+
+/** You clean one unit at a time; extra clicks line up behind it. */
+export function queueClean(state: GameState, it: Item): void {
+  const pc = state.playerClean
+  if (pc.queue.includes(it.id)) return
+  if (state.staff.some(s => s.targetId === it.id)) return // the janitor's already on it
+  pc.queue.push(it.id)
+  if (pc.queue.length === 1) pc.left = pc.total = unitDef(it.defId).cleanTime
+}
+
+export function cancelClean(state: GameState, id: number): void {
+  const pc = state.playerClean
+  const wasFirst = pc.queue[0] === id
+  pc.queue = pc.queue.filter(q => q !== id)
+  if (wasFirst) startNextClean(state)
+}
+
+export function startNextClean(state: GameState): void {
+  const pc = state.playerClean
+  const next = state.items.find(i => i.id === pc.queue[0])
+  pc.left = pc.total = next ? unitDef(next.defId).cleanTime : 0
 }
 
 export function toggle(state: GameState, id: number): void {

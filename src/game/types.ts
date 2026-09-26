@@ -85,6 +85,7 @@ export interface Staff {
   path: [number, number][]
   targetId?: number
   cleanLeft: number
+  cleanTotal?: number
 }
 
 export interface Loan {
@@ -94,7 +95,7 @@ export interface Loan {
 }
 
 export interface GameState {
-  version: 3
+  version: 4
   rebirth: number
   size: number
   money: number
@@ -118,6 +119,8 @@ export interface GameState {
   upgrades: Record<string, number>
   loan?: Loan
   bankruptStrikes: number
+  /** Units YOU are cleaning: first one in progress, the rest queued. */
+  playerClean: { queue: number[]; left: number; total: number }
   cashAtLastPayroll: number
   lastSaved: number
   /** Items whose power is out this frame (derived, but cached for UI). */

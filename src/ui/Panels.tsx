@@ -12,7 +12,7 @@ import { OFFICES } from '../data/office'
 import { STAFF, UPGRADES } from '../data/staff'
 import { LOAN_GRACE, LOAN_INSTALLMENTS, LOAN_INTEREST, loanAmountFor } from '../data/bank'
 import { FAIL_STRIKES, TICK_SECONDS } from '../data/economy'
-import { janitorCleanTime, janitorSpeed, office, officeSlots, payrollTotal, staffBlocker } from '../game/staff'
+import { janitorCleanFactor, janitorSpeed, office, officeSlots, payrollTotal, staffBlocker } from '../game/staff'
 import { notice } from './notice'
 
 export function SidePanel() {
@@ -194,7 +194,7 @@ function StaffMenu() {
       })}
       {wages > 0 && <p className="small">Payroll: <b>{money(wages)}</b> every {duration(TICK_SECONDS)} (next in {duration(g.tickIn)}).</p>}
       <h3>Upgrades</h3>
-      <p className="small muted">Walk speed {janitorSpeed(g).toFixed(1)} tiles/s · clean time {janitorCleanTime(g).toFixed(1)}s</p>
+      <p className="small muted">Walk speed {janitorSpeed(g).toFixed(1)} tiles/s · cleans in {Math.round(janitorCleanFactor(g) * 100)}% of your time</p>
       {UPGRADES.map(u => {
         const lvl = g.upgrades[u.id] ?? 0
         const maxed = lvl >= u.costs.length

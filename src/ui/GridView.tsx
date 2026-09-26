@@ -267,11 +267,24 @@ function ItemView({ game, item, accessible, selected, flashN, hidden }: {
     else if (u.status === 'occupied' && t) status = (
       <span className="st">{t.vip && '👑'}{t.anger >= ANGER_GRACE && '😠'}{t.name}</span>
     )
-    else if (u.status === 'dirty') status = <span className="st">🧹 dirty</span>
+    else if (u.status === 'dirty') {
+      const qi = game.playerClean.queue.indexOf(item.id)
+      const jan = game.staff.find(st => st.targetId === item.id)
+      const [icon, text] = qi === 0 ? ['🧽', 'cleaning'] : qi > 0 ? ['⏳', `queued #${qi + 1}`] : jan?.mode === 'cleaning' ? ['🧹', 'janitor'] : jan ? ['🚶', 'janitor coming'] : ['🧹', 'dirty']
+      status = <span className="st" title={text}>{fp.w * fp.h > 1 ? `${icon} ${text}` : icon}</span>
+    }
     else if (u.status === 'abandoned') status = <span className="st">🏚️ abandoned</span>
     else if (u.status === 'auction') status = <span className="st">🔨 {Math.max(0, Math.ceil(((u.auctionEndsAt ?? 0) - game.time) / 60))}m</span>
   }
-  const progress = u?.status === 'occupied' ? u.progress / unitDef(item.defId).timer : 0
+  let progress = u?.status === 'occupied' ? u.progress / unitDef(item.defId).timer : 0
+  let cleaning = false
+  if (u?.status === 'dirty') {
+    const pc = game.playerClean
+    const jan = game.staff.find(st => st.targetId === item.id && st.mode === 'cleaning')
+    if (pc.queue[0] === item.id && pc.total) progress = 1 - pc.left / pc.total
+    else if (jan?.cleanTotal) progress = 1 - jan.cleanLeft / jan.cleanTotal
+    cleaning = progress > 0
+  }
   return (
     <div key={flashN} className={cls + (flashN ? ' flash' : '')}
       style={{ left: item.x * TILE, top: item.y * TILE, width: fp.w * TILE, height: fp.h * TILE, background: defColor(item.kind, item.defId) }}>
@@ -285,7 +298,7 @@ function ItemView({ game, item, accessible, selected, flashN, hidden }: {
       {u && u.pending > 0 && <div className="pending">{money(u.pending)}</div>}
       {hasDoor(item.kind) && !accessible && u?.status !== 'auction' && <div className="badge blocked" title="Door can't be reached from the gate">⛔</div>}
       {!powered && itemDraw(item) > 0 && <div className="badge off" title="No power">⚡</div>}
-      {progress > 0 && <div className="progress"><div style={{ width: `${progress * 100}%` }} /></div>}
+      {progress > 0 && <div className={`progress ${cleaning ? 'clean' : ''}`}><div style={{ width: `${progress * 100}%` }} /></div>}
     </div>
   )
 }

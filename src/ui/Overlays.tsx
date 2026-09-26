@@ -34,9 +34,9 @@ export function SelectionPanel() {
       {it.kind === 'office' && <OfficeInfo />}
       {draw > 0 && <div className="small">Power: {draw}⚡ · {it.on ? (isPowered(g, it) ? 'on' : 'on (grid tripped!)') : 'switched off'}</div>}
       <div className="actions">
-        {u && (u.pending > 0 || u.status === 'dirty') && (
+        {u && (u.pending > 0 || (u.status === 'dirty' && !g.playerClean.queue.includes(it.id) && !g.staff.some(s => s.targetId === it.id))) && (
           <button className="good" onClick={() => mutate(s => A.collect(s, it.id))}>
-            {u.status === 'dirty' ? '🧹 Collect & clean' : `💰 Collect ${money(u.pending)}`}
+            {u.status === 'dirty' ? (u.pending > 0 ? `💰 Collect ${money(u.pending)} & clean` : '🧽 Clean') : `💰 Collect ${money(u.pending)}`}
           </button>
         )}
         {u?.status === 'abandoned' && <>
@@ -74,6 +74,19 @@ function OfficeInfo() {
   )
 }
 
+function CleanInfo() {
+  const g = useStore(s => s.game)!
+  const mutate = useStore(s => s.mutate)
+  const it = g.items.find(i => i.id === useStore.getState().selectedId)!
+  const pc = g.playerClean
+  const qi = pc.queue.indexOf(it.id)
+  const jan = g.staff.find(s => s.targetId === it.id)
+  if (qi === 0) return <div>🧽 You're cleaning it — {duration(pc.left)} left. <button className="linkish" onClick={() => mutate(s => A.cancelClean(s, it.id))}>stop</button></div>
+  if (qi > 0) return <div>⏳ In your cleaning queue (#{qi + 1}). <button className="linkish" onClick={() => mutate(s => A.cancelClean(s, it.id))}>remove</button></div>
+  if (jan) return <div>🧹 The janitor's {jan.mode === 'cleaning' ? `cleaning it — ${duration(jan.cleanLeft)} left` : 'on the way'}.</div>
+  return <div>Tenant moved out. Clean it before re-renting ({duration(unitDef(it.defId).cleanTime)} for you).</div>
+}
+
 function UnitInfo() {
   const g = useStore(s => s.game)!
   const it = g.items.find(i => i.id === useStore.getState().selectedId)!
@@ -89,7 +102,7 @@ function UnitInfo() {
         <div>{t.vip && '👑 '}<b>{t.name}</b> · {money(t.bid * rentMultiplier(g))}/pt · {t.leaseLeft} pts left on lease</div>
         <div>Next point in {duration(d.timer - u.progress)}</div>
       </>}
-      {u.status === 'dirty' && <div>Tenant moved out — click to collect & clean before re-renting.</div>}
+      {u.status === 'dirty' && <CleanInfo />}
       {u.status === 'abandoned' && <div>Abandoned! Take the fixed offer, or gamble on an auction (~60% it beats the offer).</div>}
       {u.status === 'auction' && <div>🔨 Auction ends in {duration((u.auctionEndsAt ?? 0) - g.time)}</div>}
       {u.pending > 0 && <div>💰 Waiting to collect: <b>{money(u.pending)}</b></div>}

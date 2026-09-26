@@ -76,7 +76,11 @@ function migrate(g: any): GameState | null {
     }
     g.version = 3
   }
-  return g.version === 3 ? (g as GameState) : null
+  if (g.version === 3) {
+    g.playerClean = { queue: [], left: 0, total: 0 }
+    g.version = 4
+  }
+  return g.version === 4 ? (g as GameState) : null
 }
 
 function writeSave(g: GameState) {

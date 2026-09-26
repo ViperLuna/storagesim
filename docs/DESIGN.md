@@ -144,6 +144,9 @@ the table is the "list price" baseline.
 
 - Rent **accumulates on the unit** (💰 counter) — online and offline alike. Timers never stall.
 - **Click the unit to collect** its pile into your wallet. (Refreshing gains nothing.)
+- **Cleaning takes time.** You clean one unit at a time (extra clicks queue up): Locker 10s,
+  Small 15s, Medium 25s, Large 40s, XL 60s. The Janitor starts at **150%** of your time and
+  gets faster with mop upgrades (-20% per level), passing you around level 2–3.
 - When a tenant **vacates**, the unit shows as needing attention: **clicking it collects
   any remaining rent and cleans it out**. It can't be rented again until you do.
 - A **Manager** (hired employee) automates collecting later.

@@ -11,6 +11,7 @@ import { expWait, rand, randInt, weighted } from './random'
 import { makeProspect, stars } from './tenants'
 import { aOrAn, money } from './format'
 import { payrollTotal, stepStaff } from './staff'
+import { startNextClean } from './actions'
 
 export interface StepOptions {
   offline?: boolean
@@ -194,6 +195,7 @@ export function step(state: GameState, dt: number, opts: StepOptions = {}): void
     else if (u.status === 'auction' && state.time >= (u.auctionEndsAt ?? 0)) finishAuction(state, item, opts.summary)
   }
 
+  stepPlayerCleaning(state, dt)
   stepStaff(state, dt)
 
   // Prospects: nobody's at the desk while you're offline, so no new arrivals then.
@@ -212,6 +214,30 @@ export function step(state: GameState, dt: number, opts: StepOptions = {}): void
   while (state.tickIn <= 0 && !state.levelOver) {
     state.tickIn += E.TICK_SECONDS
     businessTick(state, !!opts.offline)
+  }
+}
+
+function stepPlayerCleaning(state: GameState, dt: number) {
+  const pc = state.playerClean
+  let budget = dt
+  while (budget > 0 && pc.queue.length) {
+    const it = state.items.find(i => i.id === pc.queue[0])
+    if (!it || it.unit?.status !== 'dirty' || it.id === state.heldId) {
+      if (it && it.id === state.heldId) return // paused while you're moving it
+      pc.queue.shift()
+      startNextClean(state)
+      continue
+    }
+    const used = Math.min(budget, pc.left)
+    pc.left -= used
+    budget -= used
+    if (pc.left <= 0) {
+      it.unit.status = 'vacant'
+      it.unit.dirtySince = undefined
+      log(state, `✨ You cleaned ${it.label}. Ready to rent!`, { tone: 'good', focusId: it.id })
+      pc.queue.shift()
+      startNextClean(state)
+    }
   }
 }
 

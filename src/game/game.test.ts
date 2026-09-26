@@ -219,3 +219,35 @@ describe('offline safety', () => {
     expect(s.rating).toBeLessThan(3)
   })
 })
+
+describe('cleaning takes time', () => {
+  it('you clean one unit at a time, in order, by size', () => {
+    const s = createRun(0)
+    const [a, b] = s.items
+    for (const it of [a, b]) { it.unit!.status = 'dirty'; it.unit!.dirtySince = 0 }
+    collect(s, a.id)
+    collect(s, b.id)
+    expect(a.unit!.status).toBe('dirty')
+    step(s, 9.9)
+    expect(a.unit!.status).toBe('dirty')
+    step(s, 0.2)
+    expect(a.unit!.status).toBe('vacant')
+    expect(b.unit!.status).toBe('dirty') // queued behind a
+    step(s, 10)
+    expect(b.unit!.status).toBe('vacant')
+  })
+  it('janitor starts slower than you and skips units you queued', () => {
+    const s = createRun(0)
+    s.money = 1e6
+    place(s, 'generator', 'gen-1', 6, 0, 0)
+    place(s, 'office', 'office-small', 0, 0, 0)
+    hire(s, 'janitor')
+    const [a, b] = s.items
+    for (const it of [a, b]) { it.unit!.status = 'dirty'; it.unit!.dirtySince = 0 }
+    collect(s, a.id)
+    step(s, 0.1)
+    expect(s.staff[0].targetId).toBe(b.id)
+    for (let i = 0; i < 400 && s.staff[0].mode !== 'cleaning'; i++) step(s, 0.05)
+    expect(s.staff[0].cleanTotal).toBeCloseTo(15) // 10s locker × 1.5
+  })
+})
