@@ -434,6 +434,15 @@ Rebirths unlock new stuff, not just a bigger grid.
 - Draft options: Continue, New Game, Settings.
 - After Continue: show a **"While you were away…"** summary of the offline simulation.
 
+## Sounds (planned)
+
+- Audio unlocks on the title screen's first click.
+- 🔔 **New prospect:** a simple doorbell "ding-dong" (familiar > realistic).
+- 👑 **VIP prospect:** the **Westminster chimes** (grandfather-clock tune; public domain).
+- Others TBD: collect (cha-ching), cleaned, complaint, blackout, payroll.
+- Plan: drop files in `public/sounds/`, map events in `src/data/sounds.ts`; missing files play nothing.
+  Volume/mute in Settings.
+
 ## Menus (draft)
 
 - 🏗️ **Build** — units, signs
