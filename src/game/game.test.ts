@@ -251,3 +251,12 @@ describe('cleaning takes time', () => {
     expect(s.staff[0].cleanTotal).toBeCloseTo(15) // 10s locker × 1.5
   })
 })
+
+describe('names', () => {
+  it('no two people on the lot share a name', async () => {
+    const { makeProspect } = await import('./tenants')
+    const s = createRun(0)
+    for (let i = 0; i < 400; i++) s.prospects.push(makeProspect(s))
+    expect(new Set(s.prospects.map(p => p.name)).size).toBe(400)
+  })
+})

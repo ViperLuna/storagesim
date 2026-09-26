@@ -5,9 +5,22 @@ import { pick, rand, weighted } from './random'
 import { unitDef } from './defs'
 import { RATING_MAX } from '../data/economy'
 
-export function randomName(): string {
-  if (Math.random() < T.PUN_CHANCE) return pick(T.PUN_NAMES)
-  return `${pick(T.FIRST_NAMES)} ${pick([...T.LAST_INITIALS])}.`
+/** Names currently on the lot: waiting prospects and current tenants. */
+export function namesInUse(state: GameState): Set<string> {
+  const names = new Set(state.prospects.map(p => p.name))
+  for (const it of state.items) if (it.unit?.tenant) names.add(it.unit.tenant.name)
+  return names
+}
+
+/** A random name nobody on the lot is already using. */
+export function randomName(state: GameState): string {
+  const taken = namesInUse(state)
+  for (let i = 0; i < 200; i++) {
+    const name = Math.random() < T.PUN_CHANCE ? pick(T.PUN_NAMES) : `${pick(T.FIRST_NAMES)} ${pick([...T.LAST_INITIALS])}.`
+    if (!taken.has(name)) return name
+  }
+  // Absurdly crowded lot — add a number rather than duplicate.
+  return `${pick(T.FIRST_NAMES)} ${pick([...T.LAST_INITIALS])}. ${taken.size}`
 }
 
 export const stars = (state: GameState) => Math.max(0, Math.min(RATING_MAX, state.rating))
@@ -26,5 +39,5 @@ export function makeProspect(state: GameState, forceVip = false): Prospect {
   let bid = list * f
   if (vip) bid = list * rand(T.VIP_BID_MIN, T.VIP_BID_MAX)
   bid = bid >= 20 ? Math.round(bid) : Math.round(bid * 100) / 100
-  return { id: state.nextId++, name: randomName(), wants, bid, vip, arrivedAt: state.time }
+  return { id: state.nextId++, name: randomName(state), wants, bid, vip, arrivedAt: state.time }
 }
