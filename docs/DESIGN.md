@@ -25,6 +25,10 @@ pause at $0, rebirth-3 "employee" requirement now works.
 **Implementation note:** the free power hookup is currently **5 power** (= 5 lockers' worth), not
 "5 units of any size". It's `FREE_POWER` in `src/data/power.ts`.
 
+## Playtest notes
+
+- **Locker timing (60s) feels right.** Around **7 lockers** the money comes in steadily. Keep it.
+
 ## Elevator pitch
 
 An idle self-storage empire on an expandable grid. Place storage units, keep
