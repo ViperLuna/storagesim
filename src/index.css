@@ -225,3 +225,7 @@ button.bad { background: #3d2224; border-color: #733237; color: #ffc9cb; }
 .card.nofit { opacity: 0.6; }
 button.stat { background: none; border: none; padding: 0; text-align: left; }
 .stat.clickable .stat-label { text-decoration: underline dotted; text-underline-offset: 2px; }
+@media (max-width: 760px) {
+  .selection.anchored.dock-top { top: 12px !important; bottom: auto; }
+}
+button.bad.armed { background: var(--bad); color: #fff; border-color: var(--bad); }

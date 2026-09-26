@@ -50,16 +50,30 @@ export function SelectionPanel({ anchor }: { anchor: Anchor }) {
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
+  // Ignore taps for a moment after opening so a quick double-tap can't land on a button.
+  const [ready, setReady] = useState(false)
+  const [armSell, setArmSell] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => setReady(true), 400)
+    return () => clearTimeout(t)
+  }, [])
+  useEffect(() => {
+    if (!armSell) return
+    const t = setTimeout(() => setArmSell(false), 3000)
+    return () => clearTimeout(t)
+  }, [armSell])
   const it = g.items.find(i => i.id === id)
   if (!it) return null
   const pos = popupPosition(anchor, h)
+  // Phones dock the popup; put it at the top when the unit is in the bottom half so it never covers it.
+  const dockTop = (anchor.top + anchor.bottom) / 2 > anchor.vh / 2
   const u = it.unit
   const draw = itemDraw(it)
   const next = nextTier(it)
   const upCost = A.upgradeCost(it)
   const sellFor = A.sellValue(g, it)
   return (
-    <div ref={ref} className="selection anchored" style={{ left: pos.left, top: pos.top, width: PANEL_W }}
+    <div ref={ref} className={`selection anchored ${dockTop ? 'dock-top' : ''}`} style={{ left: pos.left, top: pos.top, width: PANEL_W, pointerEvents: ready ? undefined : 'none' }}
       onPointerDown={e => e.stopPropagation()} onPointerUp={e => e.stopPropagation()}>
       <div className="row">
         <strong>{it.kind === 'unit' ? `${it.label} · ${unitDef(it.defId).name}` : it.label}</strong>
@@ -84,12 +98,14 @@ export function SelectionPanel({ anchor }: { anchor: Anchor }) {
           <button disabled={g.money < upCost} onClick={() => startUpgrade(it.id, next)}>⬆️ {defName(it.kind, next)} ({money(upCost)})</button>
         )}
         {u?.status !== 'auction' && (
-          <button className="bad" onClick={() => {
+          <button className={`bad ${armSell ? 'armed' : ''}`} onClick={() => {
+            // Two taps to sell, always — no one-tap accidents.
+            if (!armSell) { setArmSell(true); return }
             if (it.kind === 'office' && g.staff.length && !confirm('Sell the office? All staff will be let go.')) return
             if (u?.status === 'occupied' && !confirm(`Evict ${u.tenant!.name}? They get their ${money(u.tenant!.deposit)} deposit back and your rating takes a hit. 😬`)) return
             mutate(s => A.sell(s, it.id))
             set({ selectedId: null })
-          }}>💲 Sell ({money(sellFor)})</button>
+          }}>{armSell ? `Tap again to sell (${money(sellFor)})` : `💲 Sell (${money(sellFor)})`}</button>
         )}
       </div>
     </div>
