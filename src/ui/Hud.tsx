@@ -6,13 +6,14 @@ import { rentMultiplierFor } from '../data/rebirths'
 
 export function Hud() {
   const g = useStore(s => s.game)!
+  const set = useStore(s => s.set)
   const draw = powerDraw(g), cap = powerCapacity(g)
   const st = stars(g)
   return (
     <header className="hud">
       <div className="brand">StorageSim</div>
       <Stat label="Cash" value={money(g.money)} tone={g.money < 0 ? 'bad' : undefined} />
-      <Stat label="Rating" value={<Stars value={st} />} tone={g.failStrikes ? 'bad' : undefined} />
+      <Stat label="Rating" value={<Stars value={st} />} tone={g.failStrikes ? 'bad' : undefined} onClick={() => set({ menu: 'money' })} />
       <Stat label="POWER" value={`${fmt(draw)} / ${fmt(cap)}`} tone={g.tripped ? 'bad' : draw > cap * 0.85 ? 'warn' : undefined} />
       {(g.staff.length > 0 || g.loan) && <Stat label="Payday" value={duration(g.tickIn)} tone={g.bankruptStrikes ? 'bad' : undefined} />}
       <Stat label="Rebirth" value={`#${g.rebirth} · ×${rentMultiplierFor(g.rebirth)}`} />
@@ -23,13 +24,10 @@ export function Hud() {
 
 const fmt = (n: number) => (Number.isInteger(n) ? n : n.toFixed(2)).toString()
 
-function Stat({ label, value, tone }: { label: string; value: React.ReactNode; tone?: 'bad' | 'warn' }) {
-  return (
-    <div className={`stat ${tone ?? ''}`}>
-      <span className="stat-label">{label}</span>
-      <span className="stat-value">{value}</span>
-    </div>
-  )
+function Stat({ label, value, tone, onClick }: { label: string; value: React.ReactNode; tone?: 'bad' | 'warn'; onClick?: () => void }) {
+  const cls = `stat ${tone ?? ''} ${onClick ? 'clickable' : ''}`
+  const body = <><span className="stat-label">{label}</span><span className="stat-value">{value}</span></>
+  return onClick ? <button className={cls} onClick={onClick}>{body}</button> : <div className={cls}>{body}</div>
 }
 
 export function Stars({ value }: { value: number }) {

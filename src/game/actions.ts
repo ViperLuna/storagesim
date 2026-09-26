@@ -73,7 +73,7 @@ export function sell(state: GameState, id: number): Result {
   if (u) state.money += u.pending
   if (u?.status === 'occupied' && u.tenant) {
     state.money -= u.tenant.deposit
-    state.rating -= E.RATING_EVICTION_HIT
+    state.rating = Math.max(0, state.rating - E.RATING_EVICTION_HIT)
     log(state, `🚪 Evicted ${u.tenant.name} from ${it.label}. Deposit refunded, and they're leaving a bad review.`, { tone: 'bad' })
   }
   state.money += sellValue(state, it)

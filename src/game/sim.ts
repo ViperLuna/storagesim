@@ -142,27 +142,36 @@ function payday(state: GameState, offline: boolean) {
   state.cashAtLastPayroll = state.money
 }
 
-function businessTick(state: GameState, offline: boolean) {
-  payday(state, offline)
-  if (state.levelOver) return
-  let issues = 0
+export interface RatingIssue { text: string; focusId?: number }
+
+/** Everything that will count against your rating at the next tick. */
+export function ratingIssues(state: GameState, offline = false): RatingIssue[] {
+  const out: RatingIssue[] = []
   for (const it of state.items) {
     const u = it.unit
     if (!u) continue
-    if (u.status === 'occupied' && u.tenant!.anger >= T.ANGER_GRACE) issues++
+    if (u.status === 'occupied' && u.tenant!.anger >= T.ANGER_GRACE) out.push({ text: `${u.tenant!.name} can't reach ${it.label}`, focusId: it.id })
     // Nobody can mop while you're away (unless you have a janitor), so dirty units only count online.
-    if (!offline && u.status === 'dirty' && state.time - (u.dirtySince ?? state.time) >= E.DIRTY_TICKS_BEFORE_ISSUE * E.TICK_SECONDS) issues++
+    if (!offline && u.status === 'dirty' && state.time - (u.dirtySince ?? state.time) >= E.DIRTY_TICKS_BEFORE_ISSUE * E.TICK_SECONDS) out.push({ text: `${it.label} has been dirty too long`, focusId: it.id })
   }
-  if (state.tripped) issues++
+  if (state.tripped) out.push({ text: 'Power is out (overloaded grid)' })
+  return out
+}
+
+function businessTick(state: GameState, offline: boolean) {
+  payday(state, offline)
+  if (state.levelOver) return
+  const issues = ratingIssues(state, offline).length
 
   // Your rating never drops while you're away; it can still climb if everything's running clean.
-  if (issues && !offline) state.rating -= E.RATING_LOSS_PER_ISSUE * issues
+  // It never goes below 0 — strikes track "still getting hit at zero".
+  if (issues && !offline) state.rating = Math.max(0, state.rating - E.RATING_LOSS_PER_ISSUE * issues)
   else if (!issues) state.rating = Math.min(E.RATING_MAX, state.rating + E.RATING_GAIN_PER_TICK)
 
   if (offline) {
     state.failStrikes = 0
   } else if (state.rating <= 0) {
-    if (state.rating <= state.ratingAtLastTick) state.failStrikes++
+    if (issues) state.failStrikes++
     else state.failStrikes = 0
     if (state.failStrikes >= E.FAIL_STRIKES) {
       state.levelOver = 'rating'

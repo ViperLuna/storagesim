@@ -95,11 +95,11 @@ export interface Loan {
 }
 
 export interface GameState {
-  version: 4
+  version: 5
   rebirth: number
   size: number
   money: number
-  /** Can go below zero internally; displayed clamped. */
+  /** 0–5 stars. */
   rating: number
   ratingAtLastTick: number
   failStrikes: number

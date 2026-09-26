@@ -237,8 +237,9 @@ When a unit is abandoned, you're offered a choice:
 - **Raising rating:** climbs **passively** on a tick (*placeholder:* every 5 minutes, same as payroll)
   as long as the place is maintained — no angry tenants, no blackouts, etc. Needs playtesting.
 - **Zero rating = lose the level** (restart current rebirth), same as bankruptcy.
-  - Hits **keep counting below zero** internally — the game knows you're still getting hammered.
-  - Same strike rule as bankruptcy: each tick at zero with **no gain** = a strike.
+  - Rating is floored at **0** (it used to sink invisibly below zero, making recovery take hours).
+    Being hit while at zero is tracked by **strikes** instead.
+  - Each tick at zero that still has problems = a strike.
     *Placeholder:* 3 strikes → **everyone pulls out**, level over.
 - **Level-over screen** (bankruptcy or zero rating): a message explaining what happened, with
   **Restart** (restart current rebirth level) or **Quit**.

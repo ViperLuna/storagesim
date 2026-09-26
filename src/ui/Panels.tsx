@@ -11,7 +11,9 @@ import { startPlacing } from './placing'
 import { OFFICES } from '../data/office'
 import { STAFF, UPGRADES } from '../data/staff'
 import { LOAN_GRACE, LOAN_INSTALLMENTS, LOAN_INTEREST, loanAmountFor } from '../data/bank'
-import { FAIL_STRIKES, TICK_SECONDS } from '../data/economy'
+import { FAIL_STRIKES, RATING_GAIN_PER_TICK, RATING_LOSS_PER_ISSUE, RATING_MAX, TICK_SECONDS } from '../data/economy'
+import { ratingIssues } from '../game/sim'
+import { Stars } from './Hud'
 import { janitorCleanFactor, janitorSpeed, office, officeSlots, payrollTotal, staffBlocker } from '../game/staff'
 import { notice } from './notice'
 
@@ -22,7 +24,7 @@ export function SidePanel() {
   return (
     <aside className="panel">
       <div className="panel-head">
-        <h2>{{ build: '🏗️ Build', tenants: '🧍 Tenants', staff: '👷 Staff', money: '💰 Money', rebirth: '🔁 Rebirth', log: '📜 Message Log', settings: '⚙️ Settings' }[menu]}</h2>
+        <h2>{{ build: '🏗️ Build', tenants: '🧍 Tenants', staff: '👷 Staff', money: '💰 Money & Rating', rebirth: '🔁 Rebirth', log: '📜 Message Log', settings: '⚙️ Settings' }[menu]}</h2>
         <button className="icon-btn" onClick={() => set({ menu: null })} aria-label="Close">✕</button>
       </div>
       <div className="panel-body">
@@ -213,6 +215,31 @@ function StaffMenu() {
   )
 }
 
+function RatingCard() {
+  const g = useStore(s => s.game)!
+  const focusItem = useStore(s => s.focusItem)
+  const issues = ratingIssues(g)
+  return (
+    <>
+      <h3>⭐ Rating</h3>
+      <div className="card">
+        <div className="row"><Stars value={g.rating} /><b>{g.rating.toFixed(1)} / {RATING_MAX}</b></div>
+        {issues.length === 0 ? (
+          <div className="small">✅ Nothing's wrong — {g.rating >= RATING_MAX ? "you're maxed out (+10% rent!)" : `+${RATING_GAIN_PER_TICK} in ${duration(g.tickIn)}`}.</div>
+        ) : (
+          <>
+            <div className="small bad">−{(RATING_LOSS_PER_ISSUE * issues.length).toFixed(2)} in {duration(g.tickIn)} unless you fix:</div>
+            {issues.map((i, n) => (
+              <button key={n} className="log-row bad" onClick={() => i.focusId && focusItem(i.focusId)}>{i.text}</button>
+            ))}
+          </>
+        )}
+        <div className="small muted">Goes up {RATING_GAIN_PER_TICK} every {duration(TICK_SECONDS)} when nothing's wrong. Never drops while you're offline.</div>
+      </div>
+    </>
+  )
+}
+
 function MoneyMenu() {
   const g = useStore(s => s.game)!
   const mutate = useStore(s => s.mutate)
@@ -228,6 +255,7 @@ function MoneyMenu() {
         {g.loan && <div className="row"><span>Loan payment</span><b>{g.loan.graceLeft > 0 ? `starts in ${g.loan.graceLeft} payrolls` : money(g.loan.installment)}</b></div>}
         <div className="row"><span>Next payday</span><b>{duration(g.tickIn)}</b></div>
       </div>
+      <RatingCard />
       {g.bankruptStrikes > 0 && <p className="bad small">⚠️ Bankruptcy strikes: {g.bankruptStrikes}/{FAIL_STRIKES}. Each payday in the red without gaining ground is a strike.</p>}
       <h3>🏦 Bank</h3>
       {g.loan ? (

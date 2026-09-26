@@ -274,3 +274,18 @@ describe('waiting list order', () => {
     expect(sortedProspects(s).map(x => x.p.id)).toEqual([2, 3, 1, 4, 5])
   })
 })
+
+describe('rating floor', () => {
+  it('never goes below 0 and climbs right away once problems are fixed', () => {
+    const s = createRun(0)
+    s.money = 1e6
+    for (let i = 0; i < 6; i++) place(s, 'unit', 'locker', i, 0, 0) // blackout
+    s.rating = 0.1
+    step(s, 300)
+    expect(s.rating).toBe(0)
+    for (const it of s.items.slice(3)) it.on = false // fix the blackout
+    step(s, 300)
+    expect(s.rating).toBeCloseTo(0.1)
+    expect(s.levelOver).toBeUndefined()
+  })
+})

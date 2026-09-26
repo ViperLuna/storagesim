@@ -61,7 +61,7 @@ function loadSave(): GameState | null {
 
 /** Bring older saves up to the current shape. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function migrate(g: any): GameState | null {
+export function migrate(g: any): GameState | null {
   if (g.version === 1) {
     Object.assign(g, { version: 2, staff: [], upgrades: {}, bankruptStrikes: 0, cashAtLastPayroll: g.money })
   }
@@ -80,7 +80,13 @@ function migrate(g: any): GameState | null {
     g.playerClean = { queue: [], left: 0, total: 0 }
     g.version = 4
   }
-  return g.version === 4 ? (g as GameState) : null
+  if (g.version === 4) {
+    // Ratings used to sink below zero invisibly (and the old offline bug dug some saves deep).
+    g.rating = Math.max(0, g.rating)
+    g.ratingAtLastTick = Math.max(0, g.ratingAtLastTick)
+    g.version = 5
+  }
+  return g.version === 5 ? (g as GameState) : null
 }
 
 function writeSave(g: GameState) {
