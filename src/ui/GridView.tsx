@@ -239,7 +239,7 @@ export function GridView() {
         )))}
         {placing && <Ghost game={game} />}
       </div>
-      {anchor && <SelectionPanel anchor={anchor} />}
+      {anchor && !placing && <SelectionPanel anchor={anchor} />}
       <div className="zoom-controls" onPointerDown={e => e.stopPropagation()}>
         <button onClick={() => zoomAt(1.25)} aria-label="Zoom in">＋</button>
         <button onClick={fit} aria-label="Fit whole lot" title="Fit whole lot">🎯</button>
