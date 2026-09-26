@@ -199,7 +199,8 @@ the table is the "list price" baseline.
 
 - Lease length is measured in **points** (`n` payouts).
 - At lease end the tenant either **renews** or **vacates** (packs up, unit goes vacant).
-- Some tenants **abandon**: stop paying and leave their stuff behind.
+- Some tenants **abandon**: stop paying and leave their stuff behind — either **mid-lease**
+  (*placeholder:* 1% chance each point) or **at lease end** (10%).
 
 ### Abandoned units
 

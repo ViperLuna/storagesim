@@ -25,6 +25,8 @@ export const UPSIZE_ACCEPT_CHANCE = 0.85
 /** Lease length in points. */
 export const LEASE_MIN = 4
 export const LEASE_MAX = 12
+/** Chance, each point, that a tenant stops paying mid-lease and abandons their stuff. */
+export const MID_LEASE_ABANDON_CHANCE = 0.01
 /** What happens when a lease ends (must sum to 1). */
 export const LEASE_END = { renew: 0.4, vacate: 0.5, abandon: 0.1 }
 

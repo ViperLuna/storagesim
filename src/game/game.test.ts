@@ -289,3 +289,19 @@ describe('rating floor', () => {
     expect(s.levelOver).toBeUndefined()
   })
 })
+
+describe('mid-lease abandonment', () => {
+  it('a tenant can stop paying partway through and abandon', async () => {
+    const { vi } = await import('vitest')
+    const s = createRun(0)
+    s.prospects.push({ id: 999, name: 'Stu Rage', wants: 'locker', bid: 10, vip: false, arrivedAt: 0 })
+    const unit = s.items[0]
+    offerUnit(s, 999, unit.id)
+    unit.unit!.tenant!.leaseLeft = 10
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0)
+    step(s, 60)
+    spy.mockRestore()
+    expect(unit.unit!.status).toBe('abandoned')
+    expect(unit.unit!.pending).toBe(10) // the point before they bailed still counts
+  })
+})

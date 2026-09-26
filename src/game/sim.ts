@@ -35,6 +35,17 @@ export function newLease(): number {
   return randInt(T.LEASE_MIN, T.LEASE_MAX)
 }
 
+function abandon(state: GameState, item: Item, tenant: Tenant, midLease: boolean, s?: OfflineSummary) {
+  const u = item.unit!
+  u.status = 'abandoned'
+  u.tenant = undefined
+  u.progress = 0
+  u.abandonOffer = Math.round(tenant.bid * rand(T.ABANDON_OFFER_MIN, T.ABANDON_OFFER_MAX) * rentMultiplierFor(state.rebirth))
+  if (s) s.abandoned++
+  const how = midLease ? `stopped paying with ${tenant.leaseLeft} pts left and abandoned` : 'abandoned'
+  log(state, `🏚️ ${tenant.name} ${how} ${item.label}! Sell the contents or auction them.`, { tone: 'bad', focusId: item.id, toast: true })
+}
+
 function endLease(state: GameState, item: Item, tenant: Tenant, s?: OfflineSummary) {
   const u = item.unit!
   if (s) s.leasesEnded++
@@ -53,12 +64,7 @@ function endLease(state: GameState, item: Item, tenant: Tenant, s?: OfflineSumma
     if (s) s.vacated++
     log(state, `📦 ${tenant.name} moved out of ${item.label}. Click it to collect & clean.`, { focusId: item.id, toast: true })
   } else {
-    u.status = 'abandoned'
-    u.tenant = undefined
-    u.progress = 0
-    u.abandonOffer = Math.round(tenant.bid * rand(T.ABANDON_OFFER_MIN, T.ABANDON_OFFER_MAX) * rentMultiplierFor(state.rebirth))
-    if (s) s.abandoned++
-    log(state, `🏚️ ${tenant.name} abandoned ${item.label}! Sell the contents or auction them.`, { tone: 'bad', focusId: item.id, toast: true })
+    abandon(state, item, tenant, false, s)
   }
 }
 
@@ -97,6 +103,7 @@ function updateOccupied(state: GameState, item: Item, reach: Set<number>, dt: nu
     if (s) s.rent += pay
     tenant.leaseLeft--
     if (tenant.leaseLeft <= 0) endLease(state, item, tenant, s)
+    else if (Math.random() < T.MID_LEASE_ABANDON_CHANCE) abandon(state, item, tenant, true, s)
   }
 }
 
