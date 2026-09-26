@@ -217,3 +217,8 @@ button.bad { background: #3d2224; border-color: #733237; color: #ffc9cb; }
 .item.office { color: #10131a; }
 .progress.clean > div { background: #7fe3ff; }
 .linkish { background: none; border: none; padding: 0 2px; color: var(--accent); text-decoration: underline; font-size: inherit; }
+.selection.anchored { bottom: auto; max-width: calc(100% - 16px); }
+@media (max-width: 760px) {
+  /* Phones: no room beside a unit — dock it at the bottom instead. */
+  .selection.anchored { left: 12px !important; right: 64px; top: auto !important; bottom: 12px; width: auto !important; }
+}

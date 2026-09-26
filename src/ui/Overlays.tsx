@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useStore } from '../store'
 import { money, duration } from '../game/format'
 import { defName, nextTier, unitDef } from '../game/defs'
@@ -12,20 +12,55 @@ import { defCost } from '../game/defs'
 import { unlockAudio } from '../audio'
 import { officeSlots, staffBlocker } from '../game/staff'
 
-export function SelectionPanel() {
+/** Selected item's rectangle in viewport pixels, plus the viewport size. */
+export interface Anchor { left: number; top: number; right: number; bottom: number; vw: number; vh: number }
+
+const PANEL_W = 340
+const GAP = 12
+
+/** Place the popup beside the unit: right if there's room, else left, else below/above. Kept on screen. */
+function popupPosition(a: Anchor, h: number): { left: number; top: number } {
+  const fitsRight = a.right + GAP + PANEL_W <= a.vw - 60 // leave room for zoom buttons
+  const fitsLeft = a.left - GAP - PANEL_W >= 8
+  let left: number, top: number
+  if (fitsRight || fitsLeft) {
+    left = fitsRight ? a.right + GAP : a.left - GAP - PANEL_W
+    top = a.top
+  } else {
+    left = (a.left + a.right) / 2 - PANEL_W / 2
+    top = a.bottom + GAP + h <= a.vh - 8 ? a.bottom + GAP : a.top - GAP - h
+  }
+  return {
+    left: Math.max(8, Math.min(left, a.vw - PANEL_W - 8)),
+    top: Math.max(8, Math.min(top, a.vh - h - 8)),
+  }
+}
+
+export function SelectionPanel({ anchor }: { anchor: Anchor }) {
   const g = useStore(s => s.game)!
   const id = useStore(s => s.selectedId)
   const mutate = useStore(s => s.mutate)
   const set = useStore(s => s.set)
+  const ref = useRef<HTMLDivElement>(null)
+  const [h, setH] = useState(160)
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setH(el.offsetHeight))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
   const it = g.items.find(i => i.id === id)
   if (!it) return null
+  const pos = popupPosition(anchor, h)
   const u = it.unit
   const draw = itemDraw(it)
   const next = nextTier(it)
   const upCost = A.upgradeCost(it)
   const sellFor = A.sellValue(g, it)
   return (
-    <div className="selection">
+    <div ref={ref} className="selection anchored" style={{ left: pos.left, top: pos.top, width: PANEL_W }}
+      onPointerDown={e => e.stopPropagation()} onPointerUp={e => e.stopPropagation()}>
       <div className="row">
         <strong>{it.kind === 'unit' ? `${it.label} · ${unitDef(it.defId).name}` : it.label}</strong>
         <button className="icon-btn" onClick={() => set({ selectedId: null })} aria-label="Close">✕</button>

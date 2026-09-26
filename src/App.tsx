@@ -3,7 +3,7 @@ import { useStore } from './store'
 import { GridView } from './ui/GridView'
 import { Hud, Nav } from './ui/Hud'
 import { SidePanel } from './ui/Panels'
-import { DebugPanel, LevelOverModal, OfflineSummaryModal, PlacementBar, SelectionPanel, TitleScreen, Toasts } from './ui/Overlays'
+import { DebugPanel, LevelOverModal, OfflineSummaryModal, PlacementBar, TitleScreen, Toasts } from './ui/Overlays'
 import { cancelPlacing, rotatePlacing } from './ui/placing'
 
 const TICK_MS = 200
@@ -62,7 +62,6 @@ export default function App() {
           <GridView />
           <Toasts />
           <PlacementBar />
-          <SelectionPanel />
           <DebugPanel />
         </div>
       </div>

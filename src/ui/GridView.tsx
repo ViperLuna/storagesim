@@ -8,6 +8,7 @@ import * as A from '../game/actions'
 import { money } from '../game/format'
 import { anchorAt, commitPlacing, placingSize } from './placing'
 import type { GameState, Item, Rot } from '../game/types'
+import { SelectionPanel, type Anchor } from './Overlays'
 import { ANGER_GRACE } from '../data/tenants'
 
 export const TILE = 56
@@ -36,6 +37,7 @@ export function GridView() {
     setViewState(v)
   }, [])
 
+  const [vpSize, setVpSize] = useState({ w: 0, h: 0 })
   const worldW = game.size * TILE
   const worldH = game.size * TILE + GATE_H
 
@@ -81,8 +83,10 @@ export function GridView() {
     const vp = vpRef.current
     if (!vp) return
     let prev = vp.getBoundingClientRect()
+    setVpSize({ w: prev.width, h: prev.height })
     const ro = new ResizeObserver(() => {
       const now = vp.getBoundingClientRect()
+      setVpSize({ w: now.width, h: now.height })
       const v = viewRef.current
       setView({ ...v, x: v.x + (now.width - prev.width) / 2, y: v.y + (now.height - prev.height) / 2 })
       prev = now
@@ -201,6 +205,15 @@ export function GridView() {
 
   const reach = useMemo(() => reachable(game), [game])
 
+  // Screen rectangle of the selected item, so its popup can sit right next to it.
+  const selected = game.items.find(i => i.id === selectedId)
+  let anchor: Anchor | null = null
+  if (selected) {
+    const fp = itemSize(selected)
+    const px = TILE * view.s
+    anchor = { left: view.x + selected.x * px, top: view.y + selected.y * px, right: view.x + (selected.x + fp.w) * px, bottom: view.y + (selected.y + fp.h) * px, vw: vpSize.w, vh: vpSize.h }
+  }
+
   return (
     <div className="viewport" ref={vpRef}
       onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
@@ -226,6 +239,7 @@ export function GridView() {
         )))}
         {placing && <Ghost game={game} />}
       </div>
+      {anchor && <SelectionPanel anchor={anchor} />}
       <div className="zoom-controls" onPointerDown={e => e.stopPropagation()}>
         <button onClick={() => zoomAt(1.25)} aria-label="Zoom in">＋</button>
         <button onClick={fit} aria-label="Fit whole lot" title="Fit whole lot">🎯</button>
