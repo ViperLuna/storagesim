@@ -100,12 +100,11 @@ function TenantsMenu() {
     <>
       <h3>Waiting ({g.prospects.length})</h3>
       {g.prospects.length === 0 && <p className="muted small">Nobody's waiting. A sign brings people in faster.</p>}
-      {g.prospects.map(p => {
+      {A.sortedProspects(g).map(({ p, exact, bigger }) => {
         const d = unitDef(p.wants)
-        const { exact, bigger } = A.eligibleUnits(g, p.wants)
         const left = PROSPECT_PATIENCE - (g.time - p.arrivedAt)
         return (
-          <div key={p.id} className={`card ${p.vip ? 'vip' : ''}`}>
+          <div key={p.id} className={`card ${p.vip ? 'vip' : ''} ${exact.length === 0 && (p.refusedUpsize || bigger.length === 0) ? 'nofit' : ''}`}>
             <div className="row">
               <strong>{p.vip && '👑 '}{p.name}</strong>
               <span className="small muted">leaves in {duration(left)}</span>

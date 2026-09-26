@@ -260,3 +260,17 @@ describe('names', () => {
     expect(new Set(s.prospects.map(p => p.name)).size).toBe(400)
   })
 })
+
+describe('waiting list order', () => {
+  it('puts people you can place first: exact, then upsize, then no fit', async () => {
+    const { sortedProspects } = await import('./actions')
+    const s = createRun(0)
+    s.money = 1e6
+    place(s, 'unit', 'small', 0, 0, 0)
+    const mk = (id: number, wants: string) => ({ id, name: `P${id}`, wants, bid: 10, vip: false, arrivedAt: 0 })
+    s.prospects = [mk(1, 'xl'), mk(2, 'small'), mk(3, 'locker'), mk(4, 'xl'), mk(5, 'medium')]
+    // Fill the lockers so lockers only fit via upsize to the Small
+    for (const it of s.items.filter(i => i.defId === 'locker')) it.unit!.status = 'occupied'
+    expect(sortedProspects(s).map(x => x.p.id)).toEqual([2, 3, 1, 4, 5])
+  })
+})

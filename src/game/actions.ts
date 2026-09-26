@@ -159,6 +159,17 @@ export function eligibleUnits(state: GameState, wants: string): { exact: Item[];
   }
 }
 
+/** Waiting list order: anyone you can place right now first (exact fit, then upsize-only), then no fit. */
+export function sortedProspects(state: GameState) {
+  return state.prospects
+    .map((p, i) => {
+      const { exact, bigger } = eligibleUnits(state, p.wants)
+      const rank = exact.length ? 0 : !p.refusedUpsize && bigger.length ? 1 : 2
+      return { p, exact, bigger, rank, i }
+    })
+    .sort((a, b) => a.rank - b.rank || a.i - b.i)
+}
+
 export function decline(state: GameState, prospectId: number): void {
   state.prospects = state.prospects.filter(p => p.id !== prospectId)
 }
