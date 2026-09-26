@@ -156,7 +156,14 @@ export function GridView() {
       st.set({ selectedId: null })
       return
     }
-    if (it.unit && (it.unit.pending > 0 || it.unit.status === 'dirty')) st.mutate(g => A.collect(g, it.id))
+    // Quick action: tapping a unit with rent (or a fresh mess) just collects/queues cleaning — no popup.
+    const u = it.unit
+    const needsClean = u?.status === 'dirty' && !st.game!.playerClean.queue.includes(it.id) && !st.game!.staff.some(s => s.targetId === it.id)
+    if (u && (u.pending > 0 || needsClean)) {
+      st.mutate(g => A.collect(g, it.id))
+      if (st.selectedId === it.id) st.set({ selectedId: null })
+      return
+    }
     st.set({ selectedId: it.id })
   }
 
