@@ -14,7 +14,7 @@ import { LOAN_GRACE, LOAN_INSTALLMENTS, LOAN_INTEREST, loanAmountFor } from '../
 import { FAIL_STRIKES, RATING_GAIN_PER_TICK, RATING_LOSS_PER_ISSUE, RATING_MAX, TICK_SECONDS } from '../data/economy'
 import { ratingIssues } from '../game/sim'
 import { Stars } from './Hud'
-import { janitorCleanFactor, janitorSpeed, office, officeSlots, payrollTotal, staffBlocker } from '../game/staff'
+import { janitorCleanFactor, janitorSpeed, office, officeSlots, payrollMax, payrollOwed, staffBlocker } from '../game/staff'
 import { notice } from './notice'
 
 export function SidePanel() {
@@ -160,7 +160,8 @@ function StaffMenu() {
   const o = office(g)
   const slots = officeSlots(g)
   const blocker = staffBlocker(g)
-  const wages = payrollTotal(g)
+  const wages = payrollMax(g)
+  const owed = payrollOwed(g)
   return (
     <>
       {!o && <p className="muted small">You need an office before you can hire anyone. Build one from the 🏗️ Build menu.</p>}
@@ -172,7 +173,7 @@ function StaffMenu() {
         const err = !o ? 'Needs an office' : g.staff.length >= slots ? 'No free office slot' : count >= d.max ? `Max ${d.max} for now` : g.money < d.hireCost ? 'Not enough money' : null
         return (
           <div key={d.id} className="card">
-            <div className="row"><strong>{d.icon} {d.name}</strong><span className="small muted">{money(d.wage)} / payroll</span></div>
+            <div className="row"><strong>{d.icon} {d.name}</strong><span className="small muted">up to {money(d.wage)} / payroll</span></div>
             <div className="small muted">Walks the paths and cleans units after tenants move out. Nearest job first.</div>
             <div className="actions">
               <button className="good" disabled={!!err} onClick={() => {
@@ -199,7 +200,7 @@ function StaffMenu() {
           </div>
         )
       })}
-      {wages > 0 && <p className="small">Payroll: <b>{money(wages)}</b> every {duration(TICK_SECONDS)} (next in {duration(g.tickIn)}).</p>}
+      {wages > 0 && <p className="small">Payroll: up to <b>{money(wages)}</b> every {duration(TICK_SECONDS)} — only for time spent working. So far this period: <b>{money(owed)}</b> (payday in {duration(g.tickIn)}).</p>}
       <h3>Upgrades</h3>
       <p className="small muted">Walk speed {janitorSpeed(g).toFixed(1)} tiles/s · cleans in {Math.round(janitorCleanFactor(g) * 100)}% of your time</p>
       {UPGRADES.map(u => {
@@ -249,7 +250,8 @@ function RatingCard() {
 function MoneyMenu() {
   const g = useStore(s => s.game)!
   const mutate = useStore(s => s.mutate)
-  const wages = payrollTotal(g)
+  const wages = payrollMax(g)
+  const owed = payrollOwed(g)
   const pendingRent = g.items.reduce((sum, i) => sum + (i.unit?.pending ?? 0), 0)
   const amount = loanAmountFor(g.rebirth)
   return (
@@ -257,7 +259,8 @@ function MoneyMenu() {
       <div className="card">
         <div className="row"><span>Cash</span><b className={g.money < 0 ? 'bad' : ''}>{money(g.money)}</b></div>
         <div className="row"><span>Rent waiting on units</span><b>{money(pendingRent)}</b></div>
-        <div className="row"><span>Payroll</span><b>{money(wages)} / {duration(TICK_SECONDS)}</b></div>
+        <div className="row"><span>Payroll this period (so far)</span><b>{money(owed)}</b></div>
+        {wages > 0 && <div className="row small muted"><span>Full-time max</span><span>{money(wages)} / {duration(TICK_SECONDS)}</span></div>}
         {g.loan && <div className="row"><span>Loan payment</span><b>{g.loan.graceLeft > 0 ? `starts in ${g.loan.graceLeft} payrolls` : money(g.loan.installment)}</b></div>}
         <div className="row"><span>Next payday</span><b>{duration(g.tickIn)}</b></div>
       </div>

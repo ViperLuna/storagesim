@@ -10,7 +10,7 @@ import { log } from './log'
 import { expWait, rand, randInt, weighted } from './random'
 import { makeProspect, stars } from './tenants'
 import { aOrAn, money } from './format'
-import { payrollTotal, stepStaff } from './staff'
+import { payrollOwed, resetWorked, stepStaff } from './staff'
 import { startNextClean } from './actions'
 
 export interface StepOptions {
@@ -109,17 +109,20 @@ function updateOccupied(state: GameState, item: Item, reach: Set<number>, dt: nu
 
 /** Payroll, loan repayment, and the bankruptcy check. Offline, payroll pauses once cash hits $0. */
 function payday(state: GameState, offline: boolean) {
-  const wages = payrollTotal(state)
+  const wages = Math.round(payrollOwed(state) * 100) / 100
   const loan = state.loan
   if (offline && state.money <= 0) return
+  resetWorked(state)
   if (wages > 0) {
     state.money -= wages
     log(state, `💸 Payroll: -${money(wages)}`, { toast: !offline })
   }
+  let charged = wages
   if (loan) {
     if (loan.graceLeft > 0) loan.graceLeft--
     else {
       const pay = Math.min(loan.installment, loan.owed)
+      charged += pay
       state.money -= pay
       loan.owed -= pay
       log(state, `🏦 Loan payment: -${money(pay)} (${money(loan.owed)} left)`, { toast: !offline })
@@ -129,7 +132,8 @@ function payday(state: GameState, offline: boolean) {
       }
     }
   }
-  if (wages === 0 && !loan) {
+  if (charged === 0) {
+    // Nothing went out this payday, so you're not bleeding money.
     state.bankruptStrikes = 0
     state.cashAtLastPayroll = state.money
     return

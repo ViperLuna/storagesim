@@ -6,6 +6,7 @@ import { isPowered } from './power'
 import { officeDef, unitDef } from './defs'
 import { log } from './log'
 import * as S from '../data/staff'
+import { TICK_SECONDS } from '../data/economy'
 
 export const office = (state: GameState) => state.items.find(i => i.kind === 'office')
 export const officeSlots = (state: GameState) => {
@@ -152,11 +153,24 @@ export function stepStaff(state: GameState, dt: number) {
   if (!state.staff.length) return
   const blocked = staffBlocker(state)
   for (const s of state.staff) {
-    if (blocked) continue // can't see what they're doing / can't get out
+    if (blocked) continue // can't see what they're doing / can't get out — and not on the clock
     if (s.role === 'janitor') updateJanitor(state, s, dt)
+    if (s.mode !== 'idle') s.workedSeconds = (s.workedSeconds ?? 0) + dt
   }
 }
 
-export function payrollTotal(state: GameState): number {
-  return state.staff.reduce((sum, s) => sum + (S.STAFF.find(d => d.id === s.role)?.wage ?? 0), 0)
+const wageOf = (s: Staff) => S.STAFF.find(d => d.id === s.role)?.wage ?? 0
+
+/** Full-time payroll: what everyone would earn if they worked the whole period. */
+export function payrollMax(state: GameState): number {
+  return state.staff.reduce((sum, s) => sum + wageOf(s), 0)
+}
+
+/** What's owed right now: wages only for time actually spent working this period. */
+export function payrollOwed(state: GameState): number {
+  return state.staff.reduce((sum, s) => sum + wageOf(s) * Math.min(1, (s.workedSeconds ?? 0) / TICK_SECONDS), 0)
+}
+
+export function resetWorked(state: GameState): void {
+  for (const s of state.staff) s.workedSeconds = 0
 }

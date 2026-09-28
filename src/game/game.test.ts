@@ -157,16 +157,29 @@ describe('office & janitor', () => {
 })
 
 describe('payroll, loans, bankruptcy', () => {
-  it('pays wages each tick and goes bankrupt after 3 strikes in the red', () => {
+  it('goes bankrupt after 3 paydays bleeding money in the red', () => {
+    const s = createRun(0)
+    s.money = 0
+    s.cashAtLastPayroll = 0
+    s.loan = { owed: 10000, installment: 100, graceLeft: 0 }
+    for (let i = 0; i < 3 && !s.levelOver; i++) step(s, 300)
+    expect(s.levelOver).toBe('bankrupt')
+  })
+  it('idle staff cost nothing; working staff are paid for time worked', () => {
     const s = createRun(0)
     s.money = 1e6
     place(s, 'generator', 'gen-1', 6, 0, 0)
     place(s, 'office', 'office-small', 0, 0, 0)
     hire(s, 'janitor')
-    s.money = 0
-    s.cashAtLastPayroll = 0
-    for (let i = 0; i < 3 && !s.levelOver; i++) step(s, 300)
-    expect(s.levelOver).toBe('bankrupt')
+    const before = s.money
+    for (let i = 0; i < 300; i++) step(s, 1) // nothing dirty all payday
+    expect(s.money).toBe(before)
+    s.items[0].unit!.status = 'dirty'; s.items[0].unit!.dirtySince = s.time
+    const mid = s.money
+    for (let i = 0; i < 300; i++) step(s, 1)
+    const paid = mid - s.money
+    expect(paid).toBeGreaterThan(0)
+    expect(paid).toBeLessThan(50) // well under the full-time $50
   })
   it('offline payroll pauses at $0', () => {
     const s = createRun(0)

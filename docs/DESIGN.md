@@ -320,8 +320,9 @@ When a unit is abandoned, you're offered a choice:
 
 ## Employees
 
-- Hired from the Upgrades menu. Wages paid on an interval (**per minute or every 5 minutes** — TBD).
-  Must always be profitable to employ; wages tuned so the math holds.
+- Hired from the Staff menu. Paid every payday (5 min), **only for time actually spent working**.
+  Idle time (nothing to do, or stuck because the office is dark/blocked) is unpaid.
+  Wage is quoted as the full-time amount per payday.
 - **Can't make payroll → staff still get paid and your cash goes negative.**
 
 ## Debt, loans & bankruptcy (draft)

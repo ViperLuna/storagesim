@@ -88,6 +88,8 @@ export interface Staff {
   targetId?: number
   cleanLeft: number
   cleanTotal?: number
+  /** Seconds spent working since the last payday (idle time is unpaid). */
+  workedSeconds?: number
 }
 
 export interface Loan {
