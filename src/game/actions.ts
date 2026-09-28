@@ -174,7 +174,15 @@ export function decline(state: GameState, prospectId: number): void {
   state.prospects = state.prospects.filter(p => p.id !== prospectId)
 }
 
-/** Offer a unit. Exact size = accepted. Bigger = they might refuse. */
+/** Meet-in-the-middle price per point for putting a prospect in a bigger unit. */
+export function upsizePrice(p: { bid: number; wants: string }, bigDefId: string): number {
+  const generosity = p.bid / unitDef(p.wants).listPrice
+  const fair = unitDef(bigDefId).listPrice * generosity
+  const price = p.bid + (fair - p.bid) * T.UPSIZE_SPLIT
+  return price >= 20 ? Math.round(price) : Math.round(price * 100) / 100
+}
+
+/** Offer a unit. Exact size = accepted at their bid. Bigger = meet-in-the-middle price, and they might refuse. */
 export function offerUnit(state: GameState, prospectId: number, itemId: number): Result {
   const p = state.prospects.find(q => q.id === prospectId)
   const it = state.items.find(i => i.id === itemId)
@@ -190,13 +198,14 @@ export function offerUnit(state: GameState, prospectId: number, itemId: number):
       return 'refused'
     }
   }
-  const deposit = p.bid * rentMultiplierFor(state.rebirth)
+  const price = rank > wantRank ? upsizePrice(p, it.defId) : p.bid
+  const deposit = price * rentMultiplierFor(state.rebirth)
   state.money += deposit
   u.status = 'occupied'
   u.progress = 0
-  u.tenant = { name: p.name, bid: p.bid, deposit, vip: p.vip, leaseLeft: newLease(), anger: 0, complaintStage: 0 }
+  u.tenant = { name: p.name, bid: price, deposit, vip: p.vip, leaseLeft: newLease(), anger: 0, complaintStage: 0 }
   decline(state, prospectId)
-  log(state, `✅ ${p.name} moved into ${it.label}${rank > wantRank ? ' (upsized!)' : ''}. Deposit +${money(deposit)}.`, { tone: 'good', focusId: it.id })
+  log(state, `✅ ${p.name} moved into ${it.label}${rank > wantRank ? ` (upsized at ${money(price)}/pt)` : ''}. Deposit +${money(deposit)}.`, { tone: 'good', focusId: it.id })
   return null
 }
 

@@ -19,8 +19,13 @@ export const VIP_CHANCE_MAX = 0.05
 export const VIP_BID_MIN = 1.5
 export const VIP_BID_MAX = 2.2
 
-/** Chance a tenant accepts being upsized to a bigger unit at their bid. */
+/** Chance a tenant accepts an upsize offer. */
 export const UPSIZE_ACCEPT_CHANCE = 0.85
+/**
+ * Upsize price = meet in the middle: their bid + SPLIT × (fair price for the bigger unit − their bid).
+ * "Fair" = the bigger unit's list price × the same generosity they showed on their own bid.
+ */
+export const UPSIZE_SPLIT = 0.5
 
 /** Lease length in points. */
 export const LEASE_MIN = 4

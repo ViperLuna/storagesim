@@ -178,7 +178,9 @@ the table is the "list price" baseline.
   - a **bid** (price per point) — some bids are garbage. That's life.
 - Player options:
   - **Accept** — assign to a vacant unit of that size at their bid.
-  - **Upsize** — offer a bigger vacant unit at their bid. Tenant may **accept or refuse**.
+  - **Upsize** — offer a bigger vacant unit at a **meet-in-the-middle price**: halfway between their bid
+    and a fair price for the bigger unit (its list price × the generosity of their bid). Shown on the
+    button. Tenant may **accept or refuse**.
   - **Decline** — they leave. **No penalty.** Just wait for the next spawn.
 - No haggling / counter-offers.
 

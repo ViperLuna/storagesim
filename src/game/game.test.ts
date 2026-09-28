@@ -305,3 +305,26 @@ describe('mid-lease abandonment', () => {
     expect(unit.unit!.pending).toBe(10) // the point before they bailed still counts
   })
 })
+
+describe('upsize pricing', () => {
+  it('meets in the middle between their bid and a fair price for the bigger unit', async () => {
+    const { upsizePrice } = await import('./actions')
+    expect(upsizePrice({ bid: 10, wants: 'locker' }, 'medium')).toBe(275) // 10 + (540 - 10) / 2
+    expect(upsizePrice({ bid: 5, wants: 'locker' }, 'medium')).toBe(138) // cheapskate: 5 + (270 - 5) / 2 = 137.5
+  })
+  it('the tenant pays the upsize price', async () => {
+    const { vi } = await import('vitest')
+    const s = createRun(0)
+    s.money = 1e6
+    place(s, 'unit', 'medium', 0, 0, 0)
+    const med = s.items.find(i => i.defId === 'medium')!
+    for (const it of s.items.filter(i => i.defId === 'locker')) it.unit!.status = 'occupied'
+    s.prospects.push({ id: 999, name: 'Dillon A.', wants: 'locker', bid: 10, vip: false, arrivedAt: 0 })
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0) // accepts
+    const before = s.money
+    expect(offerUnit(s, 999, med.id)).toBeNull()
+    spy.mockRestore()
+    expect(med.unit!.tenant!.bid).toBe(275)
+    expect(s.money - before).toBe(275)
+  })
+})

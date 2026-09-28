@@ -124,7 +124,7 @@ function TenantsMenu() {
                 <button key={u.id} onClick={() => {
                   const r = mutate(s => A.offerUnit(s, p.id, u.id))
                   if (r === 'refused') notice(`${p.name} said no to the ${unitDef(u.defId).name}.`)
-                }}>Upsize → {u.label} ({unitDef(u.defId).name})</button>
+                }}>Upsize → {u.label} {unitDef(u.defId).name} @ {money(A.upsizePrice(p, u.defId))}/pt</button>
               ))}
               {exact.length === 0 && (p.refusedUpsize || bigger.length === 0) && <span className="small muted">No suitable vacant unit.</span>}
               <button className="bad" onClick={() => mutate(s => A.decline(s, p.id))}>Decline</button>
