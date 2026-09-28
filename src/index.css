@@ -236,7 +236,11 @@ button.bad.armed { background: var(--bad); color: #fff; border-color: var(--bad)
 .toast.dragging { transition: none; }
 
 /* Draggable popups: long-press (or grab the title with a mouse) */
-.selection, .placement-bar { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.selection, .placement-bar {
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  /* Don't let the phone steal the touch to scroll the page mid-drag. */
+  touch-action: none;
+}
 .drag-handle { cursor: grab; }
 .selection.lifted, .placement-bar.lifted { box-shadow: 0 0 0 2px var(--accent), 0 12px 32px rgba(0, 0, 0, 0.6); cursor: grabbing; }
 @media (max-width: 760px) {
