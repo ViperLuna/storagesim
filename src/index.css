@@ -155,7 +155,7 @@ button.bad { background: #3d2224; border-color: #733237; color: #ffc9cb; }
 .zoom-controls button {
   width: 42px; height: 42px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); font-size: 1.1rem;
 }
-.toasts { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 6px; z-index: 20; width: min(340px, calc(100% - 20px)); }
+.toasts { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 6px; z-index: 12; width: min(340px, calc(100% - 20px)); }
 .toast {
   text-align: left; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent);
   border-radius: var(--radius); padding: 8px 10px; font-size: 0.85rem; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
@@ -229,3 +229,8 @@ button.stat { background: none; border: none; padding: 0; text-align: left; }
   .selection.anchored.dock-top { top: 12px !important; bottom: auto; }
 }
 button.bad.armed { background: var(--bad); color: #fff; border-color: var(--bad); }
+
+/* Popups & the placement bar always sit above notifications. */
+.selection, .placement-bar { z-index: 25; }
+.toast { touch-action: pan-y; transition: transform 0.18s ease-out, opacity 0.18s ease-out; user-select: none; }
+.toast.dragging { transition: none; }

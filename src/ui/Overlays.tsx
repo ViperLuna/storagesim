@@ -200,13 +200,55 @@ export function Toasts() {
   return (
     <div className="toasts">
       {toasts.map(t => (
-        <button key={t.id} className={`toast ${t.entry.tone}`} onClick={() => {
+        <SwipeToast key={t.id} tone={t.entry.tone} text={t.entry.text} onDismiss={() => dismiss(t.id)} onTap={() => {
           if (t.entry.focusId) focusItem(t.entry.focusId)
           else if (t.entry.openTenants) set({ menu: 'tenants' })
           dismiss(t.id)
-        }}>{t.entry.text}</button>
+        }} />
       ))}
     </div>
+  )
+}
+
+const SWIPE_DISMISS = 70
+
+/** A toast you can swipe sideways to dismiss. A plain tap still runs its action. */
+function SwipeToast({ tone, text, onTap, onDismiss }: { tone: string; text: string; onTap: () => void; onDismiss: () => void }) {
+  const start = useRef<{ x: number; id: number } | null>(null)
+  const moved = useRef(false)
+  const [dx, setDx] = useState(0)
+  const [leaving, setLeaving] = useState(0)
+  const [dragging, setDragging] = useState(false)
+  return (
+    <button
+      className={`toast ${tone} ${dragging ? 'dragging' : ''}`}
+      style={{ transform: `translateX(${leaving || dx}px)`, opacity: leaving ? 0 : 1 - Math.min(0.6, Math.abs(dx) / 200) }}
+      onPointerDown={e => {
+        e.stopPropagation()
+        e.currentTarget.setPointerCapture(e.pointerId)
+        start.current = { x: e.clientX, id: e.pointerId }
+        moved.current = false
+        setDragging(true)
+      }}
+      onPointerMove={e => {
+        if (!start.current || start.current.id !== e.pointerId) return
+        const d = e.clientX - start.current.x
+        if (Math.abs(d) > 6) moved.current = true
+        setDx(d)
+      }}
+      onPointerUp={e => {
+        if (!start.current) return
+        start.current = null
+        setDragging(false)
+        if (Math.abs(dx) > SWIPE_DISMISS) {
+          setLeaving(dx > 0 ? 400 : -400)
+          setTimeout(onDismiss, 180)
+        } else setDx(0)
+        e.stopPropagation()
+      }}
+      onPointerCancel={() => { start.current = null; setDragging(false); setDx(0) }}
+      onClick={() => { if (!moved.current) onTap() }}
+    >{text}</button>
   )
 }
 
