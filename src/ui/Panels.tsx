@@ -92,6 +92,12 @@ function BuildRow({ color, name, cost, money: cash, detail, onClick }: { color: 
   )
 }
 
+/** Little hint so the wiggle is readable: good deals are easy yeses, pricey ones are iffy. */
+function dealHint(p: { upsizeWiggle?: number }): string {
+  const w = p.upsizeWiggle ?? 1
+  return w <= 0.96 ? '👍' : w >= 1.04 ? '🤔' : ''
+}
+
 function TenantsMenu() {
   const g = useStore(s => s.game)!
   const mutate = useStore(s => s.mutate)
@@ -124,7 +130,7 @@ function TenantsMenu() {
                 <button key={u.id} onClick={() => {
                   const r = mutate(s => A.offerUnit(s, p.id, u.id))
                   if (r === 'refused') notice(`${p.name} said no to the ${unitDef(u.defId).name}.`)
-                }}>Upsize → {u.label} {unitDef(u.defId).name} @ {money(A.upsizePrice(p, u.defId))}/pt</button>
+                }}>Upsize → {u.label} {unitDef(u.defId).name} @ {money(A.upsizePrice(p, u.defId))}/pt {dealHint(p)}</button>
               ))}
               {exact.length === 0 && (p.refusedUpsize || bigger.length === 0) && <span className="small muted">No suitable vacant unit.</span>}
               <button className="bad" onClick={() => mutate(s => A.decline(s, p.id))}>Decline</button>

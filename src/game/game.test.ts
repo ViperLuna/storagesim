@@ -336,3 +336,12 @@ describe('upsize pricing', () => {
     expect(s.money - before).toBe(360)
   })
 })
+
+describe('upsize acceptance', () => {
+  it('good deals are likelier yeses than pricey ones', async () => {
+    const { upsizeAcceptChance } = await import('./actions')
+    expect(upsizeAcceptChance({ upsizeWiggle: 1 })).toBeCloseTo(0.85)
+    expect(upsizeAcceptChance({ upsizeWiggle: 0.9 })).toBeCloseTo(0.97)
+    expect(upsizeAcceptChance({ upsizeWiggle: 1.1 })).toBeCloseTo(0.7)
+  })
+})

@@ -19,8 +19,12 @@ export const VIP_CHANCE_MAX = 0.05
 export const VIP_BID_MIN = 1.5
 export const VIP_BID_MAX = 2.2
 
-/** Chance a tenant accepts an upsize offer. */
+/** Chance a tenant accepts an upsize offer at a normal price (wiggle 1.0). */
 export const UPSIZE_ACCEPT_CHANCE = 0.85
+/** How much the wiggle moves acceptance: +10% pricier → 15 points less likely (and vice versa). */
+export const UPSIZE_ACCEPT_PER_WIGGLE = 1.5
+export const UPSIZE_ACCEPT_MIN = 0.5
+export const UPSIZE_ACCEPT_MAX = 0.97
 /**
  * Upsize price chains up one size at a time: each step up is worth STEP_FACTOR of the unit below it
  * over the bigger unit's timer ("2 lockers' worth" of time on the next size up).

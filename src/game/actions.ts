@@ -189,6 +189,12 @@ export function upsizePrice(p: { bid: number; wants: string; upsizeWiggle?: numb
   return price >= 20 ? Math.round(price) : Math.round(price * 100) / 100
 }
 
+/** Chance they say yes to an upsize: good deals (low wiggle) are easy yeses, pricey ones get iffy. */
+export function upsizeAcceptChance(p: { upsizeWiggle?: number }): number {
+  const c = T.UPSIZE_ACCEPT_CHANCE - ((p.upsizeWiggle ?? 1) - 1) * T.UPSIZE_ACCEPT_PER_WIGGLE
+  return Math.max(T.UPSIZE_ACCEPT_MIN, Math.min(T.UPSIZE_ACCEPT_MAX, c))
+}
+
 /** Offer a unit. Exact size = accepted at their bid. Bigger = upsize price, and they might refuse. */
 export function offerUnit(state: GameState, prospectId: number, itemId: number): Result {
   const p = state.prospects.find(q => q.id === prospectId)
@@ -199,7 +205,7 @@ export function offerUnit(state: GameState, prospectId: number, itemId: number):
   if (rank < wantRank) return 'Too small'
   if (rank > wantRank) {
     if (p.refusedUpsize) return 'Already refused'
-    if (Math.random() >= T.UPSIZE_ACCEPT_CHANCE) {
+    if (Math.random() >= upsizeAcceptChance(p)) {
       p.refusedUpsize = true
       log(state, `🙅 ${p.name} turned down the bigger unit. People are weird.`)
       return 'refused'

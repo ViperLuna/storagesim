@@ -181,7 +181,8 @@ the table is the "list price" baseline.
   - **Upsize** — offer a bigger vacant unit at a discounted **upsize price** that chains up one size at
     a time: each step = 2× the price of the size below over the bigger unit's timer (e.g. a $10 locker
     bid → Small $60, Medium $360, Large $1,920, XL $9,600), ±10% per prospect, always under a fair
-    price. Shown on the button. Tenant may **accept or refuse**.
+    price. Shown on the button. Tenant may **accept or refuse**: ~85% normally, up to ~97% for a
+    good deal (👍) and down to ~70% for a pricey one (🤔).
   - **Decline** — they leave. **No penalty.** Just wait for the next spawn.
 - No haggling / counter-offers.
 
