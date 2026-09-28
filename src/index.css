@@ -250,3 +250,7 @@ button.bad.armed { background: var(--bad); color: #fff; border-color: var(--bad)
     width: var(--pin-w) !important;
   }
 }
+@media (max-width: 760px) {
+  /* Keep the placement bar compact on phones; wrapping is fine. */
+  .placement-bar { max-width: min(300px, calc(100% - 20px)); }
+}
