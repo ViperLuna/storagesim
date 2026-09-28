@@ -307,10 +307,18 @@ describe('mid-lease abandonment', () => {
 })
 
 describe('upsize pricing', () => {
-  it('meets in the middle between their bid and a fair price for the bigger unit', async () => {
+  it('chains up one size at a time, 2x the size below over the new timer, always a discount', async () => {
     const { upsizePrice } = await import('./actions')
-    expect(upsizePrice({ bid: 10, wants: 'locker' }, 'medium')).toBe(275) // 10 + (540 - 10) / 2
-    expect(upsizePrice({ bid: 5, wants: 'locker' }, 'medium')).toBe(138) // cheapskate: 5 + (270 - 5) / 2 = 137.5
+    const dillon = { bid: 10, wants: 'locker' }
+    expect(upsizePrice(dillon, 'small')).toBe(60)
+    expect(upsizePrice(dillon, 'medium')).toBe(360)
+    expect(upsizePrice(dillon, 'large')).toBe(1920)
+    expect(upsizePrice(dillon, 'xl')).toBe(9600)
+    expect(upsizePrice({ bid: 5, wants: 'locker' }, 'medium')).toBe(180) // cheapskates pay proportionally less
+    expect(upsizePrice({ ...dillon, upsizeWiggle: 1.1 }, 'medium')).toBe(396)
+    for (const big of ['small', 'medium', 'large', 'xl']) {
+      expect(upsizePrice({ ...dillon, upsizeWiggle: 1.1 }, big)).toBeLessThan(UNITS.find(u => u.id === big)!.listPrice)
+    }
   })
   it('the tenant pays the upsize price', async () => {
     const { vi } = await import('vitest')
@@ -324,7 +332,7 @@ describe('upsize pricing', () => {
     const before = s.money
     expect(offerUnit(s, 999, med.id)).toBeNull()
     spy.mockRestore()
-    expect(med.unit!.tenant!.bid).toBe(275)
-    expect(s.money - before).toBe(275)
+    expect(med.unit!.tenant!.bid).toBe(360)
+    expect(s.money - before).toBe(360)
   })
 })

@@ -22,10 +22,14 @@ export const VIP_BID_MAX = 2.2
 /** Chance a tenant accepts an upsize offer. */
 export const UPSIZE_ACCEPT_CHANCE = 0.85
 /**
- * Upsize price = meet in the middle: their bid + SPLIT × (fair price for the bigger unit − their bid).
- * "Fair" = the bigger unit's list price × the same generosity they showed on their own bid.
+ * Upsize price chains up one size at a time: each step up is worth STEP_FACTOR of the unit below it
+ * over the bigger unit's timer ("2 lockers' worth" of time on the next size up).
  */
-export const UPSIZE_SPLIT = 0.5
+export const UPSIZE_STEP_FACTOR = 2
+/** Per-prospect random wiggle on upsize prices (±10%). */
+export const UPSIZE_WIGGLE = 0.1
+/** Never more than this fraction of a fair price (list × their generosity) — it's always a discount. */
+export const UPSIZE_MAX_OF_FAIR = 0.95
 
 /** Lease length in points. */
 export const LEASE_MIN = 4

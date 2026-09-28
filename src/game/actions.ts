@@ -8,6 +8,7 @@ import { aOrAn, money } from './format'
 import * as E from '../data/economy'
 import * as T from '../data/tenants'
 import { requirementFor, rentMultiplierFor } from '../data/rebirths'
+import { UNITS } from '../data/units'
 import { newLease } from './sim'
 import { STAFF, UPGRADES } from '../data/staff'
 import { LOAN_GRACE, LOAN_INSTALLMENTS, LOAN_INTEREST, loanAmountFor } from '../data/bank'
@@ -174,15 +175,21 @@ export function decline(state: GameState, prospectId: number): void {
   state.prospects = state.prospects.filter(p => p.id !== prospectId)
 }
 
-/** Meet-in-the-middle price per point for putting a prospect in a bigger unit. */
-export function upsizePrice(p: { bid: number; wants: string }, bigDefId: string): number {
-  const generosity = p.bid / unitDef(p.wants).listPrice
-  const fair = unitDef(bigDefId).listPrice * generosity
-  const price = p.bid + (fair - p.bid) * T.UPSIZE_SPLIT
+/**
+ * Upsize price per point: chain up one size at a time. Each step = STEP_FACTOR × the price of the size
+ * below it, over the bigger unit's timer. Wiggled per prospect, and always a discount off a fair price.
+ */
+export function upsizePrice(p: { bid: number; wants: string; upsizeWiggle?: number }, bigDefId: string): number {
+  let price = p.bid
+  for (let r = unitRank(p.wants); r < unitRank(bigDefId); r++) {
+    price *= (UNITS[r + 1].timer / UNITS[r].timer) * T.UPSIZE_STEP_FACTOR
+  }
+  const fair = unitDef(bigDefId).listPrice * (p.bid / unitDef(p.wants).listPrice)
+  price = Math.min(price * (p.upsizeWiggle ?? 1), fair * T.UPSIZE_MAX_OF_FAIR)
   return price >= 20 ? Math.round(price) : Math.round(price * 100) / 100
 }
 
-/** Offer a unit. Exact size = accepted at their bid. Bigger = meet-in-the-middle price, and they might refuse. */
+/** Offer a unit. Exact size = accepted at their bid. Bigger = upsize price, and they might refuse. */
 export function offerUnit(state: GameState, prospectId: number, itemId: number): Result {
   const p = state.prospects.find(q => q.id === prospectId)
   const it = state.items.find(i => i.id === itemId)

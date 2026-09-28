@@ -178,9 +178,10 @@ the table is the "list price" baseline.
   - a **bid** (price per point) — some bids are garbage. That's life.
 - Player options:
   - **Accept** — assign to a vacant unit of that size at their bid.
-  - **Upsize** — offer a bigger vacant unit at a **meet-in-the-middle price**: halfway between their bid
-    and a fair price for the bigger unit (its list price × the generosity of their bid). Shown on the
-    button. Tenant may **accept or refuse**.
+  - **Upsize** — offer a bigger vacant unit at a discounted **upsize price** that chains up one size at
+    a time: each step = 2× the price of the size below over the bigger unit's timer (e.g. a $10 locker
+    bid → Small $60, Medium $360, Large $1,920, XL $9,600), ±10% per prospect, always under a fair
+    price. Shown on the button. Tenant may **accept or refuse**.
   - **Decline** — they leave. **No penalty.** Just wait for the next spawn.
 - No haggling / counter-offers.
 

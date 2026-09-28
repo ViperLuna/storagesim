@@ -39,5 +39,6 @@ export function makeProspect(state: GameState, forceVip = false): Prospect {
   let bid = list * f
   if (vip) bid = list * rand(T.VIP_BID_MIN, T.VIP_BID_MAX)
   bid = bid >= 20 ? Math.round(bid) : Math.round(bid * 100) / 100
-  return { id: state.nextId++, name: randomName(state), wants, bid, vip, arrivedAt: state.time }
+  const upsizeWiggle = 1 + rand(-T.UPSIZE_WIGGLE, T.UPSIZE_WIGGLE)
+  return { id: state.nextId++, name: randomName(state), wants, bid, vip, arrivedAt: state.time, upsizeWiggle }
 }

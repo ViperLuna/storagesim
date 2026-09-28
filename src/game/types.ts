@@ -50,6 +50,8 @@ export interface Prospect {
   arrivedAt: number
   /** Already turned down an upsize offer. */
   refusedUpsize?: boolean
+  /** Random multiplier on upsize prices, rolled once so the price doesn't flicker. */
+  upsizeWiggle?: number
 }
 
 export interface LogEntry {
