@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { create } from 'zustand'
 
 /** Where the player has pinned each draggable popup this session (not saved). */
-const usePins = create<{ pins: Record<string, { x: number; y: number }>; setPin: (k: string, p?: { x: number; y: number }) => void }>(set => ({
+type Pin = { x: number; y: number; w: number }
+
+const usePins = create<{ pins: Record<string, Pin>; setPin: (k: string, p?: Pin) => void }>(set => ({
   pins: {},
   setPin: (k, p) => set(s => {
     const pins = { ...s.pins }
@@ -24,7 +26,7 @@ export function useDraggablePopup(key: string) {
   const setPin = usePins(s => s.setPin)
   const [lifted, setLifted] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
-  const st = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; timer?: number; dragging: boolean; justDragged: boolean } | null>(null)
+  const st = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; w: number; timer?: number; dragging: boolean; justDragged: boolean } | null>(null)
 
   useEffect(() => () => { if (st.current?.timer) clearTimeout(st.current.timer) }, [])
 
@@ -44,7 +46,7 @@ export function useDraggablePopup(key: string) {
       // Measure where it actually is on screen (handles centering transforms and docked layouts).
       const r = el.getBoundingClientRect()
       const pr = (el.offsetParent as HTMLElement | null)?.getBoundingClientRect() ?? { left: 0, top: 0 }
-      st.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: r.left - pr.left, oy: r.top - pr.top, dragging: false, justDragged: false }
+      st.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: r.left - pr.left, oy: r.top - pr.top, w: r.width, dragging: false, justDragged: false }
       const onHandle = !!(e.target as HTMLElement).closest('[data-drag-handle]') && !(e.target as HTMLElement).closest('button')
       if (e.pointerType === 'mouse' && onHandle) {
         el.setPointerCapture(e.pointerId)
@@ -67,9 +69,11 @@ export function useDraggablePopup(key: string) {
       const el = ref.current!
       const parent = el.offsetParent as HTMLElement | null
       const pw = parent?.clientWidth ?? window.innerWidth, ph = parent?.clientHeight ?? window.innerHeight
+      // Keep the size it had when grabbed — otherwise it re-flows wider once it's off-center.
       setPin(key, {
-        x: Math.max(0, Math.min(pw - el.offsetWidth, s.ox + dx)),
+        x: Math.max(0, Math.min(pw - s.w, s.ox + dx)),
         y: Math.max(0, Math.min(ph - el.offsetHeight, s.oy + dy)),
+        w: s.w,
       })
     },
     onPointerUp: (e: React.PointerEvent<HTMLDivElement>) => {
@@ -105,7 +109,7 @@ export function useDraggablePopup(key: string) {
     lifted,
     /** Style overrides when pinned somewhere by the player. */
     pinStyle: pin
-      ? ({ left: pin.x, top: pin.y, right: 'auto', bottom: 'auto', transform: 'none', '--pin-x': `${pin.x}px`, '--pin-y': `${pin.y}px` } as React.CSSProperties)
+      ? ({ left: pin.x, top: pin.y, right: 'auto', bottom: 'auto', transform: 'none', width: pin.w, maxWidth: 'none', '--pin-x': `${pin.x}px`, '--pin-y': `${pin.y}px`, '--pin-w': `${pin.w}px` } as React.CSSProperties)
       : undefined,
     unpin: () => setPin(key, undefined),
   }

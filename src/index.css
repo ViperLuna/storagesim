@@ -247,6 +247,6 @@ button.bad.armed { background: var(--bad); color: #fff; border-color: var(--bad)
   /* A popup you've dragged somewhere stays there instead of docking. */
   .selection.anchored.pinned {
     left: var(--pin-x) !important; top: var(--pin-y) !important; right: auto; bottom: auto;
-    width: min(340px, calc(100% - 24px)) !important;
+    width: var(--pin-w) !important;
   }
 }
