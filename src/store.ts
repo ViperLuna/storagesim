@@ -18,6 +18,16 @@ export interface Placing {
   itemId?: number
 }
 
+export interface CamPlacing {
+  mode: 'new' | 'move'
+  defId: string
+  x: number
+  y: number
+  /** 0–7, every 45°. */
+  dir: number
+  camId?: number
+}
+
 export interface Toast { id: number; entry: LogEntry }
 
 interface Store {
@@ -26,6 +36,10 @@ interface Store {
   menu: Menu
   placing: Placing | null
   selectedId: number | null
+  camPlacing: CamPlacing | null
+  /** Camera view: coverage visible, taps select cameras instead of units. */
+  cameraView: boolean
+  selectedCamId: number | null
   toasts: Toast[]
   lastToastLogId: number
   flash: { id: number; n: number } | null
@@ -86,7 +100,12 @@ export function migrate(g: any): GameState | null {
     g.ratingAtLastTick = Math.max(0, g.ratingAtLastTick)
     g.version = 5
   }
-  return g.version === 5 ? (g as GameState) : null
+  if (g.version === 5) {
+    g.cameras = []
+    g.burglaryIn = 600
+    g.version = 6
+  }
+  return g.version === 6 ? (g as GameState) : null
 }
 
 function writeSave(g: GameState) {
@@ -104,6 +123,9 @@ export const useStore = create<Store>((set, get) => ({
   menu: null,
   placing: null,
   selectedId: null,
+  camPlacing: null,
+  cameraView: false,
+  selectedCamId: null,
   toasts: [],
   lastToastLogId: 0,
   flash: null,

@@ -9,6 +9,10 @@ import { money } from '../game/format'
 import { anchorAt, commitPlacing, placingSize } from './placing'
 import type { GameState, Item, Rot } from '../game/types'
 import { SelectionPanel, type Anchor } from './Overlays'
+import { CameraLayer, CameraPanel } from './cameraUi'
+import { commitCamPlacing } from './camPlacing'
+import { cameraAt } from '../game/cameras'
+import { BURGLARY_UNLOCK_REBIRTH } from '../data/cameras'
 import { ANGER_GRACE } from '../data/tenants'
 
 export const TILE = 56
@@ -28,6 +32,9 @@ export function GridView() {
   const flash = useStore(s => s.flash)
   const fitRequest = useStore(s => s.fitRequest)
   const showReach = useStore(s => s.showReach)
+  const cameraView = useStore(s => s.cameraView)
+  const camPlacing = useStore(s => s.camPlacing)
+  const selectedCamId = useStore(s => s.selectedCamId)
 
   const vpRef = useRef<HTMLDivElement>(null)
   const [view, setViewState] = useState<View>({ x: 0, y: 0, s: 1 })
@@ -133,6 +140,12 @@ export function GridView() {
   }
 
   const hoverGhost = (clientX: number, clientY: number) => {
+    const cp = useStore.getState().camPlacing
+    if (cp) {
+      const [cx, cy] = toCell(clientX, clientY)
+      if (cx !== cp.x || cy !== cp.y) useStore.getState().set({ camPlacing: { ...cp, x: cx, y: cy } })
+      return
+    }
     const p = useStore.getState().placing
     if (!p) return
     const [cx, cy] = toCell(clientX, clientY)
@@ -143,6 +156,17 @@ export function GridView() {
   const onTap = (clientX: number, clientY: number, type: string) => {
     const st = useStore.getState()
     const [cx, cy] = toCell(clientX, clientY)
+    if (st.camPlacing) {
+      const moved = cx !== st.camPlacing.x || cy !== st.camPlacing.y
+      st.set({ camPlacing: { ...st.camPlacing, x: cx, y: cy } })
+      if (type === 'mouse' || !moved) commitCamPlacing()
+      return
+    }
+    if (st.cameraView && st.game) {
+      // Camera view: taps pick cameras, not units.
+      st.set({ selectedCamId: cameraAt(st.game, cx, cy)?.id ?? null, selectedId: null })
+      return
+    }
     if (st.placing) {
       const a = anchorAt(st.placing, cx, cy)
       const moved = a.x !== st.placing.x || a.y !== st.placing.y
@@ -244,13 +268,19 @@ export function GridView() {
           <div key={st.id} className={`staff-dot ${st.mode}`} title="Janitor"
             style={{ left: (st.x + 0.5) * TILE, top: (st.y + 0.5) * TILE }}>🧹</div>
         )))}
+        <CameraLayer game={game} />
         {placing && <Ghost game={game} />}
       </div>
       {anchor && !placing && <SelectionPanel key={selectedId} anchor={anchor} />}
+      {selectedCamId !== null && !camPlacing && <CameraPanel key={`cam${selectedCamId}`} />}
       <div className="zoom-controls" onPointerDown={e => e.stopPropagation()}>
         <button onClick={() => zoomAt(1.25)} aria-label="Zoom in">＋</button>
         <button onClick={fit} aria-label="Fit whole lot" title="Fit whole lot">🎯</button>
         <button onClick={() => zoomAt(0.8)} aria-label="Zoom out">－</button>
+        {(game.rebirth >= BURGLARY_UNLOCK_REBIRTH || game.cameras.length > 0) && (
+          <button className={cameraView ? 'on' : ''} title="Camera view" aria-label="Camera view"
+            onClick={() => useStore.getState().set({ cameraView: !cameraView, selectedCamId: null, selectedId: null })}>📹</button>
+        )}
       </div>
     </div>
   )

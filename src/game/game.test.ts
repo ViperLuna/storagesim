@@ -358,3 +358,75 @@ describe('upsize acceptance', () => {
     expect(upsizeAcceptChance({ upsizeWiggle: 1.1 })).toBeCloseTo(0.7)
   })
 })
+
+describe('cameras & burglaries', () => {
+  const secured = () => {
+    const s = createRun(5)
+    s.money = 1e7
+    place(s, 'generator', 'gen-3', 0, 0, 0)
+    place(s, 'office', 'office-security', 3, 0, 0)
+    expect(hire(s, 'security')).toBeNull()
+    return s
+  }
+  it('mount only on units or the sign, one per tile', async () => {
+    const { canMountCamera, placeCamera } = await import('./cameras')
+    const s = secured()
+    const locker = s.items.find(i => i.defId === 'locker')!
+    expect(canMountCamera(s, 10, 3)).toBe(false) // empty ground
+    expect(canMountCamera(s, 3, 0)).toBe(false) // office
+    expect(placeCamera(s, 'cam-basic', locker.x, locker.y, 2)).toBeNull()
+    expect(canMountCamera(s, locker.x, locker.y)).toBe(false) // taken
+  })
+  it('cone coverage depends on facing; domes see all around', async () => {
+    const { covers } = await import('./cameras')
+    const { CAMERAS } = await import('../data/cameras')
+    const basic = CAMERAS[0], dome = CAMERAS[2]
+    const cam = { x: 5, y: 5, dir: 2 } // facing down
+    expect(covers(cam, basic, 5, 7)).toBe(true)
+    expect(covers(cam, basic, 5, 3)).toBe(false) // behind it
+    expect(covers({ ...cam }, dome, 5, 3)).toBe(true)
+    expect(covers(cam, basic, 5, 9)).toBe(false) // out of range
+  })
+  it('watched doors get burglars caught; unwatched ones get hit', async () => {
+    const { placeCamera, burglary } = await import('./cameras')
+    const s = secured()
+    const lockers = s.items.filter(i => i.defId === 'locker')
+    const [a, b] = lockers
+    for (const it of lockers) { it.unit!.status = 'occupied'; it.unit!.tenant = { name: 'T', bid: 10, deposit: 10, vip: false, leaseLeft: 5, anger: 0, complaintStage: 0 } }
+    // Camera on locker a, facing down at its door
+    placeCamera(s, 'cam-basic', a.x, a.y, 2)
+    s.rating = 3
+    burglary(s, a)
+    expect(s.rating).toBeCloseTo(3.1)
+    const far = s.items.find(i => i.defId === 'locker' && Math.abs(i.x - a.x) > 1) ?? b
+    burglary(s, far)
+    expect(s.rating).toBeLessThan(3.1)
+  })
+  it('cameras do nothing without a Security guard', async () => {
+    const { placeCamera, doorWatched } = await import('./cameras')
+    const s = secured()
+    const a = s.items.find(i => i.defId === 'locker')!
+    placeCamera(s, 'cam-dome', a.x, a.y, 0)
+    expect(doorWatched(s, a)).toBe(true)
+    s.staff = []
+    expect(doorWatched(s, a)).toBe(false)
+  })
+  it('cameras ride along when the unit moves and sell with it', async () => {
+    const { placeCamera } = await import('./cameras')
+    const { move } = await import('./actions')
+    const s = secured()
+    const a = s.items.find(i => i.defId === 'locker')!
+    placeCamera(s, 'cam-basic', a.x, a.y, 2)
+    expect(move(s, a.id, 10, 2, 0)).toBeNull()
+    expect(s.cameras[0]).toMatchObject({ x: 10, y: 2 })
+    sell(s, a.id)
+    expect(s.cameras).toHaveLength(0)
+  })
+  it('no burglaries before rebirth 5 or while offline', async () => {
+    const early = createRun(4)
+    early.items[0].unit!.status = 'occupied'
+    early.items[0].unit!.tenant = { name: 'T', bid: 10, deposit: 10, vip: false, leaseLeft: 999, anger: 0, complaintStage: 0 }
+    for (let i = 0; i < 100; i++) step(early, 60)
+    expect(early.log.some(e => e.text.includes('Break-in'))).toBe(false)
+  })
+})

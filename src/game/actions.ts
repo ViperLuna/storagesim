@@ -13,6 +13,7 @@ import { newLease } from './sim'
 import { STAFF, UPGRADES } from '../data/staff'
 import { LOAN_GRACE, LOAN_INSTALLMENTS, LOAN_INTEREST, loanAmountFor } from '../data/bank'
 import { homeTile, office, officeSlots } from './staff'
+import { camerasOn, carryCameras, sellCamerasOn } from './cameras'
 
 type Result = string | null
 
@@ -35,7 +36,10 @@ export function move(state: GameState, id: number, x: number, y: number, rot: Ro
   const it = state.items.find(i => i.id === id)
   if (!it) return 'Missing item'
   if (!canPlace(state, it.kind, it.defId, x, y, rot, [id])) return "Doesn't fit there"
+  const cams = camerasOn(state, it)
+  const from = { x: it.x, y: it.y }
   it.x = x; it.y = y; it.rot = rot
+  carryCameras(cams, from, it)
   return null
 }
 
@@ -54,8 +58,11 @@ export function upgrade(state: GameState, id: number, x: number, y: number, rot:
   if (state.money < cost) return 'Not enough money'
   if (!canPlace(state, it.kind, next, x, y, rot, [id])) return "Doesn't fit there"
   state.money -= cost
+  const cams = camerasOn(state, it)
+  const from = { x: it.x, y: it.y }
   it.defId = next; it.x = x; it.y = y; it.rot = rot
   it.label = defName(it.kind, next)
+  carryCameras(cams, from, it)
   log(state, `⬆️ Upgraded to ${it.label}.`, { tone: 'good', focusId: it.id })
   return null
 }
@@ -78,11 +85,12 @@ export function sell(state: GameState, id: number): Result {
     log(state, `🚪 Evicted ${u.tenant.name} from ${it.label}. Deposit refunded, and they're leaving a bad review.`, { tone: 'bad' })
   }
   state.money += sellValue(state, it)
+  const soldCams = sellCamerasOn(state, it)
+  if (soldCams) log(state, `📹 Sold ${soldCams} camera${soldCams > 1 ? 's' : ''} that were mounted on ${it.label}.`)
   state.items.splice(idx, 1)
   cancelClean(state, it.id)
   if (it.kind === 'office' && state.staff.length) {
-    state.staff = []
-    log(state, `👋 Sold the office — all staff were let go.`, { tone: 'bad' })
+    log(state, `🏢 Office sold — your staff are waiting (unpaid) until you build a new one.`, { tone: 'info' })
   }
   return null
 }
@@ -250,6 +258,7 @@ export function hire(state: GameState, role: string): Result {
   if (!def) return 'Unknown role'
   const o = office(state)
   if (!o) return 'Build an office first'
+  if (def.needsOffice && o.defId !== def.needsOffice) return `Needs the ${defName('office', def.needsOffice)}`
   if (state.staff.length >= officeSlots(state)) return 'No free office slots'
   if (state.staff.filter(s => s.role === role).length >= def.max) return `Max ${def.max} ${def.name.toLowerCase()} for now`
   if (state.money < def.hireCost) return 'Not enough money'

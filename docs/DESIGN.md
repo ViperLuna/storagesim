@@ -3,7 +3,7 @@
 > Living document. Captures what's been **locked** in RoundTable (RT) discussions.
 > Numbers marked *placeholder* are for tuning once the game is playable.
 
-## Build status — Alpha v0.2
+## Build status — Alpha v0.3
 
 **In:** title screen (audio unlock), 7×7 lot with gate + locked tiles, 3 pre-placed lockers,
 place/move/sell/upgrade with green/red ghost (R rotate, Esc cancel), door access via flood fill,
@@ -20,7 +20,15 @@ is dark or blocked; walk-speed & mop upgrades), payroll every 5 min, 💰 Money 
 (25% interest, 6-payday grace, 10 auto payments), bankruptcy strikes → level over, offline payroll
 pause at $0, rebirth-3 "employee" requirement now works.
 
-**Not yet:** Security/Agent/Manager, cameras & burglaries, sounds, real art.
+**v0.3 added (rebirth 5 security update):** 3×3 Security Office (2 slots), Security guard (paid only
+while there are working cameras), cameras on their own layer (Cheap 60°/2.5 tiles → HD 90°/4 tiles →
+360° Dome 3.5 tiles; mount on units or the sign; rotate in 45° steps; ride along when the unit moves,
+sell with it; 0.25⚡ each; need Security Office + guard + power to record), 📹 camera view toggle,
+burglaries from rebirth 5 while playing only (~every 10 min): caught if the tile outside the door is
+watched (+0.1★), otherwise a break-in (−0.4★, victim 50% moves out, neighbors 20% each). Selling an
+office no longer fires staff — they wait unpaid for a new office.
+
+**Not yet:** Leasing Agent, Manager, sounds, real art.
 
 **Implementation note:** the free power hookup is currently **5 power** (= 5 lockers' worth), not
 "5 units of any size". It's `FREE_POWER` in `src/data/power.ts`.

@@ -6,6 +6,7 @@ import { isPowered } from './power'
 import { officeDef, unitDef } from './defs'
 import { log } from './log'
 import * as S from '../data/staff'
+import { activeCameraCount } from './cameras'
 import { TICK_SECONDS } from '../data/economy'
 
 export const office = (state: GameState) => state.items.find(i => i.kind === 'office')
@@ -154,8 +155,13 @@ export function stepStaff(state: GameState, dt: number) {
   const blocked = staffBlocker(state)
   for (const s of state.staff) {
     if (blocked) continue // can't see what they're doing / can't get out — and not on the clock
-    if (s.role === 'janitor') updateJanitor(state, s, dt)
-    if (s.mode !== 'idle') s.workedSeconds = (s.workedSeconds ?? 0) + dt
+    if (s.role === 'janitor') {
+      updateJanitor(state, s, dt)
+      if (s.mode !== 'idle') s.workedSeconds = (s.workedSeconds ?? 0) + dt
+    } else if (s.role === 'security') {
+      // On the clock only while there are working cameras to watch.
+      if (activeCameraCount(state) > 0) s.workedSeconds = (s.workedSeconds ?? 0) + dt
+    }
   }
 }
 

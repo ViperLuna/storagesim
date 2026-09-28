@@ -12,6 +12,7 @@ import { makeProspect, stars } from './tenants'
 import { aOrAn, money } from './format'
 import { payrollOwed, resetWorked, stepStaff } from './staff'
 import { startNextClean } from './actions'
+import { stepBurglaries } from './cameras'
 
 export interface StepOptions {
   offline?: boolean
@@ -217,6 +218,7 @@ export function step(state: GameState, dt: number, opts: StepOptions = {}): void
 
   stepPlayerCleaning(state, dt)
   stepStaff(state, dt)
+  stepBurglaries(state, dt, !!opts.offline)
 
   // Prospects: nobody's at the desk while you're offline, so no new arrivals then.
   const before = state.prospects.length

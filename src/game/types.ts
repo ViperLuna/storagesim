@@ -92,6 +92,17 @@ export interface Staff {
   workedSeconds?: number
 }
 
+export interface Camera {
+  id: number
+  defId: string
+  x: number
+  y: number
+  /** 0–7, every 45°. 0 = right, 2 = down, 4 = left, 6 = up. */
+  dir: number
+  on: boolean
+  placedAt: number
+}
+
 export interface Loan {
   owed: number
   installment: number
@@ -99,7 +110,7 @@ export interface Loan {
 }
 
 export interface GameState {
-  version: 5
+  version: 6
   rebirth: number
   size: number
   money: number
@@ -125,6 +136,8 @@ export interface GameState {
   bankruptStrikes: number
   /** Units YOU are cleaning: first one in progress, the rest queued. */
   playerClean: { queue: number[]; left: number; total: number }
+  cameras: Camera[]
+  burglaryIn: number
   cashAtLastPayroll: number
   lastSaved: number
   /** Items whose power is out this frame (derived, but cached for UI). */

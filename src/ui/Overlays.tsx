@@ -10,6 +10,7 @@ import { createRun } from '../game/init'
 import { cancelPlacing, commitPlacing, rotatePlacing, startMove, startUpgrade } from './placing'
 import { defCost } from '../game/defs'
 import { unlockAudio } from '../audio'
+import { burglary } from '../game/cameras'
 import { useDraggablePopup } from './drag'
 import { officeSlots, staffBlocker } from '../game/staff'
 
@@ -354,6 +355,11 @@ export function DebugPanel() {
         <button onClick={() => mutate(s => { s.rating = 0.05 })}>Rating ~0</button>
         <button onClick={() => mutate(s => { for (const it of s.items) if (it.unit?.status === 'vacant') { it.unit.status = 'dirty'; it.unit.dirtySince = s.time } })}>Dirty vacant units</button>
         <button onClick={() => mutate(s => { s.money = -500; s.cashAtLastPayroll = -500 })}>Cash → -$500</button>
+        <button onClick={() => {
+          mutate(s => { const n = createRun(s.rebirth + 1); n.money = s.money; Object.assign(s, n) })
+          set({ fitRequest: useStore.getState().fitRequest + 1, selectedId: null, selectedCamId: null })
+        }}>Rebirth +1 (skip reqs)</button>
+        <button onClick={() => mutate(s => burglary(s))}>🦹 Burglar!</button>
         <button onClick={() => set({ showReach: !showReach })}>{showReach ? 'Hide' : 'Show'} reachable tiles</button>
       </div>
       <label className="small">Time speed ×{timeScale}

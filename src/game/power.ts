@@ -1,6 +1,7 @@
 import type { GameState, Item } from './types'
 import { FREE_POWER } from '../data/power'
 import { UNIT_POWER_PER_TILE } from '../data/units'
+import { CAMERAS } from '../data/cameras'
 import { genDef, officeDef, signDef, unitDef } from './defs'
 
 export function itemDraw(item: Item): number {
@@ -15,7 +16,9 @@ export function itemDraw(item: Item): number {
 
 /** Total draw of everything switched on. */
 export function powerDraw(state: GameState): number {
-  return state.items.reduce((sum, it) => sum + (it.on ? itemDraw(it) : 0), 0)
+  const items = state.items.reduce((sum, it) => sum + (it.on ? itemDraw(it) : 0), 0)
+  const cams = state.cameras.reduce((sum, c) => sum + (c.on ? (CAMERAS.find(d => d.id === c.defId)?.power ?? 0) : 0), 0)
+  return items + cams
 }
 
 export function powerCapacity(state: GameState): number {

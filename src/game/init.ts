@@ -3,6 +3,7 @@ import { gridSizeFor } from '../data/rebirths'
 import { STARTING_UNIT, STARTING_UNIT_COUNT } from '../data/units'
 import { RATING_START, TICK_SECONDS } from '../data/economy'
 import { BASE_SPAWN_SECONDS } from '../data/tenants'
+import { BURGLARY_MEAN_SECONDS } from '../data/cameras'
 
 export function newUnit(state: GameState, defId: string, x: number, y: number, rot: Item['rot']): Item {
   return {
@@ -16,12 +17,12 @@ export function newUnit(state: GameState, defId: string, x: number, y: number, r
 export function createRun(rebirth: number): GameState {
   const size = gridSizeFor(rebirth)
   const state: GameState = {
-    version: 5, rebirth, size, money: 0,
+    version: 6, rebirth, size, money: 0,
     rating: RATING_START, ratingAtLastTick: RATING_START, failStrikes: 0,
     items: [], nextId: 1, nextLabel: 1, prospects: [],
     nextProspectIn: BASE_SPAWN_SECONDS / 3, // first visitor shows up quickly
     time: 0, tickIn: TICK_SECONDS, log: [], lastSaved: Date.now(), tripped: false,
-    staff: [], upgrades: {}, bankruptStrikes: 0, playerClean: { queue: [], left: 0, total: 0 }, cashAtLastPayroll: 0,
+    staff: [], upgrades: {}, bankruptStrikes: 0, playerClean: { queue: [], left: 0, total: 0 }, cameras: [], burglaryIn: BURGLARY_MEAN_SECONDS, cashAtLastPayroll: 0,
   }
   // Starting pattern: lockers in a row above the locked tiles, one empty row between, doors facing the gate.
   const c = (size - 1) / 2

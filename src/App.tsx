@@ -5,6 +5,8 @@ import { Hud, Nav } from './ui/Hud'
 import { SidePanel } from './ui/Panels'
 import { DebugPanel, LevelOverModal, OfflineSummaryModal, PlacementBar, TitleScreen, Toasts } from './ui/Overlays'
 import { cancelPlacing, rotatePlacing } from './ui/placing'
+import { CameraPlacementBar } from './ui/cameraUi'
+import { cancelCamPlacing, rotateCamPlacing } from './ui/camPlacing'
 
 const TICK_MS = 200
 const SAVE_MS = 5000
@@ -39,9 +41,13 @@ export default function App() {
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return
       const s = useStore.getState()
-      if (e.key === 'r' || e.key === 'R') rotatePlacing()
-      else if (e.key === 'Escape') {
-        if (s.placing) cancelPlacing()
+      if (e.key === 'r' || e.key === 'R') {
+        if (s.camPlacing) rotateCamPlacing()
+        else rotatePlacing()
+      } else if (e.key === 'Escape') {
+        if (s.camPlacing) cancelCamPlacing()
+        else if (s.selectedCamId) s.set({ selectedCamId: null })
+        else if (s.placing) cancelPlacing()
         else if (s.selectedId) s.set({ selectedId: null })
         else if (s.menu) s.set({ menu: null })
       } else if (e.key === '`') s.set({ debugOpen: !s.debugOpen })
@@ -62,6 +68,7 @@ export default function App() {
           <GridView />
           <Toasts />
           <PlacementBar />
+          <CameraPlacementBar />
           <DebugPanel />
         </div>
       </div>

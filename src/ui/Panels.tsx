@@ -9,6 +9,9 @@ import { unitDef } from '../game/defs'
 import * as A from '../game/actions'
 import { startPlacing } from './placing'
 import { OFFICES } from '../data/office'
+import { CAMERAS, BURGLARY_UNLOCK_REBIRTH } from '../data/cameras'
+import { startCameraPlacing } from './camPlacing'
+import { securityBlocker, activeCameraCount } from '../game/cameras'
 import { STAFF, UPGRADES } from '../data/staff'
 import { LOAN_GRACE, LOAN_INSTALLMENTS, LOAN_INTEREST, loanAmountFor } from '../data/bank'
 import { FAIL_STRIKES, RATING_GAIN_PER_TICK, RATING_LOSS_PER_ISSUE, RATING_MAX, TICK_SECONDS } from '../data/economy'
@@ -73,7 +76,19 @@ function BuildMenu() {
             detail={`${o.w}×${o.h} · ${o.slots} staff slot${o.slots > 1 ? 's' : ''} · ${o.power}⚡ · door must be reachable`}
             onClick={() => startPlacing('office', o.id)} />
         ))}
-      <p className="muted small">Cameras: coming in a later build.</p>
+      <h3>Security cameras</h3>
+      {g.rebirth < BURGLARY_UNLOCK_REBIRTH ? (
+        <p className="muted small">🔒 Unlocks at rebirth {BURGLARY_UNLOCK_REBIRTH} — along with burglars, the Security Office, and a Security guard.</p>
+      ) : (
+        <>
+          <p className="muted small">Mount on a unit or your sign. They only record with the Security Office and a Security guard on duty. A burglar is caught if the tile outside the door is watched.</p>
+          {CAMERAS.filter(c => c.unlockRebirth <= g.rebirth).map(c => (
+            <BuildRow key={c.id} color="#2a3140" name={`${c.fov >= 360 ? '◉' : '📹'} ${c.name}`} cost={c.cost} money={g.money}
+              detail={`${c.fov >= 360 ? 'all around' : `${c.fov}° view`} · ${c.range} tiles · ${c.power}⚡`}
+              onClick={() => startCameraPlacing(c.id)} />
+          ))}
+        </>
+      )}
     </>
   )
 }
@@ -153,6 +168,11 @@ function TenantsMenu() {
   )
 }
 
+const STAFF_BLURB: Record<string, string> = {
+  janitor: 'Walks the paths and cleans units after tenants move out. Nearest job first.',
+  security: 'Watches the monitors in the Security Office. Cameras only record while a guard is on duty. Paid only while there are cameras to watch.',
+}
+
 function StaffMenu() {
   const g = useStore(s => s.game)!
   const mutate = useStore(s => s.mutate)
@@ -170,11 +190,11 @@ function StaffMenu() {
       <h3>Hire</h3>
       {STAFF.filter(d => d.unlockRebirth <= g.rebirth).map(d => {
         const count = g.staff.filter(x => x.role === d.id).length
-        const err = !o ? 'Needs an office' : g.staff.length >= slots ? 'No free office slot' : count >= d.max ? `Max ${d.max} for now` : g.money < d.hireCost ? 'Not enough money' : null
+        const err = !o ? 'Needs an office' : d.needsOffice && o.defId !== d.needsOffice ? `Needs the ${OFFICES.find(x => x.id === d.needsOffice)!.name}` : g.staff.length >= slots ? 'No free office slot' : count >= d.max ? `Max ${d.max} for now` : g.money < d.hireCost ? 'Not enough money' : null
         return (
           <div key={d.id} className="card">
             <div className="row"><strong>{d.icon} {d.name}</strong><span className="small muted">up to {money(d.wage)} / payroll</span></div>
-            <div className="small muted">Walks the paths and cleans units after tenants move out. Nearest job first.</div>
+            <div className="small muted">{STAFF_BLURB[d.id]}</div>
             <div className="actions">
               <button className="good" disabled={!!err} onClick={() => {
                 const e = mutate(s => A.hire(s, d.id))
@@ -189,7 +209,10 @@ function StaffMenu() {
       {g.staff.length === 0 && <p className="muted small">Nobody yet.</p>}
       {g.staff.map(st => {
         const d = STAFF.find(x => x.id === st.role)!
-        const doing = blocker ? `idle — ${blocker.toLowerCase()}` : st.mode === 'idle' ? 'in the office' : st.mode === 'toJob' ? 'heading to a job' : st.mode === 'cleaning' ? 'cleaning' : 'walking back'
+        const secBlock = st.role === 'security' ? securityBlocker(g) : null
+        const doing = blocker ? `idle — ${blocker.toLowerCase()}`
+          : st.role === 'security' ? (secBlock ? `idle — ${secBlock.toLowerCase()}` : activeCameraCount(g) ? `watching ${activeCameraCount(g)} camera${activeCameraCount(g) > 1 ? 's' : ''}` : 'idle — no cameras to watch')
+          : st.mode === 'idle' ? 'in the office' : st.mode === 'toJob' ? 'heading to a job' : st.mode === 'cleaning' ? 'cleaning' : 'walking back'
         return (
           <div key={st.id} className="card">
             <div className="row"><strong>{d.icon} {d.name}</strong><span className="small muted">{doing}</span></div>

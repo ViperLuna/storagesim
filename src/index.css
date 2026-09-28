@@ -254,3 +254,8 @@ button.bad.armed { background: var(--bad); color: #fff; border-color: var(--bad)
   /* Keep the placement bar compact on phones; wrapping is fine. */
   .placement-bar { max-width: min(300px, calc(100% - 20px)); }
 }
+
+/* Cameras */
+.camera-layer { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 7; overflow: visible; }
+.zoom-controls button.on { background: var(--accent); border-color: var(--accent); }
+.good-text { color: var(--good); }
