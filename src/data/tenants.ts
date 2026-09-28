@@ -61,6 +61,8 @@ export const FIRST_NAMES = [
   'Dillon', 'Maria', 'Jake', 'Priya', 'Carl', 'Tasha', 'Omar', 'Linda', 'Vince', 'Rosa',
   'Kevin', 'Jada', 'Earl', 'Monique', 'Derek', 'Yuki', 'Barb', 'Luis', 'Shonda', 'Gus',
   'Trish', 'Marcus', 'Deb', 'Andre', 'Heather', 'Ray', 'Nina', 'Walt', 'Keisha', 'Hank',
+  // Viper's crew
+  'Thessaly', 'Joseph', 'Abel', 'Zachary', 'Ash', 'Angel', 'Yua', 'Charity', 'Augustine', 'Ronan', 'Aeronica',
 ]
 export const LAST_INITIALS = 'ABCDEFGHJKLMNOPRSTVWY'
 /** Rare pun tenants. */
