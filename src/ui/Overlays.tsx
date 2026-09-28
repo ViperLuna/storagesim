@@ -10,6 +10,7 @@ import { createRun } from '../game/init'
 import { cancelPlacing, commitPlacing, rotatePlacing, startMove, startUpgrade } from './placing'
 import { defCost } from '../game/defs'
 import { unlockAudio } from '../audio'
+import { useDraggablePopup } from './drag'
 import { officeSlots, staffBlocker } from '../game/staff'
 
 /** Selected item's rectangle in viewport pixels, plus the viewport size. */
@@ -41,7 +42,7 @@ export function SelectionPanel({ anchor }: { anchor: Anchor }) {
   const id = useStore(s => s.selectedId)
   const mutate = useStore(s => s.mutate)
   const set = useStore(s => s.set)
-  const ref = useRef<HTMLDivElement>(null)
+  const { ref, handlers: dragHandlers, pin, lifted, pinStyle, unpin } = useDraggablePopup('selection')
   const [h, setH] = useState(160)
   useLayoutEffect(() => {
     const el = ref.current
@@ -49,7 +50,7 @@ export function SelectionPanel({ anchor }: { anchor: Anchor }) {
     const ro = new ResizeObserver(() => setH(el.offsetHeight))
     ro.observe(el)
     return () => ro.disconnect()
-  }, [])
+  }, [ref])
   // Ignore taps for a moment after opening so a quick double-tap can't land on a button.
   const [ready, setReady] = useState(false)
   const [armSell, setArmSell] = useState(false)
@@ -73,11 +74,15 @@ export function SelectionPanel({ anchor }: { anchor: Anchor }) {
   const upCost = A.upgradeCost(it)
   const sellFor = A.sellValue(g, it)
   return (
-    <div ref={ref} className={`selection anchored ${dockTop ? 'dock-top' : ''}`} style={{ left: pos.left, top: pos.top, width: PANEL_W, pointerEvents: ready ? undefined : 'none' }}
-      onPointerDown={e => e.stopPropagation()} onPointerUp={e => e.stopPropagation()}>
-      <div className="row">
+    <div ref={ref} className={`selection anchored ${dockTop ? 'dock-top' : ''} ${pin ? 'pinned' : ''} ${lifted ? 'lifted' : ''}`}
+      style={{ left: pos.left, top: pos.top, width: PANEL_W, pointerEvents: ready ? undefined : 'none', ...pinStyle }}
+      {...dragHandlers}>
+      <div className="row drag-handle" data-drag-handle>
         <strong>{it.kind === 'unit' ? `${it.label} · ${unitDef(it.defId).name}` : it.label}</strong>
-        <button className="icon-btn" onClick={() => set({ selectedId: null })} aria-label="Close">✕</button>
+        <span>
+          {pin && <button className="icon-btn" onClick={unpin} title="Put it back in its automatic spot" aria-label="Unpin">📌↺</button>}
+          <button className="icon-btn" onClick={() => set({ selectedId: null })} aria-label="Close">✕</button>
+        </span>
       </div>
       {u && <UnitInfo />}
       {it.kind === 'office' && <OfficeInfo />}
@@ -164,14 +169,15 @@ function UnitInfo() {
 export function PlacementBar() {
   const p = useStore(s => s.placing)
   const g = useStore(s => s.game)
+  const { ref: barRef, handlers: barHandlers, pin: barPin, lifted: barLifted, pinStyle: barPinStyle, unpin: barUnpin } = useDraggablePopup('placement')
   if (!p || !g) return null
   const it = p.itemId ? g.items.find(i => i.id === p.itemId) : undefined
   const cost = p.mode === 'new' ? defCost(p.kind, p.defId) : p.mode === 'upgrade' && it ? A.upgradeCost(it) ?? 0 : 0
   const drawItem = { ...(it ?? { id: 0, x: 0, y: 0, rot: 0 as const, on: true, placedAt: 0, label: '' }), kind: p.kind, defId: p.defId }
   const draw = itemDraw(drawItem)
   return (
-    <div className="placement-bar">
-      <span>
+    <div ref={barRef} className={`placement-bar ${barLifted ? 'lifted' : ''}`} style={barPinStyle} {...barHandlers}>
+      <span className="drag-handle" data-drag-handle>
         <b>{p.mode === 'move' ? 'Moving' : p.mode === 'upgrade' ? 'Upgrading to' : 'Placing'} {defName(p.kind, p.defId)}</b>
         {cost > 0 && <> · {money(cost)}</>}
         {draw > 0 && p.mode === 'new' && <> · +{draw}⚡</>}
@@ -181,6 +187,7 @@ export function PlacementBar() {
         <button onClick={rotatePlacing}>⟳ Rotate</button>
         <button className="good" onClick={commitPlacing}>✔ Place</button>
         <button className="bad" onClick={cancelPlacing}>✕ Cancel</button>
+        {barPin && <button onClick={barUnpin} title="Put it back" aria-label="Unpin">📌↺</button>}
       </div>
     </div>
   )
