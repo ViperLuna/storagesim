@@ -352,7 +352,13 @@ When a unit is abandoned, you're offered a choice:
   - **Allow upsizing** yes/no.
   - Prospects that fail the rules are declined (or left for the player — TBD).
   - Works offline too: with a Janitor, vacated units get cleaned and re-rented while you're away.
-- **Manager** — auto-collects rent. Pure convenience (rent accumulates anyway), so it comes last.
+- **Manager** — the "run the place while I'm gone" hire. Comes last.
+  - **Auto-collects rent.**
+  - **Handles abandoned units** using a player setting:
+    - *Always fixed sale* — quick, safe cash; unit back in play fast.
+    - *Always auction* — better average money, slower and riskier.
+    - *Leave it for me* — player decides each one.
+  - With Janitor (cleanup) + Leasing Agent (new tenants) + Manager, the facility can run itself.
 - **Unlock order (locked):** **Janitor → Security → Leasing Agent → Manager**.
   - Security arrives with the ~5th rebirth (3×3 office, cameras, burglaries).
   - Security is a staff member watching the monitors → 3×3 office needs **2 slots** (Janitor + Security).
