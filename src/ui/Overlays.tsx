@@ -1,15 +1,16 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useStore } from '../store'
 import { money, duration } from '../game/format'
-import { defName, nextTier, unitDef } from '../game/defs'
+import { defName, nextTier, officeDef, unitDef } from '../game/defs'
 import { itemDraw, isPowered } from '../game/power'
 import * as A from '../game/actions'
 import { isAccessible, reachable } from '../game/grid'
 import { addProspect, step, catchUp, rentMultiplier } from '../game/sim'
 import { createRun } from '../game/init'
-import { cancelPlacing, commitPlacing, rotatePlacing, startMove, startUpgrade } from './placing'
+import { cancelPlacing, commitPlacing, rotatePlacing, startMove, startReplace, startUpgrade } from './placing'
 import { defCost } from '../game/defs'
 import { unlockAudio } from '../audio'
+import { OFFICES } from '../data/office'
 import { burglary } from '../game/cameras'
 import { useDraggablePopup } from './drag'
 import { officeSlots, staffBlocker } from '../game/staff'
@@ -103,6 +104,11 @@ export function SelectionPanel({ anchor }: { anchor: Anchor }) {
         {next && upCost !== undefined && (
           <button disabled={g.money < upCost} onClick={() => startUpgrade(it.id, next)}>⬆️ {defName(it.kind, next)} ({money(upCost)})</button>
         )}
+        {it.kind === 'office' && OFFICES.filter(o => o.id !== it.defId && officeDef(it.defId).slots < o.slots).map(o => (
+          o.unlockRebirth > g.rebirth
+            ? <button key={o.id} disabled title={`Unlocks at rebirth ${o.unlockRebirth}`}>🔒 {o.name} (rebirth {o.unlockRebirth})</button>
+            : <button key={o.id} disabled={g.money < A.replaceCost(g, it, o.id)} onClick={() => startReplace(it.id, o.id)}>⬆️ {o.name} ({money(A.replaceCost(g, it, o.id))})</button>
+        ))}
         {u?.status !== 'auction' && (
           <button className={`bad ${armSell ? 'armed' : ''}`} onClick={() => {
             // Two taps to sell, always — no one-tap accidents.
