@@ -5,6 +5,7 @@ import { Hud, Nav } from './ui/Hud'
 import { SidePanel } from './ui/Panels'
 import { DebugPanel, LevelOverModal, OfflineSummaryModal, PlacementBar, TitleScreen, Toasts } from './ui/Overlays'
 import { cancelPlacing, rotatePlacing } from './ui/placing'
+import { NAV } from './ui/nav'
 import { CameraPlacementBar } from './ui/cameraUi'
 import { cancelCamPlacing, rotateCamPlacing } from './ui/camPlacing'
 
@@ -51,6 +52,10 @@ export default function App() {
         else if (s.selectedId) s.set({ selectedId: null })
         else if (s.menu) s.set({ menu: null })
       } else if (e.key === '`') s.set({ debugOpen: !s.debugOpen })
+      else if (/^[1-9]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const nav = NAV[Number(e.key) - 1]
+        if (nav) s.set({ menu: s.menu === nav.id ? null : nav.id })
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)

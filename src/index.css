@@ -259,3 +259,8 @@ button.bad.armed { background: var(--bad); color: #fff; border-color: var(--bad)
 .camera-layer { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 7; overflow: visible; }
 .zoom-controls button.on { background: var(--accent); border-color: var(--accent); }
 .good-text { color: var(--good); }
+.nav-key {
+  position: absolute; top: 3px; left: 5px; font-size: 0.6rem; color: var(--muted);
+  border: 1px solid var(--border); border-radius: 3px; padding: 0 3px; line-height: 1.3;
+}
+@media (max-width: 760px), (hover: none) { .nav-key { display: none; } }

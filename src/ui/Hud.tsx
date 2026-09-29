@@ -1,4 +1,5 @@
-import { useStore, type Menu } from '../store'
+import { useStore } from '../store'
+import { NAV } from './nav'
 import { duration, money } from '../game/format'
 import { powerCapacity, powerDraw } from '../game/power'
 import { stars } from '../game/tenants'
@@ -41,26 +42,17 @@ export function Stars({ value }: { value: number }) {
   )
 }
 
-const NAV: { id: Exclude<Menu, null>; icon: string; label: string }[] = [
-  { id: 'build', icon: '🏗️', label: 'Build' },
-  { id: 'tenants', icon: '🧍', label: 'Tenants' },
-  { id: 'staff', icon: '👷', label: 'Staff' },
-  { id: 'money', icon: '💰', label: 'Money' },
-  { id: 'rebirth', icon: '🔁', label: 'Rebirth' },
-  { id: 'log', icon: '📜', label: 'Log' },
-  { id: 'settings', icon: '⚙️', label: 'Settings' },
-]
-
 export function Nav() {
   const menu = useStore(s => s.menu)
   const set = useStore(s => s.set)
   const waiting = useStore(s => s.game?.prospects.length ?? 0)
   return (
     <nav className="nav">
-      {NAV.map(n => (
+      {NAV.map((n, i) => (
         <button key={n.id} className={menu === n.id ? 'active' : ''} onClick={() => set({ menu: menu === n.id ? null : n.id })}>
           <span className="nav-icon">{n.icon}</span>
           <span className="nav-label">{n.label}</span>
+          <span className="nav-key">{i + 1}</span>
           {n.id === 'tenants' && waiting > 0 && <span className="dot">{waiting}</span>}
         </button>
       ))}
