@@ -176,9 +176,13 @@ export function GridView() {
       return
     }
     if (st.cameraView && st.game) {
-      // Camera view: taps pick cameras, not units.
-      st.set({ selectedCamId: cameraAt(st.game, cx, cy)?.id ?? null, selectedId: null })
-      return
+      // Camera view: tapping a camera picks the camera; anything else works like normal.
+      const cam = cameraAt(st.game, cx, cy)
+      if (cam) {
+        st.set({ selectedCamId: cam.id, selectedId: null })
+        return
+      }
+      st.set({ selectedCamId: null })
     }
     if (st.placing) {
       const a = anchorAt(st.placing, cx, cy)
@@ -286,6 +290,10 @@ export function GridView() {
       </div>
       {anchor && !placing && <SelectionPanel key={selectedId} anchor={anchor} />}
       {selectedCamId !== null && !camPlacing && <CameraPanel key={`cam${selectedCamId}`} />}
+      {cameraView && !camPlacing && (
+        <button className="view-chip" onPointerDown={e => e.stopPropagation()}
+          onClick={() => useStore.getState().set({ cameraView: false, selectedCamId: null })}>📹 Camera view · tap to exit</button>
+      )}
       <div className="zoom-controls" onPointerDown={e => e.stopPropagation()}>
         <button onClick={() => zoomAt(1.25)} aria-label="Zoom in">＋</button>
         <button onClick={fit} aria-label="Fit whole lot" title="Fit whole lot">🎯</button>

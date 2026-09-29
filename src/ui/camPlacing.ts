@@ -9,7 +9,7 @@ export function startCameraPlacing(defId: string) {
   const s = useStore.getState()
   const g = s.game!
   s.set({
-    camPlacing: { mode: 'new', defId, x: Math.floor(g.size / 2), y: Math.floor(g.size / 2), dir: 2 },
+    camPlacing: { mode: 'new', defId, x: Math.floor(g.size / 2), y: Math.floor(g.size / 2), dir: 2, viewWasOn: s.cameraView },
     cameraView: true, selectedId: null, selectedCamId: null, placing: null,
     menu: window.innerWidth < 760 ? null : s.menu,
   })
@@ -18,7 +18,7 @@ export function startCameraPlacing(defId: string) {
 export function startCameraMove(camId: number) {
   const s = useStore.getState()
   const c = s.game!.cameras.find(k => k.id === camId)!
-  s.set({ camPlacing: { mode: 'move', defId: c.defId, x: c.x, y: c.y, dir: c.dir, camId }, selectedCamId: null })
+  s.set({ camPlacing: { mode: 'move', defId: c.defId, x: c.x, y: c.y, dir: c.dir, camId, viewWasOn: s.cameraView }, selectedCamId: null, cameraView: true })
 }
 
 export function rotateCamPlacing() {
@@ -28,7 +28,8 @@ export function rotateCamPlacing() {
 
 export function cancelCamPlacing() {
   const s = useStore.getState()
-  if (s.camPlacing) s.set({ camPlacing: null, selectedCamId: s.camPlacing.camId ?? null })
+  const p = s.camPlacing
+  if (p) s.set({ camPlacing: null, selectedCamId: p.camId ?? null, cameraView: p.viewWasOn || p.camId !== undefined })
 }
 
 export function commitCamPlacing() {
@@ -38,6 +39,6 @@ export function commitCamPlacing() {
   const err = s.mutate(g => (p.mode === 'new' ? placeCamera(g, p.defId, p.x, p.y, p.dir) : moveCamera(g, p.camId!, p.x, p.y, p.dir)))
   if (err) return notice(err)
   // Keep the tool for quick camera spam; moves end here.
-  if (p.mode === 'move') s.set({ camPlacing: null, selectedCamId: p.camId! })
+  if (p.mode === 'move') s.set({ camPlacing: null, selectedCamId: p.camId!, cameraView: true })
 }
 

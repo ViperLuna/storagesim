@@ -26,6 +26,8 @@ export interface CamPlacing {
   /** 0–7, every 45°. */
   dir: number
   camId?: number
+  /** Was camera view already on before placing? (If not, turn it back off when done.) */
+  viewWasOn?: boolean
 }
 
 export interface Toast { id: number; entry: LogEntry }
