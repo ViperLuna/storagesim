@@ -60,14 +60,17 @@ describe('placement', () => {
 })
 
 describe('tenants & rent', () => {
-  it('deposit + rent accumulates on the unit until collected', () => {
+  it('deposit + rent accumulates on the unit until collected', async () => {
     const s = createRun(0)
     s.prospects.push({ id: 999, name: 'Dillon A.', wants: 'locker', bid: 11, vip: false, arrivedAt: 0 })
     const unit = s.items[0]
     expect(offerUnit(s, 999, unit.id)).toBeNull()
     expect(s.money).toBe(11)
     unit.unit!.tenant!.leaseLeft = 100
+    const { vi } = await import('vitest')
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.5) // no surprise mid-lease abandonment
     step(s, 60)
+    spy.mockRestore()
     expect(unit.unit!.pending).toBe(11)
     expect(s.money).toBe(11)
     collect(s, unit.id)
@@ -93,12 +96,15 @@ describe('tenants & rent', () => {
     sell(s, s.items[0].id)
     expect(s.rating).toBeLessThan(rating)
   })
-  it('offline catch-up piles rent on units', () => {
+  it('offline catch-up piles rent on units', async () => {
     const s = createRun(0)
     s.prospects.push({ id: 999, name: 'Dillon A.', wants: 'locker', bid: 10, vip: false, arrivedAt: 0 })
     offerUnit(s, 999, s.items[0].id)
     s.items[0].unit!.tenant!.leaseLeft = 1000
+    const { vi } = await import('vitest')
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.5) // no surprise mid-lease abandonment
     const sum = catchUp(s, 600)
+    spy.mockRestore()
     expect(sum.rent).toBeCloseTo(100)
     expect(s.items[0].unit!.pending).toBeCloseTo(100)
   })
