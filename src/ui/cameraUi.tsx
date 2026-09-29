@@ -1,8 +1,10 @@
 import { useStore } from '../store'
 import type { GameState } from '../game/types'
 import { CAMERA_DIRS, type CameraDef } from '../data/cameras'
+import type { Item } from '../game/types'
+import { baseSize, doorOutside } from '../game/geometry'
 import {
-  cameraActive, cameraDef, cameraUpgradeCost, canMountCamera, securityBlocker,
+  cameraActive, cameraDef, cameraUpgradeCost, canMountCamera, covers, securityBlocker,
   sellCamera, toggleCamera, upgradeCamera, cameraSellValue,
 } from '../game/cameras'
 import { cancelCamPlacing, commitCamPlacing, rotateCamPlacing, startCameraMove } from './camPlacing'
@@ -35,6 +37,7 @@ export function CameraLayer({ game }: { game: GameState }) {
   return (
     <svg className="camera-layer" width={w} height={w} viewBox={`0 0 ${w} ${w}`}>
       <defs><clipPath id="lot-clip"><rect x={0} y={0} width={w} height={w} /></clipPath></defs>
+      {showViews && <Doorsteps game={game} />}
       <g clipPath="url(#lot-clip)">
       {showViews && game.cameras.map(c => {
         if (camPlacing?.camId === c.id) return null
@@ -57,6 +60,44 @@ export function CameraLayer({ game }: { game: GameState }) {
         <circle cx={(camPlacing.x + 0.5) * TILE} cy={(camPlacing.y + 0.5) * TILE} r={10} fill={ok ? '#3fbf7f' : '#e2555a'} stroke="#111" strokeWidth={2} />
       )}
     </svg>
+  )
+}
+
+/**
+ * Every unit's doorstep (the tile a burglar walks up to): blue if watched, faint red if exposed,
+ * gray if covered but the cameras aren't recording yet. Protected units get a 🛡️.
+ * While placing, the ghost camera's coverage counts too — so you see what it would protect.
+ */
+function Doorsteps({ game }: { game: GameState }) {
+  const p = useStore(s => s.camPlacing)
+  const recording = !securityBlocker(game) && !game.tripped
+  const cams = game.cameras.filter(c => c.on && c.id !== p?.camId).map(c => ({ c, def: cameraDef(c.defId) }))
+  const ghost = p && canMountCamera(game, p.x, p.y, p.camId) ? { c: { x: p.x, y: p.y, dir: p.dir }, def: cameraDef(p.defId) } : null
+  const tiles = new Map<string, { x: number; y: number; covered: boolean; byGhost: boolean }>()
+  const shields: { it: Item; covered: boolean }[] = []
+  for (const it of game.items) {
+    if (it.kind !== 'unit') continue
+    const [dx, dy] = doorOutside(it.x, it.y, baseSize(it.kind, it.defId), it.rot)
+    if (dx < 0 || dy < 0 || dx >= game.size || dy >= game.size) continue
+    const byCams = cams.some(({ c, def }) => covers(c, def, dx, dy))
+    const byGhost = !!ghost && covers(ghost.c, ghost.def, dx, dy)
+    const key = `${dx},${dy}`
+    const prev = tiles.get(key)
+    tiles.set(key, { x: dx, y: dy, covered: byCams || byGhost || !!prev?.covered, byGhost: byGhost || !!prev?.byGhost })
+    shields.push({ it, covered: byCams || byGhost })
+  }
+  const on = (covered: boolean) => (covered ? (recording ? 'rgba(91,157,255,0.45)' : 'rgba(170,170,170,0.35)') : 'rgba(226,85,90,0.18)')
+  return (
+    <g>
+      {[...tiles.values()].map(t => (
+        <rect key={`${t.x},${t.y}`} x={t.x * TILE + 3} y={t.y * TILE + 3} width={TILE - 6} height={TILE - 6} rx={6}
+          fill={on(t.covered)} stroke={t.byGhost ? '#3fbf7f' : t.covered ? (recording ? '#5b9dff' : '#999') : 'rgba(226,85,90,0.5)'}
+          strokeWidth={2} strokeDasharray={t.covered ? undefined : '4 3'} />
+      ))}
+      {shields.filter(s => s.covered).map(({ it }) => (
+        <text key={it.id} x={it.x * TILE + 4} y={it.y * TILE + 15} fontSize={12} opacity={recording ? 1 : 0.5}>🛡️</text>
+      ))}
+    </g>
   )
 }
 

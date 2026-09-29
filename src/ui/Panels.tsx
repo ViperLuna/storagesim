@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useStore, resetSave } from '../store'
+import type { GameState } from '../game/types'
+import { isPowered } from '../game/power'
+import { defName, nextTier } from '../game/defs'
 import { UNITS, UNIT_POWER_PER_TILE } from '../data/units'
 import { SIGNS } from '../data/signs'
 import { GENERATORS } from '../data/power'
@@ -145,6 +148,16 @@ function ArmedActions({ children }: { children: React.ReactNode }) {
   )
 }
 
+/** "Nobody's waiting" — with a tip that actually fits your sign situation. */
+function emptyWaitingHint(g: GameState): string {
+  const sign = g.items.find(i => i.kind === 'sign')
+  if (!sign) return "Nobody's waiting. A sign brings people in faster."
+  if (!isPowered(g, sign)) return "Nobody's waiting — and your sign is dark. Power it up to bring people in."
+  const next = nextTier(sign)
+  if (next && SIGNS.find(x => x.id === next)!.unlockRebirth <= g.rebirth) return `Nobody's waiting. Upgrading to a ${defName('sign', next)} brings people in faster.`
+  return "Nobody's waiting. Hang tight — someone will show up soon."
+}
+
 function TenantsMenu() {
   const g = useStore(s => s.game)!
   const mutate = useStore(s => s.mutate)
@@ -154,7 +167,7 @@ function TenantsMenu() {
   return (
     <>
       <h3>Waiting ({g.prospects.length})</h3>
-      {g.prospects.length === 0 && <p className="muted small">Nobody's waiting. A sign brings people in faster.</p>}
+      {g.prospects.length === 0 && <p className="muted small">{emptyWaitingHint(g)}</p>}
       {A.sortedProspects(g).map(({ p, exact, bigger }, index) => {
         const d = unitDef(p.wants)
         const left = PROSPECT_PATIENCE - (g.time - p.arrivedAt)
