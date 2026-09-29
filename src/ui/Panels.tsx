@@ -14,6 +14,7 @@ import { CAMERAS, BURGLARY_UNLOCK_REBIRTH } from '../data/cameras'
 import { startCameraPlacing } from './camPlacing'
 import { securityBlocker, activeCameraCount } from '../game/cameras'
 import { STAFF, UPGRADES } from '../data/staff'
+import { LOG_CATS, categorize, type LogCat } from './logFilter'
 import { LOAN_GRACE, LOAN_INSTALLMENTS, LOAN_INTEREST, loanAmountFor } from '../data/bank'
 import { FAIL_STRIKES, RATING_GAIN_PER_TICK, RATING_LOSS_PER_ISSUE, RATING_MAX, TICK_SECONDS } from '../data/economy'
 import { ratingIssues } from '../game/sim'
@@ -374,10 +375,24 @@ function LogMenu() {
   const log = useStore(s => s.game!.log)
   const focusItem = useStore(s => s.focusItem)
   const set = useStore(s => s.set)
+  const [cats, setCats] = useState<LogCat[]>([])
+  const [query, setQuery] = useState('')
+  const tagged = log.map(e => ({ e, cat: categorize(e) }))
+  const counts = Object.fromEntries(LOG_CATS.map(c => [c.id, tagged.filter(t => t.cat === c.id).length]))
+  const q = query.trim().toLowerCase()
+  const shown = tagged.filter(t => (!cats.length || (t.cat && cats.includes(t.cat))) && (!q || t.e.text.toLowerCase().includes(q)))
+  const toggle = (c: LogCat) => setCats(cs => (cs.includes(c) ? cs.filter(x => x !== c) : [...cs, c]))
   return (
     <div className="log">
-      {log.length === 0 && <p className="muted small">Nothing yet.</p>}
-      {[...log].reverse().map(e => (
+      <input className="log-search" type="search" placeholder="🔎 Search the log (name, unit #, anything)" value={query} onChange={e => setQuery(e.target.value)} />
+      <div className="chips">
+        <button className={`chip ${cats.length === 0 ? 'on' : ''}`} onClick={() => setCats([])}>All {log.length}</button>
+        {LOG_CATS.map(c => (
+          <button key={c.id} className={`chip ${cats.includes(c.id) ? 'on' : ''}`} onClick={() => toggle(c.id)}>{c.label} {counts[c.id]}</button>
+        ))}
+      </div>
+      {shown.length === 0 && <p className="muted small">{log.length ? 'Nothing matches.' : 'Nothing yet.'}</p>}
+      {[...shown].reverse().map(({ e }) => (
         <button key={e.id} className={`log-row ${e.tone}`} onClick={() => {
           if (e.focusId) focusItem(e.focusId)
           else if (e.openTenants) set({ menu: 'tenants' })

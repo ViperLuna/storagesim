@@ -278,3 +278,16 @@ button.bad.armed { background: var(--bad); color: #fff; border-color: var(--bad)
   background: var(--accent); transform-origin: left; animation: arm var(--arm-ms, 1000ms) linear forwards;
 }
 @keyframes arm { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* Log filters */
+.log-search {
+  width: 100%; padding: 8px 10px; margin-bottom: 8px; border-radius: var(--radius);
+  background: var(--surface-2); border: 1px solid var(--border); color: var(--text); font: inherit; font-size: 0.85rem;
+}
+.log-search:focus { outline: none; border-color: var(--accent); }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.chip {
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px;
+  padding: 3px 9px; font-size: 0.75rem; color: var(--muted);
+}
+.chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
