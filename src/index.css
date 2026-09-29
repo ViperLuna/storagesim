@@ -269,3 +269,12 @@ button.bad.armed { background: var(--bad); color: #fff; border-color: var(--bad)
   background: var(--accent); color: #fff; border: none; border-radius: 999px; padding: 5px 12px; font-size: 0.8rem;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 }
+
+/* Tenant cards: buttons arm a moment after the card appears or moves */
+.actions.arming { position: relative; }
+.actions.arming:not(.armed) > * { opacity: 0.35; pointer-events: none; }
+.actions.arming:not(.armed)::after {
+  content: ''; position: absolute; left: 0; bottom: -5px; height: 2px; width: 100%;
+  background: var(--accent); transform-origin: left; animation: arm var(--arm-ms, 1000ms) linear forwards;
+}
+@keyframes arm { from { transform: scaleX(0); } to { transform: scaleX(1); } }

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useStore, resetSave } from '../store'
 import { UNITS, UNIT_POWER_PER_TILE } from '../data/units'
 import { SIGNS } from '../data/signs'
@@ -125,6 +126,24 @@ function dealHint(p: { upsizeWiggle?: number }): string {
   return w <= 0.96 ? '👍' : w >= 1.04 ? '🤔' : ''
 }
 
+/** How long a tenant card's buttons stay locked after it appears or moves in the list. */
+const ARM_MS = 1000
+
+/** Buttons that only become pressable a moment after they appear — no mis-taps when the list shifts. */
+function ArmedActions({ children }: { children: React.ReactNode }) {
+  const [armed, setArmed] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => setArmed(true), ARM_MS)
+    return () => clearTimeout(t)
+  }, [])
+  return (
+    <div className={`actions arming ${armed ? 'armed' : ''}`} style={{ '--arm-ms': `${ARM_MS}ms` } as React.CSSProperties}
+      onClickCapture={e => { if (!armed) { e.stopPropagation(); e.preventDefault() } }}>
+      {children}
+    </div>
+  )
+}
+
 function TenantsMenu() {
   const g = useStore(s => s.game)!
   const mutate = useStore(s => s.mutate)
@@ -135,7 +154,7 @@ function TenantsMenu() {
     <>
       <h3>Waiting ({g.prospects.length})</h3>
       {g.prospects.length === 0 && <p className="muted small">Nobody's waiting. A sign brings people in faster.</p>}
-      {A.sortedProspects(g).map(({ p, exact, bigger }) => {
+      {A.sortedProspects(g).map(({ p, exact, bigger }, index) => {
         const d = unitDef(p.wants)
         const left = PROSPECT_PATIENCE - (g.time - p.arrivedAt)
         return (
@@ -149,7 +168,8 @@ function TenantsMenu() {
               <span className="muted"> · list {money(d.listPrice)}</span>
             </div>
             <div className="small muted">Deposit: {money(p.bid * mult)}</div>
-            <div className="actions">
+            {/* Keyed by position: a card that's new or just moved remounts and arms again. */}
+            <ArmedActions key={`${p.id}@${index}`}>
               {exact.map(u => (
                 <button key={u.id} className="good" onClick={() => mutate(s => A.offerUnit(s, p.id, u.id))}>Accept → {u.label}</button>
               ))}
@@ -161,7 +181,7 @@ function TenantsMenu() {
               ))}
               {exact.length === 0 && (p.refusedUpsize || bigger.length === 0) && <span className="small muted">No suitable vacant unit.</span>}
               <button className="bad" onClick={() => mutate(s => A.decline(s, p.id))}>Decline</button>
-            </div>
+            </ArmedActions>
           </div>
         )
       })}
