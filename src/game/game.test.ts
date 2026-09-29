@@ -422,6 +422,17 @@ describe('cameras & burglaries', () => {
     sell(s, a.id)
     expect(s.cameras).toHaveLength(0)
   })
+  it('the guard is off the clock while you are away', async () => {
+    const { placeCamera } = await import('./cameras')
+    const s = secured()
+    const a = s.items.find(i => i.defId === 'locker')!
+    placeCamera(s, 'cam-basic', a.x, a.y, 2)
+    const before = s.money
+    catchUp(s, 3600)
+    expect(s.money).toBe(before)
+    step(s, 300)
+    expect(s.money).toBeLessThan(before) // online, he's paid
+  })
   it('no burglaries before rebirth 5 or while offline', async () => {
     const early = createRun(4)
     early.items[0].unit!.status = 'occupied'

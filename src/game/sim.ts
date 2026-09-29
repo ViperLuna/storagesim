@@ -217,7 +217,7 @@ export function step(state: GameState, dt: number, opts: StepOptions = {}): void
   }
 
   stepPlayerCleaning(state, dt)
-  stepStaff(state, dt)
+  stepStaff(state, dt, !!opts.offline)
   stepBurglaries(state, dt, !!opts.offline)
 
   // Prospects: nobody's at the desk while you're offline, so no new arrivals then.

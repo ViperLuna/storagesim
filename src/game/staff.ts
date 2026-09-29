@@ -150,7 +150,7 @@ function updateJanitor(state: GameState, s: Staff, dt: number) {
   }
 }
 
-export function stepStaff(state: GameState, dt: number) {
+export function stepStaff(state: GameState, dt: number, offline = false) {
   if (!state.staff.length) return
   const blocked = staffBlocker(state)
   for (const s of state.staff) {
@@ -159,8 +159,9 @@ export function stepStaff(state: GameState, dt: number) {
       updateJanitor(state, s, dt)
       if (s.mode !== 'idle') s.workedSeconds = (s.workedSeconds ?? 0) + dt
     } else if (s.role === 'security') {
-      // On the clock only while there are working cameras to watch.
-      if (activeCameraCount(state) > 0) s.workedSeconds = (s.workedSeconds ?? 0) + dt
+      // On the clock only while there are working cameras to watch — and burglars only come while
+      // you're playing, so the guard isn't paid while you're away.
+      if (!offline && activeCameraCount(state) > 0) s.workedSeconds = (s.workedSeconds ?? 0) + dt
     }
   }
 }
