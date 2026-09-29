@@ -300,7 +300,7 @@ export function GridView() {
         <button onClick={fit} aria-label="Fit whole lot" title="Fit whole lot">🎯</button>
         <button onClick={() => zoomAt(0.8)} aria-label="Zoom out">－</button>
         {(game.rebirth >= BURGLARY_UNLOCK_REBIRTH || game.cameras.length > 0) && (
-          <button className={cameraView ? 'on' : ''} title="Camera view (C)" aria-label="Camera view"
+          <button className={cameraView ? 'on' : ''} title="Camera view (C / Page Up–Down)" aria-label="Camera view"
             onClick={() => useStore.getState().set({ cameraView: !cameraView, selectedCamId: null, selectedId: null })}>📹</button>
         )}
       </div>

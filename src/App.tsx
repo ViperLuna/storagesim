@@ -66,11 +66,11 @@ export default function App() {
         const nav = NAV[Number(digit) - 1]
         if (nav) s.set({ menu: s.menu === nav.id ? null : nav.id })
         e.preventDefault()
-      } else if (e.key === '+' || e.code === 'NumpadAdd' || e.key === 'PageUp') {
-        s.set({ viewCmd: { type: 'zoomIn', n: Date.now() } })
-        e.preventDefault()
-      } else if (e.key === '-' || e.key === '_' || e.code === 'NumpadSubtract' || e.key === 'PageDown') {
-        s.set({ viewCmd: { type: 'zoomOut', n: Date.now() } })
+      } else if (e.key === '+' || e.code === 'NumpadAdd') s.set({ viewCmd: { type: 'zoomIn', n: Date.now() } })
+      else if (e.key === '-' || e.key === '_' || e.code === 'NumpadSubtract') s.set({ viewCmd: { type: 'zoomOut', n: Date.now() } })
+      // Layers: Page Up = camera layer, Page Down = back to the ground.
+      else if (e.key === 'PageUp' || e.key === 'PageDown') {
+        if (!s.camPlacing) s.set({ cameraView: e.key === 'PageUp', selectedCamId: null })
         e.preventDefault()
       }
       else if (e.key === '=') s.set({ viewCmd: { type: 'fit', n: Date.now() } })

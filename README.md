@@ -27,6 +27,6 @@ npm run build    # production build (dist/)
 
 - **Pan:** drag the map (one finger on mobile) · **Zoom:** scroll wheel / pinch / ➕➖ · 🎯 fits the whole lot
 - **Placing:** R rotate · click to place · Esc cancel (touch: tap to position, tap again or ✔ Place)
-- **Keyboard:** <kbd>1</kbd>–<kbd>7</kbd> (or numpad) open menus · <kbd>+</kbd>/<kbd>−</kbd> or <kbd>PgUp</kbd>/<kbd>PgDn</kbd> zoom · <kbd>=</kbd> fit the lot ·
-  arrows pan · <kbd>C</kbd> camera view · <kbd>R</kbd> rotate · <kbd>Esc</kbd> backs out one step
+- **Keyboard:** <kbd>1</kbd>–<kbd>7</kbd> (or numpad) open menus · <kbd>+</kbd>/<kbd>−</kbd> zoom · <kbd>=</kbd> fit the lot ·
+  arrows pan · <kbd>C</kbd> or <kbd>PgUp</kbd>/<kbd>PgDn</kbd> camera layer on/off · <kbd>R</kbd> rotate · <kbd>Esc</kbd> backs out one step
 - **Debug panel:** press <kbd>`</kbd> (or Settings → debug)
