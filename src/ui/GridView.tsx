@@ -13,6 +13,7 @@ import { CameraLayer, CameraPanel } from './cameraUi'
 import { commitCamPlacing } from './camPlacing'
 import { cameraAt } from '../game/cameras'
 import { BURGLARY_UNLOCK_REBIRTH } from '../data/cameras'
+import { STAFF } from '../data/staff'
 import { ANGER_GRACE } from '../data/tenants'
 
 export const TILE = 56
@@ -365,7 +366,7 @@ function ItemView({ game, item, accessible, selected, flashN, hidden }: {
         <span className="lbl">{item.kind === 'unit' ? item.label : ICONS[item.kind]}</span>
         {item.kind !== 'unit' && fp.w * fp.h > 1 && <span className="st">{item.label}</span>}
         {status}
-        {item.kind === 'office' && <span className="st">{game.staff.length ? '🧹'.repeat(game.staff.length) : 'no staff'}</span>}
+        {item.kind === 'office' && <span className="st">{game.staff.length ? game.staff.map(st => STAFF.find(d => d.id === st.role)?.icon ?? '👤').join('') : 'no staff'}</span>}
       </div>
       {u && u.pending > 0 && <div className="pending">{money(u.pending)}</div>}
       {hasDoor(item.kind) && !accessible && u?.status !== 'auction' && <div className="badge blocked" title="Door can't be reached from the gate">⛔</div>}
