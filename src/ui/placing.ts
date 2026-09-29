@@ -41,6 +41,12 @@ export function startUpgrade(itemId: number, nextId: string) {
   s.set({ placing: { mode: 'upgrade', kind: it.kind, defId: nextId, rot: it.rot, x: it.x, y: it.y, itemId } })
 }
 
+export function startReplace(itemId: number, newDefId: string) {
+  const s = useStore.getState()
+  const it = s.game!.items.find(i => i.id === itemId)!
+  s.set({ placing: { mode: 'replace', kind: it.kind, defId: newDefId, rot: it.rot, x: it.x, y: it.y, itemId }, selectedId: null, menu: window.innerWidth < 760 ? null : s.menu })
+}
+
 export function rotatePlacing() {
   const s = useStore.getState()
   if (!s.placing) return
@@ -68,6 +74,7 @@ export function commitPlacing() {
       if (!e) g.heldId = undefined
       return e
     }
+    if (p.mode === 'replace') return A.replace(g, p.itemId!, p.defId, p.x, p.y, p.rot)
     return A.upgrade(g, p.itemId!, p.x, p.y, p.rot)
   })
   if (err) {

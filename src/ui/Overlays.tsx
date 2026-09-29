@@ -173,13 +173,13 @@ export function PlacementBar() {
   const { ref: barRef, handlers: barHandlers, pin: barPin, lifted: barLifted, pinStyle: barPinStyle, unpin: barUnpin } = useDraggablePopup('placement')
   if (!p || !g) return null
   const it = p.itemId ? g.items.find(i => i.id === p.itemId) : undefined
-  const cost = p.mode === 'new' ? defCost(p.kind, p.defId) : p.mode === 'upgrade' && it ? A.upgradeCost(it) ?? 0 : 0
+  const cost = p.mode === 'new' ? defCost(p.kind, p.defId) : p.mode === 'upgrade' && it ? A.upgradeCost(it) ?? 0 : p.mode === 'replace' && it ? A.replaceCost(g, it, p.defId) : 0
   const drawItem = { ...(it ?? { id: 0, x: 0, y: 0, rot: 0 as const, on: true, placedAt: 0, label: '' }), kind: p.kind, defId: p.defId }
   const draw = itemDraw(drawItem)
   return (
     <div ref={barRef} className={`placement-bar ${barLifted ? 'lifted' : ''}`} style={barPinStyle} {...barHandlers}>
       <span className="drag-handle" data-drag-handle>
-        <b>{p.mode === 'move' ? 'Moving' : p.mode === 'upgrade' ? 'Upgrading to' : 'Placing'} {defName(p.kind, p.defId)}</b>
+        <b>{p.mode === 'move' ? 'Moving' : p.mode === 'upgrade' ? 'Upgrading to' : p.mode === 'replace' ? 'Replacing with' : 'Placing'} {defName(p.kind, p.defId)}</b>
         {cost > 0 && <> · {money(cost)}</>}
         {draw > 0 && p.mode === 'new' && <> · +{draw}⚡</>}
       </span>

@@ -7,7 +7,7 @@ import { PROSPECT_PATIENCE } from '../data/tenants'
 import { aOrAn, money, duration } from '../game/format'
 import { unitDef } from '../game/defs'
 import * as A from '../game/actions'
-import { startPlacing } from './placing'
+import { startPlacing, startReplace } from './placing'
 import { OFFICES } from '../data/office'
 import { CAMERAS, BURGLARY_UNLOCK_REBIRTH } from '../data/cameras'
 import { startCameraPlacing } from './camPlacing'
@@ -69,13 +69,25 @@ function BuildMenu() {
             detail={`${GENERATORS[0].w}×${GENERATORS[0].h} · +${GENERATORS[0].capacity}⚡ capacity`}
             onClick={() => startPlacing('generator', GENERATORS[0].id)} />}
       <h3>Office</h3>
-      {g.items.some(i => i.kind === 'office')
-        ? <p className="muted small">One office per plot. For a bigger one, sell this one and build the new one.</p>
-        : OFFICES.filter(o => o.unlockRebirth <= g.rebirth).map(o => (
-          <BuildRow key={o.id} color={o.color} name={o.name} cost={o.cost} money={g.money}
-            detail={`${o.w}×${o.h} · ${o.slots} staff slot${o.slots > 1 ? 's' : ''} · ${o.power}⚡ · door must be reachable`}
-            onClick={() => startPlacing('office', o.id)} />
-        ))}
+      {(() => {
+        const current = g.items.find(i => i.kind === 'office')
+        return (
+          <>
+            {current && <p className="muted small">One office per plot. You have the {current.label}. Replacing it sells the old one and your staff move right over.</p>}
+            {OFFICES.filter(o => o.unlockRebirth <= g.rebirth && o.id !== current?.defId).map(o => {
+              const cost = current ? A.replaceCost(g, current, o.id) : o.cost
+              return (
+                <BuildRow key={o.id} color={o.color} name={current ? `Replace with ${o.name}` : o.name} cost={cost} money={g.money}
+                  detail={`${o.w}×${o.h} · ${o.slots} staff slot${o.slots > 1 ? 's' : ''} · ${o.power}⚡ · door must be reachable${current ? ` · ${money(o.cost)} minus old office` : ''}`}
+                  onClick={() => (current ? startReplace(current.id, o.id) : startPlacing('office', o.id))} />
+              )
+            })}
+            {OFFICES.filter(o => o.unlockRebirth > g.rebirth).map(o => (
+              <p key={o.id} className="muted small">🔒 {o.name} ({o.w}×{o.h}, {o.slots} slots) unlocks at rebirth {o.unlockRebirth}.</p>
+            ))}
+          </>
+        )
+      })()}
       <h3>Security cameras</h3>
       {g.rebirth < BURGLARY_UNLOCK_REBIRTH ? (
         <p className="muted small">🔒 Unlocks at rebirth {BURGLARY_UNLOCK_REBIRTH} — along with burglars, the Security Office, and a Security guard.</p>

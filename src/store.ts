@@ -8,7 +8,7 @@ const SAVE_KEY = 'storagesim.save.v1'
 export type Menu = 'build' | 'tenants' | 'staff' | 'money' | 'rebirth' | 'log' | 'settings' | null
 
 export interface Placing {
-  mode: 'new' | 'move' | 'upgrade'
+  mode: 'new' | 'move' | 'upgrade' | 'replace'
   kind: ItemKind
   defId: string
   rot: Rot

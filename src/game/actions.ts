@@ -67,6 +67,26 @@ export function upgrade(state: GameState, id: number, x: number, y: number, rot:
   return null
 }
 
+/** Cost to swap your office for a different one: the new one's full price, minus what the old one sells for. */
+export function replaceCost(state: GameState, it: Item, newDefId: string): number {
+  return Math.max(0, defCost(it.kind, newDefId) - sellValue(state, it))
+}
+
+/** Swap an office for a new one in one step. Staff move over; the old spot counts as free. */
+export function replace(state: GameState, id: number, newDefId: string, x: number, y: number, rot: Rot): Result {
+  const it = state.items.find(i => i.id === id)
+  if (!it) return 'Missing item'
+  const cost = replaceCost(state, it, newDefId)
+  if (state.money < cost) return 'Not enough money'
+  if (!canPlace(state, it.kind, newDefId, x, y, rot, [id])) return "Doesn't fit there"
+  state.money -= cost
+  it.defId = newDefId; it.x = x; it.y = y; it.rot = rot
+  it.label = defName(it.kind, newDefId)
+  it.placedAt = state.time
+  log(state, `🏢 Built the ${it.label}. Your staff moved right in.`, { tone: 'good', focusId: it.id })
+  return null
+}
+
 export function sellValue(state: GameState, it: Item): number {
   const cost = defCost(it.kind, it.defId)
   return state.time - it.placedAt <= E.SELL_GRACE_SECONDS ? cost : cost * E.SELL_REFUND

@@ -441,3 +441,24 @@ describe('cameras & burglaries', () => {
     expect(early.log.some(e => e.text.includes('Break-in'))).toBe(false)
   })
 })
+
+describe('replacing the office', () => {
+  it('swaps offices in one step and keeps the staff', async () => {
+    const { replace, replaceCost } = await import('./actions')
+    const s = createRun(5)
+    s.money = 1e6
+    place(s, 'generator', 'gen-3', 0, 0, 0)
+    place(s, 'office', 'office-small', 4, 0, 0)
+    hire(s, 'janitor')
+    s.time += 60 // past the misclick refund window
+    const old = s.items.find(i => i.kind === 'office')!
+    const cost = replaceCost(s, old, 'office-security')
+    expect(cost).toBe(60000 - 750)
+    const before = s.money
+    expect(replace(s, old.id, 'office-security', 4, 0, 0)).toBeNull() // overlaps the old spot — fine
+    expect(s.money).toBe(before - cost)
+    expect(s.items.filter(i => i.kind === 'office')).toHaveLength(1)
+    expect(s.items.find(i => i.kind === 'office')!.defId).toBe('office-security')
+    expect(s.staff).toHaveLength(1)
+  })
+})
