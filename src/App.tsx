@@ -61,6 +61,7 @@ export default function App() {
         else if (s.cameraView) s.set({ cameraView: false })
         else if (s.debugOpen) s.set({ debugOpen: false })
       } else if (e.key === '`') s.set({ debugOpen: !s.debugOpen })
+      else if ((e.key === 'c' || e.key === 'C') && !s.camPlacing) s.set({ cameraView: !s.cameraView, selectedCamId: null })
       else if (digit) {
         const nav = NAV[Number(digit) - 1]
         if (nav) s.set({ menu: s.menu === nav.id ? null : nav.id })

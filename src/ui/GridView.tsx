@@ -293,14 +293,14 @@ export function GridView() {
       {selectedCamId !== null && !camPlacing && <CameraPanel key={`cam${selectedCamId}`} />}
       {cameraView && !camPlacing && (
         <button className="view-chip" onPointerDown={e => e.stopPropagation()}
-          onClick={() => useStore.getState().set({ cameraView: false, selectedCamId: null })}>📹 Camera view · tap to exit</button>
+          onClick={() => useStore.getState().set({ cameraView: false, selectedCamId: null })}>📹 Camera view · tap or press C to exit</button>
       )}
       <div className="zoom-controls" onPointerDown={e => e.stopPropagation()}>
         <button onClick={() => zoomAt(1.25)} aria-label="Zoom in">＋</button>
         <button onClick={fit} aria-label="Fit whole lot" title="Fit whole lot">🎯</button>
         <button onClick={() => zoomAt(0.8)} aria-label="Zoom out">－</button>
         {(game.rebirth >= BURGLARY_UNLOCK_REBIRTH || game.cameras.length > 0) && (
-          <button className={cameraView ? 'on' : ''} title="Camera view" aria-label="Camera view"
+          <button className={cameraView ? 'on' : ''} title="Camera view (C)" aria-label="Camera view"
             onClick={() => useStore.getState().set({ cameraView: !cameraView, selectedCamId: null, selectedId: null })}>📹</button>
         )}
       </div>
