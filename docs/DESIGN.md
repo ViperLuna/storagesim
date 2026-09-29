@@ -478,6 +478,11 @@ More to come as RT continues.
 
 ## 🅿️ Parked (later)
 
+- **Multi-story storage buildings** (U-Haul style): a building on the lot whose floors are their own
+  indoor grids (hallways + units, access from the elevator/stairs instead of the gate). Navigate
+  floors with **Page Up / Page Down** alongside the camera layer. Late-game way to build *up*
+  when the lot is full; indoor (climate-controlled) units could rent higher.
+
 - **Rebirth details** — requirement to rebirth, multiplier curve, grid sizes, extra unlocks.
 - Lease length ranges & renew/abandon odds.
 - Other complaint types (dirty units, break-ins → cameras/fences).
