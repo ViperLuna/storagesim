@@ -102,6 +102,19 @@ export function GridView() {
     return () => ro.disconnect()
   }, [setView])
 
+  // Keyboard: + / − zoom, = fits the lot, arrows pan.
+  const viewCmd = useStore(s => s.viewCmd)
+  useEffect(() => {
+    if (!viewCmd) return
+    if (viewCmd.type === 'zoomIn') zoomAt(1.25)
+    else if (viewCmd.type === 'zoomOut') zoomAt(0.8)
+    else if (viewCmd.type === 'fit') fit()
+    else {
+      const v = viewRef.current
+      setView(clampView({ ...v, x: v.x + (viewCmd.dx ?? 0), y: v.y + (viewCmd.dy ?? 0) }))
+    }
+  }, [viewCmd, zoomAt, fit, clampView, setView])
+
   // Complaint/toast clicked → swoop to the unit.
   useEffect(() => {
     if (!flash) return

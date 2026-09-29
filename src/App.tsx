@@ -41,20 +41,38 @@ export default function App() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return
+      if (e.ctrlKey || e.metaKey || e.altKey) return
       const s = useStore.getState()
+      if (s.screen !== 'game') return
+      // Numpad digits work whether NumLock is on or off.
+      const numpad = /^Numpad([1-9])$/.exec(e.code)
+      const digit = numpad ? numpad[1] : /^[1-9]$/.test(e.key) ? e.key : null
       if (e.key === 'r' || e.key === 'R') {
         if (s.camPlacing) rotateCamPlacing()
         else rotatePlacing()
       } else if (e.key === 'Escape') {
-        if (s.camPlacing) cancelCamPlacing()
-        else if (s.selectedCamId) s.set({ selectedCamId: null })
+        // Back out of whatever you're in, one layer at a time.
+        if (s.summary) s.set({ summary: null })
+        else if (s.camPlacing) cancelCamPlacing()
         else if (s.placing) cancelPlacing()
+        else if (s.selectedCamId) s.set({ selectedCamId: null })
         else if (s.selectedId) s.set({ selectedId: null })
         else if (s.menu) s.set({ menu: null })
+        else if (s.cameraView) s.set({ cameraView: false })
+        else if (s.debugOpen) s.set({ debugOpen: false })
       } else if (e.key === '`') s.set({ debugOpen: !s.debugOpen })
-      else if (/^[1-9]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
-        const nav = NAV[Number(e.key) - 1]
+      else if (digit) {
+        const nav = NAV[Number(digit) - 1]
         if (nav) s.set({ menu: s.menu === nav.id ? null : nav.id })
+        e.preventDefault()
+      } else if (e.key === '+' || e.code === 'NumpadAdd') s.set({ viewCmd: { type: 'zoomIn', n: Date.now() } })
+      else if (e.key === '-' || e.key === '_' || e.code === 'NumpadSubtract') s.set({ viewCmd: { type: 'zoomOut', n: Date.now() } })
+      else if (e.key === '=') s.set({ viewCmd: { type: 'fit', n: Date.now() } })
+      else if (e.key.startsWith('Arrow')) {
+        const step = 60
+        const [dx, dy] = { ArrowLeft: [step, 0], ArrowRight: [-step, 0], ArrowUp: [0, step], ArrowDown: [0, -step] }[e.key] ?? [0, 0]
+        s.set({ viewCmd: { type: 'pan', dx, dy, n: Date.now() + Math.random() } })
+        e.preventDefault()
       }
     }
     window.addEventListener('keydown', onKey)

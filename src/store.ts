@@ -30,6 +30,9 @@ export interface CamPlacing {
 
 export interface Toast { id: number; entry: LogEntry }
 
+/** One-shot camera commands from the keyboard (GridView owns the view). */
+export interface ViewCmd { type: 'zoomIn' | 'zoomOut' | 'fit' | 'pan'; dx?: number; dy?: number; n: number }
+
 interface Store {
   screen: 'title' | 'game'
   game: GameState | null
@@ -40,6 +43,7 @@ interface Store {
   /** Camera view: coverage visible, taps select cameras instead of units. */
   cameraView: boolean
   selectedCamId: number | null
+  viewCmd: ViewCmd | null
   toasts: Toast[]
   lastToastLogId: number
   flash: { id: number; n: number } | null
@@ -126,6 +130,7 @@ export const useStore = create<Store>((set, get) => ({
   camPlacing: null,
   cameraView: false,
   selectedCamId: null,
+  viewCmd: null,
   toasts: [],
   lastToastLogId: 0,
   flash: null,
