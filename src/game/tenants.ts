@@ -25,11 +25,20 @@ export function randomName(state: GameState): string {
 
 export const stars = (state: GameState) => Math.max(0, Math.min(RATING_MAX, state.rating))
 
+/** Units someone could move into: vacant, or being cleaned out (ready soon). */
+export function openUnits(state: GameState) {
+  return state.items.filter(i => i.unit?.status === 'vacant' || i.unit?.status === 'dirty')
+}
+
+/** Room for another prospect? Everyone already waiting counts against the open units. */
+export const hasVacancy = (state: GameState) => openUnits(state).length > state.prospects.length
+
 export function makeProspect(state: GameState, forceVip = false): Prospect {
   const unlocked = UNITS.filter(u => u.unlockRebirth <= state.rebirth)
-  const owned = [...new Set(state.items.filter(i => i.kind === 'unit').map(i => i.defId))]
-  const wants = owned.length && Math.random() < T.OWNED_SIZE_BIAS
-    ? pick(owned)
+  const open = openUnits(state)
+  // Mostly they want what you've got open (picked per unit, so common sizes come up more); sometimes anything.
+  const wants = open.length && Math.random() < T.AVAILABLE_SIZE_BIAS
+    ? pick(open).defId
     : weighted(unlocked.map(u => [u.id, u.demand] as [string, number]))
   const list = unitDef(wants).listPrice
   // Average of two uniforms → most bids land near the middle of the range.

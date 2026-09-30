@@ -8,7 +8,7 @@ import { isPowered, isTripped } from './power'
 import { unitDef, signDef } from './defs'
 import { log } from './log'
 import { expWait, rand, randInt, weighted } from './random'
-import { makeProspect, stars } from './tenants'
+import { hasVacancy, makeProspect, stars } from './tenants'
 import { aOrAn, money } from './format'
 import { payrollOwed, resetWorked, stepStaff } from './staff'
 import { startNextClean } from './actions'
@@ -263,8 +263,13 @@ function stepPlayerCleaning(state: GameState, dt: number) {
   }
 }
 
-export function addProspect(state: GameState, forceVip = false) {
+/** Someone shows up. If you're full, they look around and leave (unless forced, e.g. from the debug panel). */
+export function addProspect(state: GameState, forceVip = false, force = false) {
   const p = makeProspect(state, forceVip)
+  if (!force && !hasVacancy(state)) {
+    log(state, `🚶 ${p.name} came by looking for ${aOrAn(unitDef(p.wants).name)}, but you're full. They left.`)
+    return
+  }
   state.prospects.push(p)
   const d = unitDef(p.wants)
   log(state, `${p.vip ? '👑 VIP ' : '🧍 '}${p.name} wants ${aOrAn(d.name)} — offering ${money(p.bid)}/pt.`, { tone: p.vip ? 'vip' : 'info', openTenants: true, toast: true })

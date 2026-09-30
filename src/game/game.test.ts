@@ -468,3 +468,32 @@ describe('replacing the office', () => {
     expect(s.staff).toHaveLength(1)
   })
 })
+
+describe('prospects follow vacancy', () => {
+  it('turn around when everything is full', async () => {
+    const { addProspect } = await import('./sim')
+    const s = createRun(0)
+    for (const it of s.items) { it.unit!.status = 'occupied'; it.unit!.tenant = { name: 'T', bid: 10, deposit: 10, vip: false, leaseLeft: 9, anger: 0, complaintStage: 0 } }
+    addProspect(s)
+    expect(s.prospects).toHaveLength(0)
+    expect(s.log.at(-1)!.text).toContain("you're full")
+    addProspect(s, false, true) // debug override
+    expect(s.prospects).toHaveLength(1)
+  })
+  it('waiting people count against open units', async () => {
+    const { addProspect } = await import('./sim')
+    const s = createRun(0) // 3 vacant lockers
+    for (let i = 0; i < 5; i++) addProspect(s)
+    expect(s.prospects).toHaveLength(3)
+  })
+  it('mostly want a size you have open', async () => {
+    const { makeProspect } = await import('./tenants')
+    const s = createRun(0)
+    s.money = 1e6
+    place(s, 'unit', 'medium', 0, 0, 0)
+    for (const it of s.items.filter(i => i.defId === 'locker')) it.unit!.status = 'occupied'
+    let medium = 0
+    for (let i = 0; i < 400; i++) if (makeProspect(s).wants === 'medium') medium++
+    expect(medium / 400).toBeGreaterThan(0.7)
+  })
+})

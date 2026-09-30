@@ -179,6 +179,9 @@ the table is the "list price" baseline.
 ### Prospects (arrivals)
 
 - Spawn on a **random timer**. Slow with no advertising.
+- **Only when there's room:** open units (vacant or being cleaned) must outnumber people already
+  waiting. Otherwise they come by, see you're full, and leave (Log only, no toast).
+- **~80% want a size you have open** (picked per open unit); the rest want something random.
 - Arrival shows a **toast** in a screen corner (click → opens Tenant menu).
   If the Tenant menu is already open, they just appear in the list live.
 - Each prospect has:

@@ -6,8 +6,8 @@ export const BASE_SPAWN_SECONDS = 45
 export const MAX_PROSPECTS = 5
 /** Seconds a prospect waits before giving up. */
 export const PROSPECT_PATIENCE = 240
-/** Chance a prospect asks for a size you already own (keeps the early game moving). */
-export const OWNED_SIZE_BIAS = 0.6
+/** Chance a prospect wants a size you have open right now (otherwise they want something random). */
+export const AVAILABLE_SIZE_BIAS = 0.8
 
 /** Bids are list price × a random factor in this range (bell-ish, centred ~0.9). */
 export const BID_MIN = 0.5

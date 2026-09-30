@@ -350,8 +350,8 @@ export function DebugPanel() {
       <div className="actions">
         <button onClick={() => mutate(s => { s.money += 1000 })}>+$1K</button>
         <button onClick={() => mutate(s => { s.money += 100000 })}>+$100K</button>
-        <button onClick={() => mutate(s => addProspect(s))}>Spawn prospect</button>
-        <button onClick={() => mutate(s => addProspect(s, true))}>Spawn VIP</button>
+        <button onClick={() => mutate(s => addProspect(s, false, true))}>Spawn prospect</button>
+        <button onClick={() => mutate(s => addProspect(s, true, true))}>Spawn VIP</button>
         <button onClick={() => mutate(s => { for (let i = 0; i < 60; i++) step(s, 5) })}>Skip 5 min</button>
         <button onClick={() => {
           const sum = mutate(s => catchUp(s, 3600))
