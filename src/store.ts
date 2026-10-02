@@ -181,12 +181,13 @@ export const useStore = create<Store>((set, get) => ({
 
   replaceGame: (next) => {
     const { lastToastLogId, toasts, game: prev } = get()
-    // Sound cues: ding-dong when someone new walks up to the desk, power-down when the grid trips.
+    // Sound cues: ding-dong when someone new walks up to the desk, power-down/up as the grid trips and recovers.
     if (prev) {
       const known = new Set(prev.prospects.map(p => p.id))
       const arrived = next.prospects.filter(p => !known.has(p.id))
       if (arrived.length) playSound(arrived.some(p => p.vip) ? 'vip' : 'prospect')
       if (next.tripped && !prev.tripped) playSound('blackout')
+      else if (!next.tripped && prev.tripped) playSound('powerRestored')
     }
     const fresh = next.log.filter(e => e.id > lastToastLogId && e.toast)
     set({
