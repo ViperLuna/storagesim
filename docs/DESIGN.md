@@ -28,7 +28,7 @@ burglaries from rebirth 5 while playing only (~every 10 min): caught if the tile
 watched (+0.1★), otherwise a break-in (−0.4★, victim 50% moves out, neighbors 20% each). Selling an
 office no longer fires staff — they wait unpaid for a new office.
 
-**Not yet:** Leasing Agent, Manager, most sounds (only the doorbell so far), real art.
+**Not yet:** Leasing Agent, Manager, most sounds (only doorbell + power-down so far), real art.
 
 **Implementation note:** the free power hookup is currently **5 power** (= 5 lockers' worth), not
 "5 units of any size". It's `FREE_POWER` in `src/data/power.ts`.
@@ -463,7 +463,8 @@ Rebirths unlock new stuff, not just a bigger grid.
 - Audio unlocks on the title screen's first click.
 - 🔔 **New prospect:** a simple doorbell "ding-dong" (familiar > realistic). ✅ `public/sounds/doorbell.mp3`
 - 👑 **VIP prospect:** the **Westminster chimes** (grandfather-clock tune; public domain). Uses the doorbell until we have the file.
-- Others TBD: collect (cha-ching), cleaned, complaint, blackout, payroll.
+- ⚡ **Blackout:** a power-down sound when the grid trips. ✅ `public/sounds/powerdown.mp3`
+- Others TBD: collect (cha-ching), cleaned, complaint, payroll.
 - Files live in `public/sounds/`, mapped to events in `src/data/sounds.ts`; missing files play nothing.
 - Volume slider + mute in Settings (stored per device, not in the save, so a reset keeps them).
 
