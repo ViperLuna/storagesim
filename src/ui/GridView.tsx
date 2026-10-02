@@ -5,6 +5,7 @@ import { doorInside, baseSize, isLocked, itemSize, lockedTiles } from '../game/g
 import { defColor, hasDoor, unitDef } from '../game/defs'
 import { isPowered, itemDraw } from '../game/power'
 import * as A from '../game/actions'
+import { playSound } from '../audio'
 import { money } from '../game/format'
 import { anchorAt, commitPlacing, placingSize } from './placing'
 import type { GameState, Item, Rot } from '../game/types'
@@ -202,7 +203,7 @@ export function GridView() {
     const u = it.unit
     const needsClean = u?.status === 'dirty' && !st.game!.playerClean.queue.includes(it.id) && !st.game!.staff.some(s => s.targetId === it.id)
     if (u && (u.pending > 0 || needsClean)) {
-      st.mutate(g => A.collect(g, it.id))
+      if (st.mutate(g => A.collect(g, it.id)) > 0) playSound('collect')
       if (st.selectedId === it.id) st.set({ selectedId: null })
       return
     }

@@ -9,7 +9,7 @@ import { addProspect, step, catchUp, rentMultiplier } from '../game/sim'
 import { createRun } from '../game/init'
 import { cancelPlacing, commitPlacing, rotatePlacing, startMove, startReplace, startUpgrade } from './placing'
 import { defCost } from '../game/defs'
-import { unlockAudio } from '../audio'
+import { playSound, unlockAudio } from '../audio'
 import { OFFICES } from '../data/office'
 import { burglary } from '../game/cameras'
 import { useDraggablePopup } from './drag'
@@ -91,7 +91,7 @@ export function SelectionPanel({ anchor }: { anchor: Anchor }) {
       {draw > 0 && <div className="small">Power: {draw}⚡ · {it.on ? (isPowered(g, it) ? 'on' : 'on (grid tripped!)') : 'switched off'}</div>}
       <div className="actions">
         {u && (u.pending > 0 || (u.status === 'dirty' && !g.playerClean.queue.includes(it.id) && !g.staff.some(s => s.targetId === it.id))) && (
-          <button className="good" onClick={() => mutate(s => A.collect(s, it.id))}>
+          <button className="good" onClick={() => { if (mutate(s => A.collect(s, it.id)) > 0) playSound('collect') }}>
             {u.status === 'dirty' ? (u.pending > 0 ? `💰 Collect ${money(u.pending)} & clean` : '🧽 Clean') : `💰 Collect ${money(u.pending)}`}
           </button>
         )}
