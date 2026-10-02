@@ -291,3 +291,7 @@ button.bad.armed { background: var(--bad); color: #fff; border-color: var(--bad)
   padding: 3px 9px; font-size: 0.75rem; color: var(--muted);
 }
 .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.sound-settings { display: grid; gap: 8px; }
+.sound-settings .row { justify-content: flex-start; }
+.sound-settings input[type=range] { flex: 1; min-width: 0; }

@@ -23,6 +23,7 @@ import { FAIL_STRIKES, RATING_GAIN_PER_TICK, RATING_LOSS_PER_ISSUE, RATING_MAX, 
 import { ratingIssues } from '../game/sim'
 import { Stars } from './Hud'
 import { janitorCleanFactor, janitorSpeed, office, officeSlots, payrollMax, payrollOwed, staffBlocker } from '../game/staff'
+import { getVolume, isMuted, playSound, setMuted, setVolume } from '../audio'
 import { notice } from './notice'
 
 export function SidePanel() {
@@ -417,6 +418,28 @@ function LogMenu() {
   )
 }
 
+function SoundSettings() {
+  const [volume, setVol] = useState(getVolume)
+  const [muted, setMute] = useState(isMuted)
+  return (
+    <div className="sound-settings">
+      <label className="row">
+        <span>🔊 Volume</span>
+        <input type="range" min={0} max={100} step={5} value={Math.round(volume * 100)} disabled={muted} onChange={e => {
+          const v = Number(e.target.value) / 100
+          setVol(v)
+          setVolume(v)
+        }} onPointerUp={() => playSound('prospect')} onKeyUp={() => playSound('prospect')} />
+        <span className="small muted">{Math.round(volume * 100)}%</span>
+      </label>
+      <label className="row">
+        <input type="checkbox" checked={muted} onChange={e => { setMute(e.target.checked); setMuted(e.target.checked) }} />
+        <span>Mute all sounds</span>
+      </label>
+    </div>
+  )
+}
+
 function SettingsMenu() {
   const quit = useStore(s => s.quitToTitle)
   const set = useStore(s => s.set)
@@ -431,7 +454,7 @@ function SettingsMenu() {
         quit()
         resetSave()
       }}>🗑️ Reset save</button>
-      <p className="muted small">Sound settings will live here once sounds exist.</p>
+      <SoundSettings />
       <p className="muted small">Alpha build · v0.1</p>
     </>
   )

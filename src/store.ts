@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { GameState, ItemKind, LogEntry, OfflineSummary, Rot } from './game/types'
 import { createRun } from './game/init'
 import { catchUp, step } from './game/sim'
+import { playSound } from './audio'
 
 const SAVE_KEY = 'storagesim.save.v1'
 
@@ -179,7 +180,13 @@ export const useStore = create<Store>((set, get) => ({
   },
 
   replaceGame: (next) => {
-    const { lastToastLogId, toasts } = get()
+    const { lastToastLogId, toasts, game: prev } = get()
+    // Ding-dong when someone new walks up to the desk.
+    if (prev) {
+      const known = new Set(prev.prospects.map(p => p.id))
+      const arrived = next.prospects.filter(p => !known.has(p.id))
+      if (arrived.length) playSound(arrived.some(p => p.vip) ? 'vip' : 'prospect')
+    }
     const fresh = next.log.filter(e => e.id > lastToastLogId && e.toast)
     set({
       game: next,
