@@ -1,6 +1,6 @@
 // Sound effects. Files live in public/sounds/; a missing file just plays nothing.
 
-export type SoundId = 'prospect' | 'vip' | 'blackout'
+export type SoundId = 'prospect' | 'vip' | 'blackout' | 'powerRestored'
 
 export interface SoundDef {
   file: string
@@ -13,6 +13,7 @@ export const SOUNDS: Record<SoundId, SoundDef> = {
   // TODO: Westminster chimes once we have a file. Doorbell until then so VIPs aren't silent.
   vip: { file: 'doorbell.mp3', volume: 0.8 },
   blackout: { file: 'powerdown.mp3', volume: 0.8 },
+  powerRestored: { file: 'poweron.mp3', volume: 0.8 },
 }
 
 export const DEFAULT_VOLUME = 0.7
