@@ -331,9 +331,11 @@ When a unit is abandoned, you're offered a choice:
 
 ## Employees
 
-- Hired from the Staff menu. Paid every payday (5 min), **only for time actually spent working**.
-  Idle time (nothing to do, or stuck because the office is dark/blocked) is unpaid.
-  Wage is quoted as the full-time amount per payday.
+- Hired from the Staff menu. Paid every payday (5 min). A payday spent completely idle (nothing to do,
+  or stuck because the office is dark/blocked) is unpaid.
+  - **Janitor: flat $250** for any payday he did some work (`flatPay` in `src/data/staff.ts`).
+  - **Security: by time worked** (on the clock only while there are working cameras), quoted as the
+    full-time amount per payday.
 - **Can't make payroll → staff still get paid and your cash goes negative.**
 
 ## Debt, loans & bankruptcy (draft)
