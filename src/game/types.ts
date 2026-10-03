@@ -39,6 +39,8 @@ export interface Item {
   placedAt: number
   label: string
   unit?: UnitState
+  /** Extra paid on top of the list price (extra generators). Refunded only by a quick undo-sell. */
+  surcharge?: number
 }
 
 export interface Prospect {

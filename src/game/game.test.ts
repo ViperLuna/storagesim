@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { createRun } from './init'
 import { canPlace, isAccessible, reachable } from './grid'
 import { doorOutside } from './geometry'
-import { place, offerUnit, collect, sell, hire, takeLoan } from './actions'
+import { place, placeCost, offerUnit, collect, sell, hire, takeLoan } from './actions'
 import { step, catchUp } from './sim'
-import { isTripped, powerDraw } from './power'
+import { isTripped, powerCapacity, powerDraw } from './power'
 import { UNITS } from '../data/units'
 
 describe('economy curve', () => {
@@ -122,6 +122,31 @@ describe('power', () => {
     expect(isTripped(s)).toBe(true)
     place(s, 'generator', 'gen-1', 4, 0, 0)
     expect(isTripped(s)).toBe(false)
+  })
+
+  it('generators stack, and each new one costs double', () => {
+    const s = createRun(0)
+    s.money = 1e6
+    expect(placeCost(s, 'generator', 'gen-1')).toBe(150)
+    expect(place(s, 'generator', 'gen-1', 4, 0, 0)).toBeNull()
+    expect(placeCost(s, 'generator', 'gen-1')).toBe(300)
+    const before = s.money
+    expect(place(s, 'generator', 'gen-1', 5, 0, 0)).toBeNull()
+    expect(before - s.money).toBe(300)
+    expect(powerCapacity(s)).toBe(5 + 15 + 15)
+    expect(placeCost(s, 'generator', 'gen-1')).toBe(600)
+  })
+
+  it('a quick undo-sell refunds the extra-generator surcharge too', () => {
+    const s = createRun(0)
+    s.money = 1e6
+    place(s, 'generator', 'gen-1', 4, 0, 0)
+    place(s, 'generator', 'gen-1', 5, 0, 0)
+    const id = s.items[s.items.length - 1].id
+    const before = s.money
+    expect(sell(s, id)).toBeNull()
+    expect(s.money - before).toBe(300)
+    expect(placeCost(s, 'generator', 'gen-1')).toBe(300)
   })
 })
 

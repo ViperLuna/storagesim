@@ -11,23 +11,33 @@ import { requirementFor, rentMultiplierFor } from '../data/rebirths'
 import { UNITS } from '../data/units'
 import { newLease } from './sim'
 import { STAFF, UPGRADES } from '../data/staff'
+import { EXTRA_GENERATOR_COST_MULT } from '../data/power'
 import { LOAN_GRACE, LOAN_INSTALLMENTS, LOAN_INTEREST, loanAmountFor } from '../data/bank'
 import { homeTile, office, officeSlots } from './staff'
 import { camerasOn, carryCameras, sellCamerasOn } from './cameras'
 
 type Result = string | null
 
-export function place(state: GameState, kind: ItemKind, defId: string, x: number, y: number, rot: Rot): Result {
+/** Price to build something new. Each generator you already own makes the next one pricier. */
+export function placeCost(state: GameState, kind: ItemKind, defId: string): number {
   const cost = defCost(kind, defId)
+  if (kind !== 'generator') return cost
+  const owned = state.items.filter(i => i.kind === 'generator').length
+  return Math.round(cost * EXTRA_GENERATOR_COST_MULT ** owned)
+}
+
+export function place(state: GameState, kind: ItemKind, defId: string, x: number, y: number, rot: Rot): Result {
+  const cost = placeCost(state, kind, defId)
   if (state.money < cost) return 'Not enough money'
-  if (kind !== 'unit' && state.items.some(i => i.kind === kind)) return `Only one ${kind} per plot`
+  if (kind !== 'unit' && kind !== 'generator' && state.items.some(i => i.kind === kind)) return `Only one ${kind} per plot`
   if (!canPlace(state, kind, defId, x, y, rot)) return "Doesn't fit there"
   state.money -= cost
   if (kind === 'unit') {
     const it = newUnit(state, defId, x, y, rot)
     state.items.push(it)
   } else {
-    state.items.push({ id: state.nextId++, kind, defId, x, y, rot, on: true, placedAt: state.time, label: defName(kind, defId) })
+    const surcharge = cost - defCost(kind, defId)
+    state.items.push({ id: state.nextId++, kind, defId, x, y, rot, on: true, placedAt: state.time, label: defName(kind, defId), ...(surcharge > 0 && { surcharge }) })
   }
   return null
 }
@@ -89,7 +99,7 @@ export function replace(state: GameState, id: number, newDefId: string, x: numbe
 
 export function sellValue(state: GameState, it: Item): number {
   const cost = defCost(it.kind, it.defId)
-  return state.time - it.placedAt <= E.SELL_GRACE_SECONDS ? cost : cost * E.SELL_REFUND
+  return state.time - it.placedAt <= E.SELL_GRACE_SECONDS ? cost + (it.surcharge ?? 0) : cost * E.SELL_REFUND
 }
 
 export function sell(state: GameState, id: number): Result {
