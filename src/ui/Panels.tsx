@@ -164,10 +164,18 @@ function TenantsMenu() {
   const focusItem = useStore(s => s.focusItem)
   const tenants = g.items.filter(i => i.unit?.status === 'occupied')
   const mult = rentMultiplierFor(g.rebirth)
+  const canAcceptAll = A.acceptAllCount(g)
   return (
     <>
       <h3>Waiting ({g.prospects.length})</h3>
       {g.prospects.length === 0 && <p className="muted small">{emptyWaitingHint(g)}</p>}
+      {canAcceptAll >= 2 && (
+        <ArmedActions key={`all@${canAcceptAll}`}>
+          <button className="good big accept-all" onClick={() => mutate(s => A.acceptAll(s))}>
+            ✅ Accept all ({canAcceptAll}){canAcceptAll < g.prospects.length && <span className="small"> · exact sizes only</span>}
+          </button>
+        </ArmedActions>
+      )}
       {A.sortedProspects(g).map(({ p, exact, bigger }, index) => {
         const d = unitDef(p.wants)
         const left = PROSPECT_PATIENCE - (g.time - p.arrivedAt)

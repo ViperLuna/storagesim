@@ -295,3 +295,5 @@ button.bad.armed { background: var(--bad); color: #fff; border-color: var(--bad)
 .sound-settings { display: grid; gap: 8px; }
 .sound-settings .row { justify-content: flex-start; }
 .sound-settings input[type=range] { flex: 1; min-width: 0; }
+
+.accept-all { flex: 1; }
