@@ -198,7 +198,8 @@ export function eligibleUnits(state: GameState, wants: string): { exact: Item[];
   }
 }
 
-/** Waiting list order: anyone you can place right now first (exact fit, then upsize-only), then no fit. */
+/** Waiting list order: anyone you can place right now first (exact fit, then upsize-only), then no fit.
+ *  The placeable groups put the biggest offers on top; the no-fit group stays in arrival order. */
 export function sortedProspects(state: GameState) {
   return state.prospects
     .map((p, i) => {
@@ -206,7 +207,7 @@ export function sortedProspects(state: GameState) {
       const rank = exact.length ? 0 : !p.refusedUpsize && bigger.length ? 1 : 2
       return { p, exact, bigger, rank, i }
     })
-    .sort((a, b) => a.rank - b.rank || a.i - b.i)
+    .sort((a, b) => a.rank - b.rank || (a.rank < 2 ? b.p.bid - a.p.bid : 0) || a.i - b.i)
 }
 
 export function decline(state: GameState, prospectId: number): void {
