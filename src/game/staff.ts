@@ -174,8 +174,12 @@ export function payrollMax(state: GameState): number {
   return state.staff.reduce((sum, s) => sum + wageOf(s), 0)
 }
 
-/** What's owed right now. Flat-pay staff get the full wage once they've done any work this period; others by time worked. */
+/**
+ * What's owed right now. If you played at all this period, everyone gets full pay.
+ * While you're away: flat-pay staff get the full wage once they've done any work; others by time worked.
+ */
 export function payrollOwed(state: GameState): number {
+  if (state.playedThisPeriod) return payrollMax(state)
   return state.staff.reduce((sum, s) => {
     const worked = s.workedSeconds ?? 0
     const share = staffDef(s)?.flatPay ? (worked > 0 ? 1 : 0) : Math.min(1, worked / TICK_SECONDS)
@@ -185,4 +189,5 @@ export function payrollOwed(state: GameState): number {
 
 export function resetWorked(state: GameState): void {
   for (const s of state.staff) s.workedSeconds = 0
+  state.playedThisPeriod = false
 }
