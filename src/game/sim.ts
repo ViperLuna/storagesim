@@ -201,6 +201,7 @@ function businessTick(state: GameState, offline: boolean) {
 export function step(state: GameState, dt: number, opts: StepOptions = {}): void {
   if (state.levelOver || dt <= 0) return
   state.time += dt
+  if (!opts.offline) state.playedThisPeriod = true
 
   const wasTripped = state.tripped
   state.tripped = isTripped(state)

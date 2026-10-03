@@ -209,7 +209,7 @@ describe('payroll, loans, bankruptcy', () => {
     for (let i = 0; i < 3 && !s.levelOver; i++) step(s, 300)
     expect(s.levelOver).toBe('bankrupt')
   })
-  it('janitor: idle payday costs nothing, any work earns the full wage', () => {
+  it('while playing, staff get full pay even when idle', () => {
     const s = createRun(0)
     s.money = 1e6
     place(s, 'generator', 'gen-1', 6, 0, 0)
@@ -217,10 +217,21 @@ describe('payroll, loans, bankruptcy', () => {
     hire(s, 'janitor')
     const before = s.money
     for (let i = 0; i < 300; i++) step(s, 1) // nothing dirty all payday
+    expect(before - s.money).toBe(250)
+  })
+  it('while away, the janitor is paid only for a payday he did some work', () => {
+    const s = createRun(0)
+    s.money = 1e6
+    place(s, 'generator', 'gen-1', 6, 0, 0)
+    place(s, 'office', 'office-small', 0, 0, 0)
+    hire(s, 'janitor')
+    for (let i = 0; i < 300; i++) step(s, 1) // finish the payday you were playing in
+    const before = s.money
+    for (let i = 0; i < 300; i++) step(s, 1, { offline: true }) // nothing dirty all payday
     expect(s.money).toBe(before)
     s.items[0].unit!.status = 'dirty'; s.items[0].unit!.dirtySince = s.time
     const mid = s.money
-    for (let i = 0; i < 300; i++) step(s, 1)
+    for (let i = 0; i < 300; i++) step(s, 1, { offline: true })
     expect(mid - s.money).toBe(250)
   })
   it('offline payroll pauses at $0', () => {
@@ -480,8 +491,9 @@ describe('cameras & burglaries', () => {
     const before = s.money
     catchUp(s, 3600)
     expect(s.money).toBe(before)
+    const mid = s.money
     step(s, 300)
-    expect(s.money).toBeLessThan(before) // online, he's paid
+    expect(mid - s.money).toBe(2000) // online, he's paid in full
   })
   it('no burglaries before rebirth 5 or while offline', async () => {
     const early = createRun(4)

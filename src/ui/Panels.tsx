@@ -247,7 +247,7 @@ function StaffMenu() {
         const err = !o ? 'Needs an office' : d.needsOffice && o.defId !== d.needsOffice ? `Needs the ${OFFICES.find(x => x.id === d.needsOffice)!.name}` : g.staff.length >= slots ? 'No free office slot' : count >= d.max ? `Max ${d.max} for now` : g.money < d.hireCost ? 'Not enough money' : null
         return (
           <div key={d.id} className="card">
-            <div className="row"><strong>{d.icon} {d.name}</strong><span className="small muted">{d.flatPay ? `${money(d.wage)} / payroll if he works` : `up to ${money(d.wage)} / payroll`}</span></div>
+            <div className="row"><strong>{d.icon} {d.name}</strong><span className="small muted">{money(d.wage)} / payroll</span></div>
             <div className="small muted">{STAFF_BLURB[d.id]}</div>
             <div className="actions">
               <button className="good" disabled={!!err} onClick={() => {
@@ -277,7 +277,7 @@ function StaffMenu() {
           </div>
         )
       })}
-      {wages > 0 && <p className="small">Payroll: up to <b>{money(wages)}</b> every {duration(TICK_SECONDS)}. Nobody's paid for a payday spent idle. So far this period: <b>{money(owed)}</b> (payday in {duration(g.tickIn)}).</p>}
+      {wages > 0 && <p className="small">Payroll: <b>{money(wages)}</b> every {duration(TICK_SECONDS)} while you're playing. While you're away, the janitor's paid only if he cleaned something, and security isn't paid. So far this period: <b>{money(owed)}</b> (payday in {duration(g.tickIn)}).</p>}
       <h3>Upgrades</h3>
       <p className="small muted">Walk speed {janitorSpeed(g).toFixed(1)} tiles/s · cleans in {Math.round(janitorCleanFactor(g) * 100)}% of your time</p>
       {UPGRADES.map(u => {

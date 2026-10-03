@@ -7,7 +7,8 @@ export interface StaffDef {
   hireCost: number
   /** Paid each payroll. */
   wage: number
-  /** Full wage for any payday they did some work; nothing if idle all period. Otherwise paid by time worked. */
+  /** While you're away: full wage for any payday they did some work, nothing if idle. Otherwise paid by time worked.
+   *  (While you're playing, everyone gets full pay.) */
   flatPay?: boolean
   unlockRebirth: number
   /** Code supports many; capped for now. */
@@ -19,7 +20,7 @@ export interface StaffDef {
 export const STAFF: StaffDef[] = [
   { id: 'janitor', name: 'Janitor', icon: '🧹', hireCost: 250, wage: 250, flatPay: true, unlockRebirth: 0, max: 1 },
   // Sits in the Security Office watching the monitors. Paid only while there are working cameras.
-  { id: 'security', name: 'Security', icon: '💂', hireCost: 2000, wage: 150, unlockRebirth: 5, max: 1, needsOffice: 'office-security' },
+  { id: 'security', name: 'Security', icon: '💂', hireCost: 2000, wage: 2000, unlockRebirth: 5, max: 1, needsOffice: 'office-security' },
 ]
 
 // Janitor tuning

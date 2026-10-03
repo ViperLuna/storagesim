@@ -141,6 +141,8 @@ export interface GameState {
   cameras: Camera[]
   burglaryIn: number
   cashAtLastPayroll: number
+  /** You played (weren't away) at some point this pay period: everyone gets full pay. */
+  playedThisPeriod?: boolean
   lastSaved: number
   /** Items whose power is out this frame (derived, but cached for UI). */
   tripped: boolean
