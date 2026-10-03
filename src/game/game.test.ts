@@ -330,6 +330,14 @@ describe('waiting list order', () => {
     for (const it of s.items.filter(i => i.defId === 'locker')) it.unit!.status = 'occupied'
     expect(sortedProspects(s).map(x => x.p.id)).toEqual([2, 3, 1, 4, 5])
   })
+
+  it('biggest offers first among people you can place; no-fit stays in arrival order', async () => {
+    const { sortedProspects } = await import('./actions')
+    const s = createRun(0) // 3 vacant lockers, nothing bigger
+    const mk = (id: number, wants: string, bid: number) => ({ id, name: `P${id}`, wants, bid, vip: false, arrivedAt: 0 })
+    s.prospects = [mk(1, 'locker', 9), mk(2, 'xl', 5000), mk(3, 'locker', 12), mk(4, 'medium', 900), mk(5, 'locker', 11)]
+    expect(sortedProspects(s).map(x => x.p.id)).toEqual([3, 5, 1, 2, 4])
+  })
 })
 
 describe('rating floor', () => {
