@@ -22,8 +22,7 @@ export function powerDraw(state: GameState): number {
 }
 
 export function powerCapacity(state: GameState): number {
-  const gen = state.items.find(it => it.kind === 'generator')
-  return FREE_POWER + (gen ? genDef(gen.defId).capacity : 0)
+  return state.items.reduce((sum, it) => sum + (it.kind === 'generator' ? genDef(it.defId).capacity : 0), FREE_POWER)
 }
 
 /** Overload trips the whole grid. Recovers automatically once draw fits. */

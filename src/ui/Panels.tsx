@@ -5,7 +5,7 @@ import { isPowered } from '../game/power'
 import { defName, nextTier } from '../game/defs'
 import { UNITS, UNIT_POWER_PER_TILE } from '../data/units'
 import { SIGNS } from '../data/signs'
-import { GENERATORS } from '../data/power'
+import { EXTRA_GENERATOR_COST_MULT, GENERATORS } from '../data/power'
 import { rentMultiplierFor, gridSizeFor } from '../data/rebirths'
 import { PROSPECT_PATIENCE } from '../data/tenants'
 import { aOrAn, money, duration } from '../game/format'
@@ -52,7 +52,7 @@ export function SidePanel() {
 function BuildMenu() {
   const g = useStore(s => s.game)!
   const hasSign = g.items.some(i => i.kind === 'sign')
-  const hasGen = g.items.some(i => i.kind === 'generator')
+  const gens = g.items.filter(i => i.kind === 'generator').length
   const firstSign = SIGNS.find(s => s.unlockRebirth <= g.rebirth)!
   return (
     <>
@@ -69,11 +69,10 @@ function BuildMenu() {
             detail={`${firstSign.w}×${firstSign.h} · prospects ×${firstSign.spawnBoost} · ${firstSign.power}⚡`}
             onClick={() => startPlacing('sign', firstSign.id)} />}
       <h3>Power</h3>
-      {hasGen
-        ? <p className="muted small">One power grid per plot. Select it to upgrade.</p>
-        : <BuildRow color={GENERATORS[0].color} name={GENERATORS[0].name} cost={GENERATORS[0].cost} money={g.money}
-            detail={`${GENERATORS[0].w}×${GENERATORS[0].h} · +${GENERATORS[0].capacity}⚡ capacity`}
-            onClick={() => startPlacing('generator', GENERATORS[0].id)} />}
+      <BuildRow color={GENERATORS[0].color} name={gens ? `Another ${GENERATORS[0].name}` : GENERATORS[0].name} cost={A.placeCost(g, 'generator', GENERATORS[0].id)} money={g.money}
+        detail={`${GENERATORS[0].w}×${GENERATORS[0].h} · +${GENERATORS[0].capacity}⚡ capacity`}
+        onClick={() => startPlacing('generator', GENERATORS[0].id)} />
+      {gens > 0 && <p className="muted small">You own {gens} · capacity adds up · each new one costs ×{EXTRA_GENERATOR_COST_MULT} more than the last. Select one to upgrade it.</p>}
       <h3>Office</h3>
       {(() => {
         const current = g.items.find(i => i.kind === 'office')

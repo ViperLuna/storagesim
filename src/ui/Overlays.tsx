@@ -8,7 +8,6 @@ import { isAccessible, reachable } from '../game/grid'
 import { addProspect, step, catchUp, rentMultiplier } from '../game/sim'
 import { createRun } from '../game/init'
 import { cancelPlacing, commitPlacing, rotatePlacing, startMove, startReplace, startUpgrade } from './placing'
-import { defCost } from '../game/defs'
 import { playSound, unlockAudio } from '../audio'
 import { OFFICES } from '../data/office'
 import { burglary } from '../game/cameras'
@@ -179,7 +178,7 @@ export function PlacementBar() {
   const { ref: barRef, handlers: barHandlers, pin: barPin, lifted: barLifted, pinStyle: barPinStyle, unpin: barUnpin } = useDraggablePopup('placement')
   if (!p || !g) return null
   const it = p.itemId ? g.items.find(i => i.id === p.itemId) : undefined
-  const cost = p.mode === 'new' ? defCost(p.kind, p.defId) : p.mode === 'upgrade' && it ? A.upgradeCost(it) ?? 0 : p.mode === 'replace' && it ? A.replaceCost(g, it, p.defId) : 0
+  const cost = p.mode === 'new' ? A.placeCost(g, p.kind, p.defId) : p.mode === 'upgrade' && it ? A.upgradeCost(it) ?? 0 : p.mode === 'replace' && it ? A.replaceCost(g, it, p.defId) : 0
   const drawItem = { ...(it ?? { id: 0, x: 0, y: 0, rot: 0 as const, on: true, placedAt: 0, label: '' }), kind: p.kind, defId: p.defId }
   const draw = itemDraw(drawItem)
   return (

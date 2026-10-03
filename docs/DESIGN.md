@@ -409,6 +409,10 @@ When a unit is abandoned, you're offered a choice:
   - **Recovery is automatic** as soon as the draw fits capacity again.
   - The **free 5-unit hookup trips the same way** — placing a 6th unit with no generator blacks you out.
 - **Generator cost curve:** the first one is **fairly cheap**; upgrades get **stupid expensive**.
+- **Multiple generators:** build as many as you like; their capacity **adds up**. Each new one costs
+  **×2 more** per generator you already own (`EXTRA_GENERATOR_COST_MULT`); upgrades keep their normal price.
+  Added because the lot grows every rebirth but one generator topped out at 255⚡, so big lots ran out
+  of power with yard to spare. Spare yard can now become power.
 - **Unpowered effects** (tripped or switched off):
   - Units: rent **significantly reduced** (*placeholder:* 25%).
   - Cameras: catch nobody.

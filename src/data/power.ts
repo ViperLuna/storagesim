@@ -1,4 +1,4 @@
-// Electricity. Capacity = free hookup + generator. Overload trips everything.
+// Electricity. Capacity = free hookup + every generator you own. Overload trips everything.
 
 export interface GeneratorDef {
   id: string
@@ -21,6 +21,9 @@ export const GENERATORS: GeneratorDef[] = [
   { id: 'gen-3', name: 'Substation', w: 2, h: 2, cost: 40000, capacity: 100, color: '#636a77', next: 'gen-4' },
   { id: 'gen-4', name: 'Power Plant', w: 2, h: 2, cost: 400000, capacity: 250, color: '#515866' },
 ]
+
+/** Building another generator costs this much more for each one you already own (upgrades aren't affected). */
+export const EXTRA_GENERATOR_COST_MULT = 2
 
 /** Rent multiplier for a unit with no power (switched off or blackout). */
 export const UNPOWERED_RENT = 0.25
