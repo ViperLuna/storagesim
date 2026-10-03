@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createRun } from './init'
 import { canPlace, isAccessible, reachable } from './grid'
 import { doorOutside } from './geometry'
-import { place, placeCost, offerUnit, collect, sell, hire, takeLoan } from './actions'
+import { place, placeCost, offerUnit, acceptAll, acceptAllCount, collect, sell, hire, takeLoan } from './actions'
 import { step, catchUp } from './sim'
 import { isTripped, powerCapacity, powerDraw } from './power'
 import { UNITS } from '../data/units'
@@ -60,6 +60,19 @@ describe('placement', () => {
 })
 
 describe('tenants & rent', () => {
+  it('Accept all fills exact sizes, best bids first, and leaves the rest waiting', () => {
+    const s = createRun(0) // 3 vacant lockers
+    const bids = [5, 20, 10, 15]
+    bids.forEach((bid, i) => s.prospects.push({ id: 900 + i, name: `P${i}`, wants: 'locker', bid, vip: false, arrivedAt: 0 }))
+    s.prospects.push({ id: 950, name: 'Wants Small', wants: 'small', bid: 70, vip: false, arrivedAt: 0 })
+    expect(acceptAllCount(s)).toBe(3)
+    expect(acceptAll(s)).toBe(3)
+    expect(s.items.filter(i => i.unit?.status === 'occupied').map(i => i.unit!.tenant!.bid).sort((a, b) => a - b)).toEqual([10, 15, 20])
+    expect(s.prospects.map(p => p.id).sort()).toEqual([900, 950])
+    expect(s.money).toBe(45)
+    expect(acceptAllCount(s)).toBe(0)
+  })
+
   it('deposit + rent accumulates on the unit until collected', async () => {
     const s = createRun(0)
     s.prospects.push({ id: 999, name: 'Dillon A.', wants: 'locker', bid: 11, vip: false, arrivedAt: 0 })

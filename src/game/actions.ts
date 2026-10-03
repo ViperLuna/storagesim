@@ -233,6 +233,28 @@ export function upsizeAcceptChance(p: { upsizeWiggle?: number }): number {
   return Math.max(T.UPSIZE_ACCEPT_MIN, Math.min(T.UPSIZE_ACCEPT_MAX, c))
 }
 
+/** Who Accept All would place: exact-size fits only, highest bid first when units run short. */
+function acceptAllPlan(state: GameState): { prospectId: number; itemId: number }[] {
+  const taken = new Set<number>()
+  const plan: { prospectId: number; itemId: number }[] = []
+  for (const p of [...state.prospects].sort((a, b) => b.bid - a.bid)) {
+    const unit = eligibleUnits(state, p.wants).exact.find(u => !taken.has(u.id))
+    if (!unit) continue
+    taken.add(unit.id)
+    plan.push({ prospectId: p.id, itemId: unit.id })
+  }
+  return plan
+}
+
+export const acceptAllCount = (state: GameState) => acceptAllPlan(state).length
+
+/** Move everyone with an exact-size vacancy in at their bid. Upsizes are left for you. Returns how many moved in. */
+export function acceptAll(state: GameState): number {
+  const plan = acceptAllPlan(state)
+  for (const { prospectId, itemId } of plan) offerUnit(state, prospectId, itemId)
+  return plan.length
+}
+
 /** Offer a unit. Exact size = accepted at their bid. Bigger = upsize price, and they might refuse. */
 export function offerUnit(state: GameState, prospectId: number, itemId: number): Result {
   const p = state.prospects.find(q => q.id === prospectId)
