@@ -166,16 +166,21 @@ export function stepStaff(state: GameState, dt: number, offline = false) {
   }
 }
 
-const wageOf = (s: Staff) => S.STAFF.find(d => d.id === s.role)?.wage ?? 0
+const staffDef = (s: Staff) => S.STAFF.find(d => d.id === s.role)
+const wageOf = (s: Staff) => staffDef(s)?.wage ?? 0
 
 /** Full-time payroll: what everyone would earn if they worked the whole period. */
 export function payrollMax(state: GameState): number {
   return state.staff.reduce((sum, s) => sum + wageOf(s), 0)
 }
 
-/** What's owed right now: wages only for time actually spent working this period. */
+/** What's owed right now. Flat-pay staff get the full wage once they've done any work this period; others by time worked. */
 export function payrollOwed(state: GameState): number {
-  return state.staff.reduce((sum, s) => sum + wageOf(s) * Math.min(1, (s.workedSeconds ?? 0) / TICK_SECONDS), 0)
+  return state.staff.reduce((sum, s) => {
+    const worked = s.workedSeconds ?? 0
+    const share = staffDef(s)?.flatPay ? (worked > 0 ? 1 : 0) : Math.min(1, worked / TICK_SECONDS)
+    return sum + wageOf(s) * share
+  }, 0)
 }
 
 export function resetWorked(state: GameState): void {

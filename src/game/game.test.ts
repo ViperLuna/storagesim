@@ -209,7 +209,7 @@ describe('payroll, loans, bankruptcy', () => {
     for (let i = 0; i < 3 && !s.levelOver; i++) step(s, 300)
     expect(s.levelOver).toBe('bankrupt')
   })
-  it('idle staff cost nothing; working staff are paid for time worked', () => {
+  it('janitor: idle payday costs nothing, any work earns the full wage', () => {
     const s = createRun(0)
     s.money = 1e6
     place(s, 'generator', 'gen-1', 6, 0, 0)
@@ -221,9 +221,7 @@ describe('payroll, loans, bankruptcy', () => {
     s.items[0].unit!.status = 'dirty'; s.items[0].unit!.dirtySince = s.time
     const mid = s.money
     for (let i = 0; i < 300; i++) step(s, 1)
-    const paid = mid - s.money
-    expect(paid).toBeGreaterThan(0)
-    expect(paid).toBeLessThan(50) // well under the full-time $50
+    expect(mid - s.money).toBe(250)
   })
   it('offline payroll pauses at $0', () => {
     const s = createRun(0)
@@ -233,7 +231,7 @@ describe('payroll, loans, bankruptcy', () => {
     hire(s, 'janitor')
     s.money = 60
     catchUp(s, 3600)
-    expect(s.money).toBeGreaterThanOrEqual(-50)
+    expect(s.money).toBeGreaterThanOrEqual(-250)
     expect(s.levelOver).toBeUndefined()
   })
   it('loan has a grace period then auto-repays', () => {
