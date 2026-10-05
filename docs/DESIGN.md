@@ -181,6 +181,7 @@ the table is the "list price" baseline.
 - Spawn on a **random timer**. Slow with no advertising.
 - **Only when there's room:** open units (vacant or being cleaned) must outnumber people already
   waiting. Otherwise they come by, see you're full, and leave (Log only, no toast).
+- **Line cap: 15 waiting** at once (`MAX_PROSPECTS`; was 5). Open units usually cap it first.
 - **~80% want a size you have open** (picked per open unit); the rest want something random.
 - Arrival shows a **toast** in a screen corner (click → opens Tenant menu).
   If the Tenant menu is already open, they just appear in the list live.
@@ -189,6 +190,7 @@ the table is the "list price" baseline.
   - a **bid** (price per point) — some bids are garbage. That's life.
 - Player options:
   - **Accept** — assign to a vacant unit of that size at their bid.
+  - **Accept all** — one tap for everyone with an exact-size vacancy (2+ needed), highest bids first.
   - **Upsize** — offer a bigger vacant unit at a discounted **upsize price** that chains up one size at
     a time: each step = 2× the price of the size below over the bigger unit's timer (e.g. a $10 locker
     bid → Small $60, Medium $360, Large $1,920, XL $9,600), ±10% per prospect, always under a fair

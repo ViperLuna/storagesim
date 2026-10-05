@@ -2,8 +2,8 @@
 
 /** Average seconds between prospects with no sign, at 3 stars. */
 export const BASE_SPAWN_SECONDS = 45
-/** Max prospects waiting at once. Extras just don't show up. */
-export const MAX_PROSPECTS = 5
+/** Max prospects waiting at once (open units cap it too). Extras just don't show up. */
+export const MAX_PROSPECTS = 15
 /** Seconds a prospect waits before giving up. */
 export const PROSPECT_PATIENCE = 240
 /** Chance a prospect wants a size you have open right now (otherwise they want something random). */

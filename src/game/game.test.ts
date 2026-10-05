@@ -327,6 +327,22 @@ describe('names', () => {
   })
 })
 
+describe('prospect queue', () => {
+  it('lines up to MAX_PROSPECTS when you have the open units', async () => {
+    const { MAX_PROSPECTS } = await import('../data/tenants')
+    const s = createRun(0)
+    for (let i = 0; i < 30; i++) s.items.push({ ...structuredClone(s.items[0]), id: 5000 + i })
+    for (let i = 0; i < 40; i++) { s.nextProspectIn = 0; step(s, 0.001) }
+    expect(MAX_PROSPECTS).toBeGreaterThan(5)
+    expect(s.prospects).toHaveLength(MAX_PROSPECTS)
+  })
+  it('never lines up more people than open units', () => {
+    const s = createRun(0) // 3 vacant lockers
+    for (let i = 0; i < 40; i++) { s.nextProspectIn = 0; step(s, 0.001) }
+    expect(s.prospects).toHaveLength(3)
+  })
+})
+
 describe('waiting list order', () => {
   it('puts people you can place first: exact, then upsize, then no fit', async () => {
     const { sortedProspects } = await import('./actions')
