@@ -61,6 +61,11 @@ export const FIRST_NAMES = [
   'Dillon', 'Maria', 'Jake', 'Priya', 'Carl', 'Tasha', 'Omar', 'Linda', 'Vince', 'Rosa',
   'Kevin', 'Jada', 'Earl', 'Monique', 'Derek', 'Yuki', 'Barb', 'Luis', 'Shonda', 'Gus',
   'Trish', 'Marcus', 'Deb', 'Andre', 'Heather', 'Ray', 'Nina', 'Walt', 'Keisha', 'Hank',
+  'Destiny', 'Danielle', 'Danny', 'Chase', 'Jace', 'Aiyana', 'Kendra', 'Kester', 'Cassie',
+  'Christian', 'Christopher', 'Maddy', 'Jessica', 'Brooklyn', 'Floyd', 'Frank', 'Edwin',
+  'Allison', 'Ally', 'Natalie', 'Nate', 'Nathan', 'Deb', 'Sean', 'Patrick', 'Peso',
+  'Anayia', 'Asia', 'Phillip', 'Riley', 'Leigh', 'Ashley', 'Ashlynn', 'Ember', 'Veronica',
+  'Matthew', 'Rose', 'Rachel', 'Gretchen', 'Heather', 'George', 'Greg', 'Orlando', 'Ted',
   // Viper's crew
   'Thessaly', 'Joseph', 'Abel', 'Zachary', 'Ash', 'Angel', 'Yua', 'Charity', 'Augustine', 'Ronan', 'Aeronica',
 ]
