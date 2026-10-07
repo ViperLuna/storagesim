@@ -327,6 +327,47 @@ describe('names', () => {
   })
 })
 
+describe('pun-name quirks', () => {
+  it('Lotta Stuff wants an XL and Les Space wants a Locker, whatever is open', async () => {
+    const { makeProspect } = await import('./tenants')
+    const { vi } = await import('vitest')
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0) // would normally pick an open Locker
+    const s = createRun(0)
+    expect(makeProspect(s, false, 'Lotta Stuff').wants).toBe('xl')
+    expect(makeProspect(s, false, 'Les Space').wants).toBe('locker')
+    spy.mockRestore()
+  })
+  it('Will Fitt always takes the upsize', async () => {
+    const { upsizeAcceptChance } = await import('./actions')
+    const { vi } = await import('vitest')
+    expect(upsizeAcceptChance({ name: 'Will Fitt', upsizeWiggle: 1.1 })).toBe(1)
+    const s = createRun(0)
+    s.money = 1e6
+    place(s, 'unit', 'small', 0, 0, 0)
+    const small = s.items.find(i => i.defId === 'small')!
+    s.prospects.push({ id: 990, name: 'Will Fitt', wants: 'locker', bid: 10, vip: false, arrivedAt: 0, upsizeWiggle: 1.1 })
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.999)
+    expect(offerUnit(s, 990, small.id)).toBeNull()
+    spy.mockRestore()
+  })
+  it('Moe Vinout signs a 1-point lease and never renews', async () => {
+    const { vi } = await import('vitest')
+    const s = createRun(0)
+    const [moe, other] = s.items
+    s.prospects.push({ id: 991, name: 'Moe Vinout', wants: 'locker', bid: 10, vip: false, arrivedAt: 0 })
+    s.prospects.push({ id: 992, name: 'Dillon A.', wants: 'locker', bid: 10, vip: false, arrivedAt: 0 })
+    offerUnit(s, 991, moe.id)
+    offerUnit(s, 992, other.id)
+    expect(moe.unit!.tenant!.leaseLeft).toBe(1)
+    other.unit!.tenant!.leaseLeft = 1
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.02) // lease end rolls "renew"
+    step(s, 61)
+    spy.mockRestore()
+    expect(moe.unit!.status).toBe('dirty')
+    expect(other.unit!.status).toBe('occupied')
+  })
+})
+
 describe('prospect queue', () => {
   it('lines up to MAX_PROSPECTS when you have the open units', async () => {
     const { MAX_PROSPECTS } = await import('../data/tenants')

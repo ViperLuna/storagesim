@@ -229,7 +229,8 @@ export function upsizePrice(p: { bid: number; wants: string; upsizeWiggle?: numb
 }
 
 /** Chance they say yes to an upsize: good deals (low wiggle) are easy yeses, pricey ones get iffy. */
-export function upsizeAcceptChance(p: { upsizeWiggle?: number }): number {
+export function upsizeAcceptChance(p: { upsizeWiggle?: number; name?: string }): number {
+  if (p.name && T.PUN_QUIRKS[p.name]?.alwaysUpsizes) return 1
   const c = T.UPSIZE_ACCEPT_CHANCE - ((p.upsizeWiggle ?? 1) - 1) * T.UPSIZE_ACCEPT_PER_WIGGLE
   return Math.max(T.UPSIZE_ACCEPT_MIN, Math.min(T.UPSIZE_ACCEPT_MAX, c))
 }
@@ -277,7 +278,7 @@ export function offerUnit(state: GameState, prospectId: number, itemId: number):
   state.money += deposit
   u.status = 'occupied'
   u.progress = 0
-  u.tenant = { name: p.name, bid: price, deposit, vip: p.vip, leaseLeft: newLease(), anger: 0, complaintStage: 0 }
+  u.tenant = { name: p.name, bid: price, deposit, vip: p.vip, leaseLeft: T.PUN_QUIRKS[p.name]?.lease ?? newLease(), anger: 0, complaintStage: 0 }
   decline(state, prospectId)
   log(state, `✅ ${p.name} moved into ${it.label}${rank > wantRank ? ` (upsized at ${money(price)}/pt)` : ''}. Deposit +${money(deposit)}.`, { tone: 'good', focusId: it.id })
   return null

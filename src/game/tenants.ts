@@ -33,13 +33,15 @@ export function openUnits(state: GameState) {
 /** Room for another prospect? Everyone already waiting counts against the open units. */
 export const hasVacancy = (state: GameState) => openUnits(state).length > state.prospects.length
 
-export function makeProspect(state: GameState, forceVip = false): Prospect {
+export function makeProspect(state: GameState, forceVip = false, name = randomName(state)): Prospect {
   const unlocked = UNITS.filter(u => u.unlockRebirth <= state.rebirth)
   const open = openUnits(state)
+  const quirkWants = T.PUN_QUIRKS[name]?.wants
   // Mostly they want what you've got open (picked per unit, so common sizes come up more); sometimes anything.
-  const wants = open.length && Math.random() < T.AVAILABLE_SIZE_BIAS
-    ? pick(open).defId
-    : weighted(unlocked.map(u => [u.id, u.demand] as [string, number]))
+  const wants = quirkWants && unlocked.some(u => u.id === quirkWants) ? quirkWants
+    : open.length && Math.random() < T.AVAILABLE_SIZE_BIAS
+      ? pick(open).defId
+      : weighted(unlocked.map(u => [u.id, u.demand] as [string, number]))
   const list = unitDef(wants).listPrice
   // Average of two uniforms → most bids land near the middle of the range.
   const f = T.BID_MIN + (T.BID_MAX - T.BID_MIN) * ((Math.random() + Math.random()) / 2)
@@ -49,5 +51,5 @@ export function makeProspect(state: GameState, forceVip = false): Prospect {
   if (vip) bid = list * rand(T.VIP_BID_MIN, T.VIP_BID_MAX)
   bid = bid >= 20 ? Math.round(bid) : Math.round(bid * 100) / 100
   const upsizeWiggle = 1 + rand(-T.UPSIZE_WIGGLE, T.UPSIZE_WIGGLE)
-  return { id: state.nextId++, name: randomName(state), wants, bid, vip, arrivedAt: state.time, upsizeWiggle }
+  return { id: state.nextId++, name, wants, bid, vip, arrivedAt: state.time, upsizeWiggle }
 }
