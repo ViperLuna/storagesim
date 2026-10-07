@@ -181,6 +181,9 @@ the table is the "list price" baseline.
 - Spawn on a **random timer**. Slow with no advertising.
 - **Only when there's room:** open units (vacant or being cleaned) must outnumber people already
   waiting. Otherwise they come by, see you're full, and leave (Log only, no toast).
+- **Pun names** (~4%, `PUN_NAMES`) and a few live up to them (`PUN_QUIRKS`): **Moe Vinout** signs a
+  1-point lease and never renews, **Lotta Stuff** always wants an XL, **Les Space** always wants a Locker,
+  **Will Fitt** always takes an upsize.
 - **Line cap: 15 waiting** at once (`MAX_PROSPECTS`; was 5). Open units usually cap it first.
 - **~80% want a size you have open** (picked per open unit); the rest want something random.
 - Arrival shows a **toast** in a screen corner (click → opens Tenant menu).

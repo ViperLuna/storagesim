@@ -50,9 +50,10 @@ function abandon(state: GameState, item: Item, tenant: Tenant, midLease: boolean
 function endLease(state: GameState, item: Item, tenant: Tenant, s?: OfflineSummary) {
   const u = item.unit!
   if (s) s.leasesEnded++
-  const outcome = weighted<'renew' | 'vacate' | 'abandon'>([
+  let outcome = weighted<'renew' | 'vacate' | 'abandon'>([
     ['renew', T.LEASE_END.renew], ['vacate', T.LEASE_END.vacate], ['abandon', T.LEASE_END.abandon],
   ])
+  if (outcome === 'renew' && T.PUN_QUIRKS[tenant.name]?.neverRenews) outcome = 'vacate'
   if (outcome === 'renew') {
     tenant.leaseLeft = newLease()
     if (s) s.renewed++

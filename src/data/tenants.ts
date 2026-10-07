@@ -77,3 +77,22 @@ export const PUN_NAMES = [
   'Sal Vage', 'Ann Tique', 'Cole Lector', 'Lotta Stuff', 'Rusty Hinges', 'Dusty Shelves', 'Phil Upp',
 ]
 export const PUN_CHANCE = 0.04
+
+/** Pun-name tenants who live up to their name. */
+export interface PunQuirk {
+  /** Always wants this unit size. */
+  wants?: string
+  /** Lease length in points (normally LEASE_MIN–LEASE_MAX). */
+  lease?: number
+  /** Never renews: a lease end that would renew is a move-out instead. */
+  neverRenews?: boolean
+  /** Always says yes to an upsize. */
+  alwaysUpsizes?: boolean
+}
+
+export const PUN_QUIRKS: Record<string, PunQuirk> = {
+  'Moe Vinout': { lease: 1, neverRenews: true },
+  'Lotta Stuff': { wants: 'xl' },
+  'Les Space': { wants: 'locker' },
+  'Will Fitt': { alwaysUpsizes: true },
+}

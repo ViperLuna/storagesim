@@ -125,7 +125,8 @@ function BuildRow({ color, name, cost, money: cash, detail, onClick }: { color: 
 }
 
 /** Little hint so the wiggle is readable: good deals are easy yeses, pricey ones are iffy. */
-function dealHint(p: { upsizeWiggle?: number }): string {
+function dealHint(p: { upsizeWiggle?: number; name: string }): string {
+  if (A.upsizeAcceptChance(p) >= 1) return '👍'
   const w = p.upsizeWiggle ?? 1
   return w <= 0.96 ? '👍' : w >= 1.04 ? '🤔' : ''
 }
