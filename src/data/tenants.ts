@@ -71,5 +71,9 @@ export const FIRST_NAMES = [
 ]
 export const LAST_INITIALS = 'ABCDEFGHJKLMNOPRSTVWY'
 /** Rare pun tenants. */
-export const PUN_NAMES = ['Stu Rage', 'Box Anne', 'Hugh Haul', 'Pat Lock', 'Clara Tter', 'Lee Sing', 'Moe Vinout', 'Rennie Tall']
+export const PUN_NAMES = [
+  'Stu Rage', 'Box Anne', 'Hugh Haul', 'Pat Lock', 'Clara Tter', 'Lee Sing', 'Moe Vinout', 'Rennie Tall',
+  'Bubba Wrap', 'Ty Downs', 'Dee Clutter', 'Les Space', 'Will Fitt', 'Carrie Moore', 'Ken Tainer',
+  'Sal Vage', 'Ann Tique', 'Cole Lector', 'Lotta Stuff', 'Rusty Hinges', 'Dusty Shelves', 'Phil Upp',
+]
 export const PUN_CHANCE = 0.04
