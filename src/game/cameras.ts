@@ -140,6 +140,20 @@ export function doorWatched(state: GameState, it: Item): boolean {
   return isWatched(state, dx, dy)
 }
 
+/** Is the tile outside the door in any camera's view, recording or not? */
+export function doorCovered(state: GameState, it: Item): boolean {
+  const [dx, dy] = doorOutside(it.x, it.y, baseSize(it.kind, it.defId), it.rot)
+  return state.cameras.some(c => covers(c, cameraDef(c.defId), dx, dy))
+}
+
+/** Why a camera covering a door didn't catch anyone. */
+function whyNobodyWatching(state: GameState): string {
+  const b = securityBlocker(state)
+  if (b) return b.charAt(0).toLowerCase() + b.slice(1)
+  if (state.tripped) return 'the power was out'
+  return 'the camera was switched off'
+}
+
 function neighbors(state: GameState, it: Item): Item[] {
   const fp = itemSize(it)
   return state.items.filter(o => {
@@ -174,7 +188,10 @@ export function burglary(state: GameState, target?: Item): void {
   }
   state.rating = Math.max(0, state.rating - C.RATING_BURGLARY_HIT)
   const victim = it.unit!.tenant!.name
-  log(state, `🚨 Break-in at ${it.label}! ${victim}'s stuff got hit.`, { tone: 'bad', focusId: it.id, toast: true })
+  const why = doorCovered(state, it)
+    ? `A camera covers that door, but nobody was watching (${whyNobodyWatching(state)}).`
+    : 'No camera covers that door.'
+  log(state, `🚨 Break-in at ${it.label}! ${victim}'s stuff got hit. ${why}`, { tone: 'bad', focusId: it.id, toast: true })
   const near = neighbors(state, it)
   if (Math.random() < C.BURGLARY_VICTIM_LEAVES) moveOut(state, it, 'got robbed and moved out of')
   for (const n of near) if (Math.random() < C.BURGLARY_NEIGHBOR_LEAVES) moveOut(state, n, 'got spooked by the break-in and moved out of')
