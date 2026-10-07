@@ -479,6 +479,28 @@ describe('cameras & burglaries', () => {
     burglary(s, far)
     expect(s.rating).toBeLessThan(3.1)
   })
+  it('break-in message says whether the door was covered and why nobody saw it', async () => {
+    const { placeCamera, burglary, toggleCamera } = await import('./cameras')
+    const { fire } = await import('./actions')
+    const s = secured()
+    const a = s.items.find(i => i.defId === 'locker')!
+    const occupy = () => { a.unit!.status = 'occupied'; a.unit!.tenant = { name: 'T', bid: 10, deposit: 10, vip: false, leaseLeft: 5, anger: 0, complaintStage: 0 } }
+    const { vi } = await import('vitest')
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.99) // nobody moves out
+    const last = () => s.log[s.log.length - 1].text
+    occupy()
+    burglary(s, a)
+    expect(last()).toMatch(/No camera covers that door\./)
+    placeCamera(s, 'cam-basic', a.x, a.y, 2)
+    toggleCamera(s, s.cameras[0].id)
+    burglary(s, a)
+    expect(last()).toMatch(/nobody was watching \(the camera was switched off\)/)
+    toggleCamera(s, s.cameras[0].id)
+    fire(s, s.staff.find(x => x.role === 'security')!.id)
+    burglary(s, a)
+    expect(last()).toMatch(/nobody was watching \(no Security guard hired\)/)
+    spy.mockRestore()
+  })
   it('cameras do nothing without a Security guard', async () => {
     const { placeCamera, doorWatched } = await import('./cameras')
     const s = secured()
