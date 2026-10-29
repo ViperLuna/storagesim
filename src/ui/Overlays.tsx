@@ -271,7 +271,9 @@ export function TitleScreen() {
   const cont = useStore(s => s.continueGame)
   return (
     <div className="title-screen">
-      <h1>StorageSim</h1>
+      <h1 className="title-art">
+        <img src={`${import.meta.env.BASE_URL}title.webp`} width={1536} height={885} alt="StorageSim, developed by ViperBot" />
+      </h1>
       <p className="muted">Build a self-storage empire.</p>
       <div className="title-buttons">
         {hasSave && <button className="big good" onClick={() => { unlockAudio(); cont() }}>▶ Continue</button>}
