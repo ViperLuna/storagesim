@@ -283,7 +283,7 @@ export function TitleScreen() {
           newGame()
         }}>✨ New Game</button>
       </div>
-      <p className="muted small">Alpha v0.1 · colored boxes until the real art shows up</p>
+      <p className="muted small">Alpha v0.1</p>
     </div>
   )
 }
