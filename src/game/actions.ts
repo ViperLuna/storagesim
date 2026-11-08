@@ -12,6 +12,7 @@ import { UNITS } from '../data/units'
 import { newLease } from './sim'
 import { STAFF, UPGRADES } from '../data/staff'
 import { EXTRA_GENERATOR_COST_MULT } from '../data/power'
+import { OFFICES, officeRank } from '../data/office'
 import { LOAN_GRACE, LOAN_INSTALLMENTS, LOAN_INTEREST, loanAmountFor } from '../data/bank'
 import { homeTile, office, officeSlots } from './staff'
 import { camerasOn, carryCameras, sellCamerasOn } from './cameras'
@@ -88,6 +89,12 @@ export function replace(state: GameState, id: number, newDefId: string, x: numbe
   if (!it) return 'Missing item'
   const cost = replaceCost(state, it, newDefId)
   if (state.money < cost) return 'Not enough money'
+  if (it.kind === 'office') {
+    const slots = OFFICES.find(o => o.id === newDefId)!.slots
+    if (state.staff.length > slots) return `The ${defName('office', newDefId)} only has ${slots} desk${slots > 1 ? 's' : ''}. Let someone go first.`
+    const stuck = state.staff.map(s => STAFF.find(d => d.id === s.role)).find(d => d?.needsOffice && officeRank(newDefId) < officeRank(d.needsOffice))
+    if (stuck) return `Your ${stuck.name} needs the ${defName('office', stuck.needsOffice!)} or bigger.`
+  }
   if (!canPlace(state, it.kind, newDefId, x, y, rot, [id])) return "Doesn't fit there"
   state.money -= cost
   it.defId = newDefId; it.x = x; it.y = y; it.rot = rot
@@ -312,7 +319,7 @@ export function hire(state: GameState, role: string): Result {
   if (!def) return 'Unknown role'
   const o = office(state)
   if (!o) return 'Build an office first'
-  if (def.needsOffice && o.defId !== def.needsOffice) return `Needs the ${defName('office', def.needsOffice)}`
+  if (def.needsOffice && officeRank(o.defId) < officeRank(def.needsOffice)) return `Needs the ${defName('office', def.needsOffice)} (or bigger)`
   if (state.staff.length >= officeSlots(state)) return 'No free office slots'
   if (state.staff.filter(s => s.role === role).length >= def.max) return `Max ${def.max} ${def.name.toLowerCase()} for now`
   if (state.money < def.hireCost) return 'Not enough money'

@@ -158,7 +158,7 @@ export const useStore = create<Store>((set, get) => ({
     let summary: OfflineSummary | null = null
     if (away > 30 && !g.levelOver) {
       summary = catchUp(g, away)
-      if (summary.rent === 0 && summary.leasesEnded === 0 && summary.ragequit === 0 && summary.auctions === 0) summary = null
+      if (summary.rent === 0 && summary.leasesEnded === 0 && summary.ragequit === 0 && summary.auctions === 0 && summary.leased === 0 && summary.turnedAway === 0) summary = null
     }
     writeSave(g)
     set({ screen: 'game', game: g, lastToastLogId: maxLogId(g), toasts: [], summary, menu: null, placing: null, selectedId: null, fitRequest: get().fitRequest + 1 })

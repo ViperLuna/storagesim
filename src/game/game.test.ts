@@ -327,6 +327,104 @@ describe('names', () => {
   })
 })
 
+describe('Leasing Agent & Manager', () => {
+  /** Rebirth 15 lot with Headquarters, power, and the given staff hired. Starts with 3 vacant lockers. */
+  const staffed = (...roles: string[]) => {
+    const s = createRun(15)
+    s.money = 1e8
+    place(s, 'generator', 'gen-4', 0, 0, 0)
+    expect(place(s, 'office', 'office-hq', 3, 0, 0)).toBeNull()
+    for (const r of roles) expect(hire(s, r)).toBeNull()
+    return s
+  }
+  const prospect = (id: number, wants: string, bid: number, arrivedAt = 0) => ({ id, name: `P${id}`, wants, bid, vip: false, arrivedAt })
+
+  it('needs the right office: Main Office for the agent, Headquarters for the manager', () => {
+    const s = createRun(15)
+    s.money = 1e8
+    place(s, 'generator', 'gen-4', 0, 0, 0)
+    place(s, 'office', 'office-security', 3, 0, 0)
+    expect(hire(s, 'leasing')).toMatch(/Main Office/)
+    expect(hire(s, 'manager')).toMatch(/Headquarters/)
+  })
+
+  it('Security still works out of a bigger office', async () => {
+    const { securityBlocker } = await import('./cameras')
+    const s = staffed('security')
+    expect(securityBlocker(s)).toBeNull()
+  })
+
+  it('leases anyone at or over your minimum, turns away anyone under it, after a short delay', () => {
+    const s = staffed('leasing')
+    s.leasing = { minPct: { locker: 90 }, allowUpsize: false } // Locker list $10 -> $9 minimum
+    s.prospects.push(prospect(1, 'locker', 9, s.time), prospect(2, 'locker', 8.5, s.time))
+    step(s, 1)
+    expect(s.prospects).toHaveLength(2) // still within the 3 s delay
+    step(s, 3)
+    expect(s.prospects.map(p => p.id)).toEqual([])
+    expect(s.items.filter(i => i.unit?.tenant?.name === 'P1')).toHaveLength(1)
+    expect(s.items.some(i => i.unit?.tenant?.name === 'P2')).toBe(false)
+    expect(s.log.some(e => /turned away P2/.test(e.text))).toBe(true)
+  })
+
+  it('a qualifying prospect with no open unit waits; upsizes only when you allow them', async () => {
+    const { vi } = await import('vitest')
+    const s = staffed('leasing')
+    for (const it of s.items.filter(i => i.defId === 'locker')) { it.unit!.status = 'occupied'; it.unit!.tenant = { name: 'T', bid: 10, deposit: 10, vip: false, leaseLeft: 99, anger: 0, complaintStage: 0 } }
+    expect(place(s, 'unit', 'small', 20, 20, 0)).toBeNull()
+    s.prospects.push(prospect(1, 'locker', 10))
+    step(s, 4)
+    expect(s.prospects).toHaveLength(1) // waiting: no Locker open, upsizing off
+    const { setLeasingUpsize } = await import('./management')
+    setLeasingUpsize(s, true)
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.01) // says yes
+    step(s, 1)
+    spy.mockRestore()
+    expect(s.items.find(i => i.defId === 'small')!.unit!.tenant?.name).toBe('P1')
+  })
+
+  it('prospects show up while you are away only if a Leasing Agent is on the job', () => {
+    const without = createRun(0)
+    catchUp(without, 3600)
+    expect(without.log.some(e => /wants/.test(e.text))).toBe(false)
+    const s = staffed('leasing')
+    s.leasing = { minPct: {}, allowUpsize: false }
+    const sum = catchUp(s, 3600)
+    expect(sum.leased + sum.turnedAway).toBeGreaterThan(0)
+  })
+
+  it('the Manager collects rent and sells abandoned units when told to', () => {
+    const s = staffed('manager')
+    const [a, b] = s.items.filter(i => i.defId === 'locker')
+    a.unit!.pending = 120
+    b.unit!.status = 'abandoned'; b.unit!.abandonOffer = 40
+    const before = s.money
+    step(s, 0.1)
+    expect(a.unit!.pending).toBe(0)
+    expect(b.unit!.status).toBe('abandoned') // "leave it for me" by default
+    s.manager = { abandoned: 'sale' }
+    step(s, 0.1)
+    expect(b.unit!.status).toBe('vacant')
+    expect(s.money).toBeCloseTo(before + 120 + 40)
+  })
+
+  it("can't swap to an office too small for your staff", async () => {
+    const { replace } = await import('./actions')
+    const s = staffed('janitor', 'security', 'leasing')
+    const hq = s.items.find(i => i.kind === 'office')!
+    expect(replace(s, hq.id, 'office-small', 3, 0, 0)).toMatch(/only has 1 desk/)
+    expect(replace(s, hq.id, 'office-security', 3, 0, 0)).toMatch(/only has 2 desks/)
+  })
+
+  it('while away, desk staff are paid only for a payday they did some work', () => {
+    const s = staffed('manager')
+    for (let i = 0; i < 300; i++) step(s, 1) // finish the payday you were playing in
+    const before = s.money
+    catchUp(s, 300) // nothing to collect, nothing abandoned
+    expect(s.money).toBe(before)
+  })
+})
+
 describe('pun-name quirks', () => {
   it('Lotta Stuff wants an XL and Les Space wants a Locker, whatever is open', async () => {
     const { makeProspect } = await import('./tenants')

@@ -28,7 +28,7 @@ burglaries from rebirth 5 while playing only (~every 10 min): caught if the tile
 watched (+0.1★), otherwise a break-in (−0.4★, victim 50% moves out, neighbors 20% each). Selling an
 office no longer fires staff — they wait unpaid for a new office.
 
-**Not yet:** Leasing Agent, Manager, most sounds (only doorbell, power down/up, cha-ching so far), real art.
+**Not yet:** most sounds (only doorbell, power down/up, cha-ching so far), real art.
 
 **Implementation note:** the free power hookup is currently **5 power** (= 5 lockers' worth), not
 "5 units of any size". It's `FREE_POWER` in `src/data/power.ts`.
@@ -364,14 +364,17 @@ When a unit is abandoned, you're offered a choice:
 - **Offline rating safety:** your rating **never drops while you're away** (it can still climb if
   everything runs clean), and zero-rating strikes can't happen. You can never lose the level in your sleep.
 - Each employee takes an **office slot**.
-- **Leasing Agent** — auto-handles prospects using **player-set rules**:
-  - **Minimum bid** (as % of list price, possibly per unit size). Can be set anywhere —
-    lenient ("as long as they pay") or so strict that *nobody* ever qualifies. The player
-    has to learn what works.
-  - **Allow upsizing** yes/no.
-  - Prospects that fail the rules are declined (or left for the player — TBD).
-  - Works offline too: with a Janitor, vacated units get cleaned and re-rented while you're away.
-- **Manager** — the "run the place while I'm gone" hire. Comes last.
+- **Leasing Agent** ✅ (rebirth 10, needs the Main Office; hire $25K, $5K/payday) — auto-handles prospects
+  using **player-set rules** (Staff menu):
+  - **Minimum bid** as % of list price, **per unit size** (0–150%, default 90%). Lenient ("as long as
+    they pay") or so strict that *nobody* qualifies. The player has to learn what works.
+  - **Allow upsizing** yes/no (default no). Upsize offers can still be refused.
+  - Gets to each prospect after ~3 s (so you see them arrive), best bids first.
+  - Prospects under the minimum are **declined**. Ones that pass but have no open unit **wait**.
+  - Works offline too, and **prospects keep arriving while you're away once he's hired** (without him,
+    nobody shows up offline). With a Janitor, vacated units get cleaned and re-rented while you're away.
+- **Manager** ✅ (rebirth 15, needs Headquarters; hire $100K, $10K/payday) — the "run the place while
+  I'm gone" hire. Comes last.
   - **Auto-collects rent.**
   - **Handles abandoned units** using a player setting:
     - *Always fixed sale* — quick, safe cash; unit back in play fast.
@@ -381,7 +384,13 @@ When a unit is abandoned, you're offered a choice:
 - **Unlock order (locked):** **Janitor → Security → Leasing Agent → Manager**.
   - Security arrives with the ~5th rebirth (3×3 office, cameras, burglaries).
   - Security is a staff member watching the monitors → 3×3 office needs **2 slots** (Janitor + Security).
-  - **Leasing Agent at rebirth 10** (with the next office). **Manager at rebirth 15 or 20** (playtest).
+  - **Leasing Agent at rebirth 10** (Main Office). **Manager at rebirth 15** (Headquarters).
+- **Offices, one per hire:** Office 2×2 (1 slot) → Security Office 3×3 (2, rebirth 5) → **Main Office 4×4
+  (3 slots, $250K, rebirth 10)** → **Headquarters 5×5 (4 slots, $1M, rebirth 15)**. A bigger office does
+  everything a smaller one does (cameras record from any of the last three). You can't swap to an office
+  too small for your staff.
+- Desk staff (Leasing Agent, Manager) are paid like the Janitor while you're away: full wage for any
+  payday they did some work, nothing if idle.
 - **Janitor** — auto-cleans vacated units (so they're ready to rent again).
   - Shown as a **dot that walks the pathways** (empty tiles) from the office door to the
     dirty unit's door, cleans it, then heads to the next job or back to the office.
@@ -458,8 +467,8 @@ Rebirths unlock new stuff, not just a bigger grid.
 |---|---|
 | Start | Begins with ~3 cheap units. Buildable: storage units, **small sign**, 2×2 office + Janitor |
 | 5th (17×17) | **Burglaries** begin; **cameras** unlocked; **3×3 office** + Security staff |
-| 10th (27×27) | **Next office size** + **Leasing Agent** (size/slots TBD) |
-| 15th or 20th | **Manager** (decide in playtesting) |
+| 10th (27×27) | **Main Office** (4×4, 3 slots) + **Leasing Agent** |
+| 15th (37×37) | **Headquarters** (5×5, 4 slots) + **Manager** |
 | Later | TBD |
 
 ## Title screen
@@ -506,7 +515,6 @@ More to come as RT continues.
 - Other complaint types (dirty units, break-ins → cameras/fences).
 - Non-grid advertising (newspaper/radio/online) as prestige unlocks.
 - Burglaries: frequency, consequences, guard vs cameras.
-- **Leasing Agent / Manager** unlock timing (which rebirth) and office slots for them.
 - Tenant bid distribution (e.g. ~50%–130% of list price; VIPs higher).
 
 ## ❓ Open questions

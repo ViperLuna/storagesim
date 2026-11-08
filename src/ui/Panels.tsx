@@ -16,7 +16,9 @@ import { OFFICES } from '../data/office'
 import { CAMERAS, BURGLARY_UNLOCK_REBIRTH } from '../data/cameras'
 import { startCameraPlacing } from './camPlacing'
 import { securityBlocker, activeCameraCount } from '../game/cameras'
-import { STAFF, UPGRADES } from '../data/staff'
+import { STAFF, UPGRADES, LEASING_MIN_PCT_MAX, type AbandonedPolicy } from '../data/staff'
+import { leasingAgentWorking, leasingRules, managerRules, minBid, setAbandonedPolicy, setLeasingMinPct, setLeasingUpsize } from '../game/management'
+import { officeRank } from '../data/office'
 import { LOG_CATS, categorize, type LogCat } from './logFilter'
 import { LOAN_GRACE, LOAN_INSTALLMENTS, LOAN_INTEREST, loanAmountFor } from '../data/bank'
 import { FAIL_STRIKES, RATING_GAIN_PER_TICK, RATING_LOSS_PER_ISSUE, RATING_MAX, TICK_SECONDS } from '../data/economy'
@@ -169,6 +171,7 @@ function TenantsMenu() {
   return (
     <>
       <h3>Waiting ({g.prospects.length})</h3>
+      {leasingAgentWorking(g) && <p className="small muted">🧑‍💼 Your Leasing Agent is working the line by your rules (Staff menu).</p>}
       {g.prospects.length === 0 && <p className="muted small">{emptyWaitingHint(g)}</p>}
       {canAcceptAll >= 2 && (
         <ArmedActions key={`all@${canAcceptAll}`}>
@@ -226,6 +229,54 @@ function TenantsMenu() {
 const STAFF_BLURB: Record<string, string> = {
   janitor: 'Walks the paths and cleans units after tenants move out. Nearest job first.',
   security: 'Watches the monitors in the Security Office. Cameras only record while a guard is on duty. Paid only while there are cameras to watch.',
+  leasing: 'Works the waiting line by your rules: leases anyone who meets your minimum bid, turns away anyone who doesn\'t. Keeps leasing while you\'re away, and people keep showing up for him.',
+  manager: 'Collects rent from every unit as it comes in, and deals with abandoned units the way you tell him. Works while you\'re away too.',
+}
+
+const ABANDONED_CHOICES: { id: AbandonedPolicy; label: string }[] = [
+  { id: 'manual', label: 'Leave it for me' },
+  { id: 'sale', label: 'Always fixed sale' },
+  { id: 'auction', label: 'Always auction' },
+]
+
+/** Leasing Agent rules: minimum bid per unit size, and whether to offer upsizes. */
+function LeasingRules() {
+  const g = useStore(s => s.game)!
+  const mutate = useStore(s => s.mutate)
+  const rules = leasingRules(g)
+  return (
+    <div className="rules">
+      <div className="small muted">Minimum bid, as % of list price. Anyone under it gets turned away.</div>
+      {UNITS.filter(u => u.unlockRebirth <= g.rebirth).map(u => (
+        <label key={u.id} className="row rule-row">
+          <span className="rule-name">{u.name}</span>
+          <input id={`lease-min-${u.id}`} type="range" min={0} max={LEASING_MIN_PCT_MAX} step={5} value={rules.minPct[u.id]}
+            onChange={e => mutate(s => setLeasingMinPct(s, u.id, Number(e.target.value)))} />
+          <span className="small rule-val">{rules.minPct[u.id]}% · {money(minBid(g, u.id) >= 20 ? Math.round(minBid(g, u.id)) : minBid(g, u.id))}+</span>
+        </label>
+      ))}
+      <label className="row rule-check">
+        <input id="lease-upsize" type="checkbox" checked={rules.allowUpsize} onChange={e => mutate(s => setLeasingUpsize(s, e.target.checked))} />
+        <span className="small">Offer a bigger unit when their size is full (they might say no)</span>
+      </label>
+    </div>
+  )
+}
+
+function ManagerRules() {
+  const g = useStore(s => s.game)!
+  const mutate = useStore(s => s.mutate)
+  const policy = managerRules(g).abandoned
+  return (
+    <div className="rules">
+      <div className="small muted">Abandoned units:</div>
+      <div className="chips">
+        {ABANDONED_CHOICES.map(c => (
+          <button key={c.id} className={`chip ${policy === c.id ? 'on' : ''}`} onClick={() => mutate(s => setAbandonedPolicy(s, c.id))}>{c.label}</button>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 function StaffMenu() {
@@ -245,7 +296,7 @@ function StaffMenu() {
       <h3>Hire</h3>
       {STAFF.filter(d => d.unlockRebirth <= g.rebirth).map(d => {
         const count = g.staff.filter(x => x.role === d.id).length
-        const err = !o ? 'Needs an office' : d.needsOffice && o.defId !== d.needsOffice ? `Needs the ${OFFICES.find(x => x.id === d.needsOffice)!.name}` : g.staff.length >= slots ? 'No free office slot' : count >= d.max ? `Max ${d.max} for now` : g.money < d.hireCost ? 'Not enough money' : null
+        const err = !o ? 'Needs an office' : d.needsOffice && officeRank(o.defId) < officeRank(d.needsOffice) ? `Needs the ${OFFICES.find(x => x.id === d.needsOffice)!.name} or bigger` : g.staff.length >= slots ? 'No free office slot' : count >= d.max ? `Max ${d.max} for now` : g.money < d.hireCost ? 'Not enough money' : null
         return (
           <div key={d.id} className="card">
             <div className="row"><strong>{d.icon} {d.name}</strong><span className="small muted">{money(d.wage)} / payroll</span></div>
@@ -267,10 +318,14 @@ function StaffMenu() {
         const secBlock = st.role === 'security' ? securityBlocker(g) : null
         const doing = blocker ? `idle — ${blocker.toLowerCase()}`
           : st.role === 'security' ? (secBlock ? `idle — ${secBlock.toLowerCase()}` : activeCameraCount(g) ? `watching ${activeCameraCount(g)} camera${activeCameraCount(g) > 1 ? 's' : ''}` : 'idle — no cameras to watch')
+          : st.role === 'leasing' ? 'working the waiting line'
+          : st.role === 'manager' ? 'collecting rent'
           : st.mode === 'idle' ? 'in the office' : st.mode === 'toJob' ? 'heading to a job' : st.mode === 'cleaning' ? 'cleaning' : 'walking back'
         return (
           <div key={st.id} className="card">
             <div className="row"><strong>{d.icon} {d.name}</strong><span className="small muted">{doing}</span></div>
+            {st.role === 'leasing' && <LeasingRules />}
+            {st.role === 'manager' && <ManagerRules />}
             <div className="actions">
               {st.targetId && <button onClick={() => useStore.getState().focusItem(st.targetId!)}>📍 Show job</button>}
               <button className="bad" onClick={() => { if (confirm(`Fire the ${d.name}?`)) mutate(s => A.fire(s, st.id)) }}>Fire</button>
@@ -278,7 +333,7 @@ function StaffMenu() {
           </div>
         )
       })}
-      {wages > 0 && <p className="small">Payroll: <b>{money(wages)}</b> every {duration(TICK_SECONDS)} while you're playing. While you're away, the janitor's paid only if he cleaned something, and security isn't paid. So far this period: <b>{money(owed)}</b> (payday in {duration(g.tickIn)}).</p>}
+      {wages > 0 && <p className="small">Payroll: <b>{money(wages)}</b> every {duration(TICK_SECONDS)} while you're playing. While you're away, staff are paid only for a payday they did some work (security isn't paid then). So far this period: <b>{money(owed)}</b> (payday in {duration(g.tickIn)}).</p>}
       <h3>Upgrades</h3>
       <p className="small muted">Walk speed {janitorSpeed(g).toFixed(1)} tiles/s · cleans in {Math.round(janitorCleanFactor(g) * 100)}% of your time</p>
       {UPGRADES.map(u => {
