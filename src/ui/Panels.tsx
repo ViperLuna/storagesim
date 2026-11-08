@@ -248,12 +248,16 @@ function LeasingRules() {
     <div className="rules">
       <div className="small muted">Minimum bid, as % of list price. Anyone under it gets turned away.</div>
       {UNITS.filter(u => u.unlockRebirth <= g.rebirth).map(u => (
-        <label key={u.id} className="row rule-row">
-          <span className="rule-name">{u.name}</span>
+        <div key={u.id} className="row rule-row">
+          <label className="rule-name" htmlFor={`lease-min-${u.id}`}>{u.name}</label>
+          <button className="rule-step" aria-label={`Lower the ${u.name} minimum by 5%`} disabled={rules.minPct[u.id] <= 0}
+            onClick={() => mutate(s => setLeasingMinPct(s, u.id, rules.minPct[u.id] - 5))}>−</button>
           <input id={`lease-min-${u.id}`} type="range" min={0} max={LEASING_MIN_PCT_MAX} step={5} value={rules.minPct[u.id]}
             onChange={e => mutate(s => setLeasingMinPct(s, u.id, Number(e.target.value)))} />
+          <button className="rule-step" aria-label={`Raise the ${u.name} minimum by 5%`} disabled={rules.minPct[u.id] >= LEASING_MIN_PCT_MAX}
+            onClick={() => mutate(s => setLeasingMinPct(s, u.id, rules.minPct[u.id] + 5))}>+</button>
           <span className="small rule-val">{rules.minPct[u.id]}% · {money(minBid(g, u.id) >= 20 ? Math.round(minBid(g, u.id)) : minBid(g, u.id))}+</span>
-        </label>
+        </div>
       ))}
       <label className="row rule-check">
         <input id="lease-upsize" type="checkbox" checked={rules.allowUpsize} onChange={e => mutate(s => setLeasingUpsize(s, e.target.checked))} />
