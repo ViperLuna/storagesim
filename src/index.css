@@ -300,8 +300,9 @@ button.bad.armed { background: var(--bad); color: #fff; border-color: var(--bad)
 .accept-all { flex: 1; }
 
 .rules { display: grid; gap: 6px; margin: 6px 0; }
-.rule-row { justify-content: flex-start; gap: 8px; }
-.rule-row input[type=range] { flex: 1; min-width: 0; }
+.rule-row { justify-content: flex-start; gap: 6px; }
+.rule-step { flex: none; width: 28px; height: 28px; padding: 0; font-size: 1rem; line-height: 1; }
+.rule-row input[type=range] { flex: 1 1 0; width: 0; min-width: 32px; }
 .rule-name { flex: none; width: 4.2em; }
 .rule-val { flex: none; min-width: 7em; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .rule-check { justify-content: flex-start; }
