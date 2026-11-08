@@ -302,6 +302,6 @@ button.bad.armed { background: var(--bad); color: #fff; border-color: var(--bad)
 .rules { display: grid; gap: 6px; margin: 6px 0; }
 .rule-row { justify-content: flex-start; gap: 8px; }
 .rule-row input[type=range] { flex: 1; min-width: 0; }
-.rule-name { width: 4.5em; }
-.rule-val { width: 8.5em; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.rule-name { flex: none; width: 4.2em; }
+.rule-val { flex: none; min-width: 7em; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .rule-check { justify-content: flex-start; }
