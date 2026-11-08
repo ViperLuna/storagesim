@@ -17,4 +17,11 @@ export const OFFICES: OfficeDef[] = [
   { id: 'office-small', name: 'Office', w: 2, h: 2, cost: 1500, power: 5, slots: 1, color: '#c9ccd4', unlockRebirth: 0 },
   // Security office (monitors & computers) — arrives with cameras.
   { id: 'office-security', name: 'Security Office', w: 3, h: 3, cost: 60000, power: 9, slots: 2, color: '#b3b8c4', unlockRebirth: 5 },
+  // Room for a Leasing Agent's desk. Still has the security monitors.
+  { id: 'office-main', name: 'Main Office', w: 4, h: 4, cost: 250000, power: 16, slots: 3, color: '#a9afbc', unlockRebirth: 10 },
+  // The Manager's corner office. Everything the smaller offices do, plus one more desk.
+  { id: 'office-hq', name: 'Headquarters', w: 5, h: 5, cost: 1000000, power: 25, slots: 4, color: '#9ea5b3', unlockRebirth: 15 },
 ]
+
+/** Offices are ranked by catalog order: a bigger office does everything a smaller one does. */
+export const officeRank = (id: string) => OFFICES.findIndex(o => o.id === id)

@@ -297,7 +297,10 @@ export function OfflineSummaryModal() {
       <div className="modal">
         <h2>💤 While you were away ({duration(s.seconds)})</h2>
         <ul>
-          <li>💰 {money(s.rent)} in rent piled up on your units — go click it!</li>
+          {s.collected > 0
+            ? <li>💰 {money(s.rent)} in rent came in. Your Manager collected {money(s.collected)} of it.</li>
+            : <li>💰 {money(s.rent)} in rent piled up on your units — go click it!</li>}
+          {(s.leased > 0 || s.turnedAway > 0) && <li>🧑‍💼 Your Leasing Agent moved in {s.leased} tenant{s.leased === 1 ? '' : 's'} and turned away {s.turnedAway}</li>}
           {s.leasesEnded > 0 && <li>🧍 {s.leasesEnded} lease{s.leasesEnded > 1 ? 's' : ''} ended — {s.renewed} renewed, {s.vacated} moved out</li>}
           {s.abandoned > 0 && <li>🏚️ {s.abandoned} unit{s.abandoned > 1 ? 's' : ''} abandoned</li>}
           {s.ragequit > 0 && <li>😡 {s.ragequit} tenant{s.ragequit > 1 ? 's' : ''} left because they couldn't reach their unit</li>}

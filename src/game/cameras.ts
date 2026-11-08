@@ -1,4 +1,5 @@
 // Cameras & burglaries.
+import { officeRank } from '../data/office'
 import type { Camera, GameState, Item } from './types'
 import { CAMERAS, CAMERA_DIRS, type CameraDef } from '../data/cameras'
 import * as C from '../data/cameras'
@@ -41,7 +42,7 @@ export function covers(cam: Pick<Camera, 'x' | 'y' | 'dir'>, def: CameraDef, tx:
 /** Cameras need the Security Office, a Security guard on duty, and the office running. */
 export function securityBlocker(state: GameState): string | null {
   const o = office(state)
-  if (!o || o.defId !== 'office-security') return 'Needs the Security Office'
+  if (!o || officeRank(o.defId) < officeRank('office-security')) return 'Needs the Security Office (or bigger)'
   const b = staffBlocker(state)
   if (b) return b
   if (!state.staff.some(s => s.role === 'security')) return 'No Security guard hired'

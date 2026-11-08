@@ -76,6 +76,10 @@ export interface OfflineSummary {
   abandoned: number
   ragequit: number
   auctions: number
+  /** Leasing Agent: moved in / turned away. Manager: rent collected. */
+  leased: number
+  turnedAway: number
+  collected: number
 }
 
 export interface Staff {
@@ -133,6 +137,10 @@ export interface GameState {
   heldId?: number
   levelOver?: 'rating' | 'bankrupt'
   staff: Staff[]
+  /** Leasing Agent's rules (defaults until you change them). */
+  leasing?: { minPct: Record<string, number>; allowUpsize: boolean }
+  /** Manager's settings. */
+  manager?: { abandoned: 'manual' | 'sale' | 'auction' }
   upgrades: Record<string, number>
   loan?: Loan
   bankruptStrikes: number

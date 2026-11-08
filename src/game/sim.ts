@@ -13,6 +13,7 @@ import { aOrAn, money } from './format'
 import { payrollOwed, resetWorked, stepStaff } from './staff'
 import { startNextClean } from './actions'
 import { stepBurglaries } from './cameras'
+import { leasingAgentWorking, stepManagement } from './management'
 
 export interface StepOptions {
   offline?: boolean
@@ -222,17 +223,18 @@ export function step(state: GameState, dt: number, opts: StepOptions = {}): void
   stepStaff(state, dt, !!opts.offline)
   stepBurglaries(state, dt, !!opts.offline)
 
-  // Prospects: nobody's at the desk while you're offline, so no new arrivals then.
+  // Prospects: while you're away nobody's at the desk, so nobody new shows up, unless a Leasing Agent is.
   const before = state.prospects.length
   state.prospects = state.prospects.filter(p => state.time - p.arrivedAt < T.PROSPECT_PATIENCE)
   if (state.prospects.length < before && !opts.offline) log(state, `🚶 A prospect got tired of waiting and left.`)
-  if (!opts.offline) {
+  if (!opts.offline || leasingAgentWorking(state)) {
     state.nextProspectIn -= dt * spawnRate(state)
     if (state.nextProspectIn <= 0) {
       state.nextProspectIn = expWait(T.BASE_SPAWN_SECONDS)
       if (state.prospects.length < T.MAX_PROSPECTS) addProspect(state)
     }
   }
+  stepManagement(state, dt, opts.summary)
 
   state.tickIn -= dt
   while (state.tickIn <= 0 && !state.levelOver) {
@@ -292,7 +294,7 @@ function finishAuction(state: GameState, item: Item, s?: OfflineSummary) {
 }
 
 export function emptySummary(seconds: number): OfflineSummary {
-  return { seconds, rent: 0, leasesEnded: 0, renewed: 0, vacated: 0, abandoned: 0, ragequit: 0, auctions: 0 }
+  return { seconds, rent: 0, leasesEnded: 0, renewed: 0, vacated: 0, abandoned: 0, ragequit: 0, auctions: 0, leased: 0, turnedAway: 0, collected: 0 }
 }
 
 /** Simulate time away. Rent piles up on units; you still click to collect it. */
